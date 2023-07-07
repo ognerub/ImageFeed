@@ -18,18 +18,37 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="mJo-nK-gGC">
-                                <rect key="frame" x="16" y="59" width="361" height="759"/>
+                                <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                                 <color key="backgroundColor" name="YP Black"/>
                                 <color key="separatorColor" name="YP Black"/>
                                 <color key="sectionIndexBackgroundColor" name="YP Black"/>
                                 <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="ImageListCell" id="TJT-cd-v3d" customClass="ImagesListCell" customModule="ImageFeed" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="50" width="361" height="44"/>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="ImagesListCell" rowHeight="224" id="TJT-cd-v3d" customClass="ImagesListCell" customModule="ImageFeed" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="50" width="393" height="224"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="TJT-cd-v3d" id="X5d-TP-3rA">
-                                            <rect key="frame" x="0.0" y="0.0" width="361" height="44"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="393" height="224"/>
                                             <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="0" translatesAutoresizingMaskIntoConstraints="NO" id="88g-Xj-hRB" userLabel="Cell Image">
+                                                    <rect key="frame" x="16" y="0.0" width="361" height="224"/>
+                                                    <userDefinedRuntimeAttributes>
+                                                        <userDefinedRuntimeAttribute type="boolean" keyPath="layer.maskToBounds" value="YES"/>
+                                                        <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                                            <integer key="value" value="16"/>
+                                                        </userDefinedRuntimeAttribute>
+                                                    </userDefinedRuntimeAttributes>
+                                                </imageView>
+                                            </subviews>
+                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            <constraints>
+                                                <constraint firstAttribute="leading" secondItem="88g-Xj-hRB" secondAttribute="leading" constant="-16" id="Ey5-0g-JoY"/>
+                                                <constraint firstItem="88g-Xj-hRB" firstAttribute="trailing" secondItem="X5d-TP-3rA" secondAttribute="trailing" constant="-16" id="MxT-T3-FRQ"/>
+                                                <constraint firstItem="88g-Xj-hRB" firstAttribute="bottom" secondItem="X5d-TP-3rA" secondAttribute="bottom" id="e4b-9R-Unk"/>
+                                                <constraint firstAttribute="top" secondItem="88g-Xj-hRB" secondAttribute="top" id="nqX-jJ-Qdt"/>
+                                            </constraints>
                                         </tableViewCellContentView>
+                                        <color key="backgroundColor" name="YP Black"/>
                                     </tableViewCell>
                                 </prototypes>
                                 <connections>
@@ -41,10 +60,10 @@
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" name="YP Black"/>
                         <constraints>
-                            <constraint firstItem="mJo-nK-gGC" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="Cip-T7-rPZ"/>
-                            <constraint firstAttribute="bottom" secondItem="mJo-nK-gGC" secondAttribute="bottom" constant="34" id="T6X-jQ-CNC"/>
-                            <constraint firstAttribute="trailing" secondItem="mJo-nK-gGC" secondAttribute="trailing" constant="16" id="bNT-ed-sgN"/>
-                            <constraint firstItem="mJo-nK-gGC" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="topMargin" id="ikF-Hg-KR0"/>
+                            <constraint firstItem="mJo-nK-gGC" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="0P8-h5-jus"/>
+                            <constraint firstAttribute="bottom" secondItem="mJo-nK-gGC" secondAttribute="bottom" id="DAc-wa-MMd"/>
+                            <constraint firstAttribute="leading" secondItem="mJo-nK-gGC" secondAttribute="leading" id="W81-ak-okb"/>
+                            <constraint firstItem="mJo-nK-gGC" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailing" id="z9q-Za-Oux"/>
                         </constraints>
                     </view>
                     <connections>
@@ -53,10 +72,11 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="25" y="-34"/>
+            <point key="canvasLocation" x="23.664122137404579" y="-34.507042253521128"/>
         </scene>
     </scenes>
     <resources>
+        <image name="0" width="200" height="132"/>
         <namedColor name="YP Black">
             <color red="0.10199999809265137" green="0.10599999874830246" blue="0.13300000131130219" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
