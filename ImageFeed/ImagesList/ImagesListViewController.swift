@@ -12,13 +12,15 @@ class ImagesListViewController: UIViewController {
     
     @IBOutlet private var tableView: UITableView!
     
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-//        // connection of tableViw with it`s delegate and dataSource (now it`s MVC two in one) in code:
-//        tableView.delegate = self
-//        tableView.dataSource = self
-//        // custom cell registration:
-//        tableView.register(ImagesListCell.self, forCellReuseIdentifier: ImagesListCell.reuseIdentifier)
+        //        // connection of tableViw with it`s delegate and dataSource (now it`s MVC two in one) in code:
+        //        tableView.delegate = self
+        //        tableView.dataSource = self
+        //        // custom cell registration:
+        //        tableView.register(ImagesListCell.self, forCellReuseIdentifier: ImagesListCell.reuseIdentifier)
+        
     }
 }
 
