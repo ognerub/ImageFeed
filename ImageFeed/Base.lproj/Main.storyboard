@@ -80,6 +80,11 @@
                                             </constraints>
                                         </tableViewCellContentView>
                                         <color key="backgroundColor" name="YP Black"/>
+                                        <connections>
+                                            <outlet property="cellDateLabel" destination="QId-gL-huh" id="LAP-kA-pyv"/>
+                                            <outlet property="cellImage" destination="88g-Xj-hRB" id="Uta-68-Czz"/>
+                                            <outlet property="cellLikeButton" destination="AOW-Xz-HGP" id="UUU-Ft-hUM"/>
+                                        </connections>
                                     </tableViewCell>
                                 </prototypes>
                                 <connections>
