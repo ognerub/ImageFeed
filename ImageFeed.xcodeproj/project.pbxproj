@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		842BC8F52A66FB2600B09935 /* SingleImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 842BC8F42A66FB2600B09935 /* SingleImageViewController.swift */; };
 		8431A3512A5754370056E618 /* ImagesListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8431A3502A5754370056E618 /* ImagesListCell.swift */; };
 		8431A3542A58A80C0056E618 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8431A3532A58A80C0056E618 /* Assets.xcassets */; };
 		848282682A62EBF400B0C492 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 848282672A62EBF400B0C492 /* ProfileViewController.swift */; };
@@ -18,6 +19,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		842BC8F42A66FB2600B09935 /* SingleImageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleImageViewController.swift; sourceTree = "<group>"; };
 		8431A3502A5754370056E618 /* ImagesListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesListCell.swift; sourceTree = "<group>"; };
 		8431A3532A58A80C0056E618 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		848282672A62EBF400B0C492 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
@@ -50,14 +52,6 @@
 			path = ImagesList;
 			sourceTree = "<group>";
 		};
-		848282662A62EBC700B0C492 /* ProfileView */ = {
-			isa = PBXGroup;
-			children = (
-				848282672A62EBF400B0C492 /* ProfileViewController.swift */,
-			);
-			path = ProfileView;
-			sourceTree = "<group>";
-		};
 		84FB04262A507D170084F445 = {
 			isa = PBXGroup;
 			children = (
@@ -77,9 +71,10 @@
 		84FB04312A507D170084F445 /* ImageFeed */ = {
 			isa = PBXGroup;
 			children = (
-				848282662A62EBC700B0C492 /* ProfileView */,
 				84FB04322A507D170084F445 /* AppDelegate.swift */,
 				84FB04342A507D170084F445 /* SceneDelegate.swift */,
+				842BC8F42A66FB2600B09935 /* SingleImageViewController.swift */,
+				848282672A62EBF400B0C492 /* ProfileViewController.swift */,
 				8431A3522A5754640056E618 /* ImagesList */,
 				84FB04382A507D170084F445 /* Main.storyboard */,
 				84FB043D2A507D1B0084F445 /* LaunchScreen.storyboard */,
@@ -164,6 +159,7 @@
 				8431A3512A5754370056E618 /* ImagesListCell.swift in Sources */,
 				848282682A62EBF400B0C492 /* ProfileViewController.swift in Sources */,
 				84FB04332A507D170084F445 /* AppDelegate.swift in Sources */,
+				842BC8F52A66FB2600B09935 /* SingleImageViewController.swift in Sources */,
 				84FB04352A507D170084F445 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
