@@ -9,6 +9,8 @@ import UIKit
 
 final class ImagesListViewController: UIViewController {
     
+    private let ShowSingleImageSequeIdentifier = "ShowSingleImage"
+    
     private let photosName: [String] = Array(0..<20).map{ "\($0)" }
     
     private lazy var dateFormatter: DateFormatter = {
@@ -33,12 +35,12 @@ final class ImagesListViewController: UIViewController {
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-           if segue.identifier == "ShowSingleImage" { // 1
+           if segue.identifier == ShowSingleImageSequeIdentifier { // 1
                let viewController = segue.destination as! SingleImageViewController // 2
                let indexPath = sender as! IndexPath // 3
                let image = UIImage(named: photosName[indexPath.row]) // 4
-               _ = viewController.view // crash fixed
-               viewController.singleImageView.image = image // 5
+               //_ = viewController.view // crash fixed
+               viewController.image = image // 5
            } else {
                super.prepare(for: segue, sender: sender) // 6
            }
@@ -83,7 +85,7 @@ extension ImagesListViewController {
 extension ImagesListViewController: UITableViewDelegate {
     /// в данном методе будем настраивать реагирование на нажатие пользователем на ячейку (строку)
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        performSegue(withIdentifier: "ShowSingleImage", sender: indexPath)
+        performSegue(withIdentifier: ShowSingleImageSequeIdentifier, sender: indexPath)
     }
     
     /// добавлен новый метод, корректирующий высоту ячейки (строки) в зависимости от высоты изображения
