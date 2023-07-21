@@ -7,8 +7,6 @@
 
 import UIKit
 
-final class SingleImageViewController: UIViewController {
-    override func viewDidLoad() {
-        super.viewDidLoad()
-    }
+final class SingleImageViewController: UIViewController {    
+    @IBOutlet weak var singleImageView: UIImageView!
 }

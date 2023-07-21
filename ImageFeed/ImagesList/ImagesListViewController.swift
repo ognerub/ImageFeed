@@ -30,8 +30,19 @@ final class ImagesListViewController: UIViewController {
         //        tableView.register(ImagesListCell.self, forCellReuseIdentifier: ImagesListCell.reuseIdentifier)
         
         tableView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
-        
     }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+           if segue.identifier == "ShowSingleImage" { // 1
+               let viewController = segue.destination as! SingleImageViewController // 2
+               let indexPath = sender as! IndexPath // 3
+               let image = UIImage(named: photosName[indexPath.row]) // 4
+               _ = viewController.view // crash fixed
+               viewController.singleImageView.image = image // 5
+           } else {
+               super.prepare(for: segue, sender: sender) // 6
+           }
+       }
 }
 
 extension ImagesListViewController: UITableViewDataSource {
@@ -71,7 +82,9 @@ extension ImagesListViewController {
 
 extension ImagesListViewController: UITableViewDelegate {
     /// в данном методе будем настраивать реагирование на нажатие пользователем на ячейку (строку)
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {}
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        performSegue(withIdentifier: "ShowSingleImage", sender: indexPath)
+    }
     
     /// добавлен новый метод, корректирующий высоту ячейки (строки) в зависимости от высоты изображения
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
