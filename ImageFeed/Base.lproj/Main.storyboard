@@ -93,6 +93,7 @@
                         </constraints>
                     </view>
                     <tabBarItem key="tabBarItem" title="" image="tab_editorial_active" id="gra-ZB-rJO"/>
+                    <navigationItem key="navigationItem" id="wa4-qS-zji"/>
                     <connections>
                         <outlet property="tableView" destination="mJo-nK-gGC" id="ybD-rs-ebD"/>
                         <segue destination="QLk-8d-kAj" kind="presentation" identifier="ShowSingleImage" id="Iei-VH-g6r"/>
@@ -110,9 +111,22 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="0" translatesAutoresizingMaskIntoConstraints="NO" id="THY-Nk-6W6" userLabel="Image View">
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jlJ-9r-M57">
                                 <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
-                            </imageView>
+                                <subviews>
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" placeholderIntrinsicWidth="414" placeholderIntrinsicHeight="414" image="0" translatesAutoresizingMaskIntoConstraints="NO" id="THY-Nk-6W6" userLabel="Image View">
+                                        <rect key="frame" x="0.0" y="0.0" width="414" height="414"/>
+                                    </imageView>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="bottom" secondItem="THY-Nk-6W6" secondAttribute="bottom" id="9y9-c0-1lx"/>
+                                    <constraint firstItem="THY-Nk-6W6" firstAttribute="top" secondItem="jlJ-9r-M57" secondAttribute="top" id="Cfk-YN-MPX"/>
+                                    <constraint firstItem="THY-Nk-6W6" firstAttribute="leading" secondItem="jlJ-9r-M57" secondAttribute="leading" id="SeQ-0d-cae"/>
+                                    <constraint firstAttribute="trailing" secondItem="THY-Nk-6W6" secondAttribute="trailing" id="pKM-Ig-s5v"/>
+                                </constraints>
+                                <viewLayoutGuide key="contentLayoutGuide" id="Tki-s2-J8k"/>
+                                <viewLayoutGuide key="frameLayoutGuide" id="AQq-DP-Gw4"/>
+                            </scrollView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Rtl-e5-nU0" userLabel="BackButton">
                                 <rect key="frame" x="8" y="67" width="44" height="44"/>
                                 <constraints>
@@ -129,18 +143,18 @@
                         <viewLayoutGuide key="safeArea" id="djn-nm-vxL"/>
                         <color key="backgroundColor" name="YP Black"/>
                         <constraints>
-                            <constraint firstAttribute="trailing" secondItem="THY-Nk-6W6" secondAttribute="trailing" id="1eS-rA-O5y"/>
-                            <constraint firstAttribute="bottom" secondItem="THY-Nk-6W6" secondAttribute="bottom" id="Ath-dL-2Qd"/>
-                            <constraint firstItem="THY-Nk-6W6" firstAttribute="leading" secondItem="djn-nm-vxL" secondAttribute="leading" id="F4t-qj-btP"/>
-                            <constraint firstItem="THY-Nk-6W6" firstAttribute="leading" secondItem="TYJ-I5-Hj9" secondAttribute="leading" id="NLp-Mo-0gc"/>
+                            <constraint firstItem="jlJ-9r-M57" firstAttribute="top" secondItem="TYJ-I5-Hj9" secondAttribute="top" id="85B-Kb-JMM"/>
+                            <constraint firstItem="djn-nm-vxL" firstAttribute="trailing" secondItem="jlJ-9r-M57" secondAttribute="trailing" id="MUH-iV-Faw"/>
+                            <constraint firstAttribute="bottom" secondItem="jlJ-9r-M57" secondAttribute="bottom" id="Zow-FK-drJ"/>
                             <constraint firstItem="Rtl-e5-nU0" firstAttribute="leading" secondItem="djn-nm-vxL" secondAttribute="leading" constant="8" id="cGt-pe-FSV"/>
-                            <constraint firstItem="THY-Nk-6W6" firstAttribute="top" secondItem="TYJ-I5-Hj9" secondAttribute="top" id="tW6-sB-AAA"/>
+                            <constraint firstItem="djn-nm-vxL" firstAttribute="leading" secondItem="jlJ-9r-M57" secondAttribute="leading" id="rD2-y5-F9A"/>
                             <constraint firstItem="Rtl-e5-nU0" firstAttribute="top" secondItem="djn-nm-vxL" secondAttribute="top" constant="8" id="tZN-Zi-mLY"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="Ido-ae-hcH"/>
                     <connections>
-                        <outlet property="singleImageView" destination="THY-Nk-6W6" id="xiV-yP-xyM"/>
+                        <outlet property="scrollView" destination="jlJ-9r-M57" id="Ngk-57-Wsg"/>
+                        <outlet property="singleImageView" destination="THY-Nk-6W6" id="6lK-oT-XIK"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="9Xj-TM-a8D" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
