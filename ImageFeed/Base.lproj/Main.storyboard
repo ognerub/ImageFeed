@@ -142,11 +142,25 @@
                                     <action selector="didTapBackButton" destination="QLk-8d-kAj" eventType="touchUpInside" id="pMq-Zj-upa"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dRl-O5-WPH" userLabel="ShareButton">
+                                <rect key="frame" x="171.66666666666666" y="751" width="50" height="50"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="50" id="EIp-83-4mE"/>
+                                    <constraint firstAttribute="height" constant="50" id="qFs-CY-zNv"/>
+                                </constraints>
+                                <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                <state key="normal" image="Sharing"/>
+                                <connections>
+                                    <action selector="didTapShareButton:" destination="QLk-8d-kAj" eventType="touchUpInside" id="dMp-5g-Iiw"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="djn-nm-vxL"/>
                         <color key="backgroundColor" name="YP Black"/>
                         <constraints>
+                            <constraint firstItem="dRl-O5-WPH" firstAttribute="centerX" secondItem="TYJ-I5-Hj9" secondAttribute="centerX" id="79w-P7-hKj"/>
                             <constraint firstItem="jlJ-9r-M57" firstAttribute="top" secondItem="TYJ-I5-Hj9" secondAttribute="top" id="85B-Kb-JMM"/>
+                            <constraint firstAttribute="bottom" secondItem="dRl-O5-WPH" secondAttribute="bottom" constant="51" id="Lpm-DN-CRL"/>
                             <constraint firstItem="djn-nm-vxL" firstAttribute="trailing" secondItem="jlJ-9r-M57" secondAttribute="trailing" id="MUH-iV-Faw"/>
                             <constraint firstAttribute="bottom" secondItem="jlJ-9r-M57" secondAttribute="bottom" id="Zow-FK-drJ"/>
                             <constraint firstItem="Rtl-e5-nU0" firstAttribute="leading" secondItem="djn-nm-vxL" secondAttribute="leading" constant="8" id="cGt-pe-FSV"/>
@@ -260,6 +274,7 @@
         <image name="BackArrow" width="9" height="16"/>
         <image name="LikeOn" width="42" height="42"/>
         <image name="LogOut" width="44" height="44"/>
+        <image name="Sharing" width="51" height="50"/>
         <image name="tab_editorial_active" width="75" height="49"/>
         <image name="tab_profile_active" width="75" height="49"/>
         <namedColor name="YP Black">
