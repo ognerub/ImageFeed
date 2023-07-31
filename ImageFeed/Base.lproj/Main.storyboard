@@ -286,14 +286,17 @@
                                     <wkPreferences key="preferences"/>
                                 </wkWebViewConfiguration>
                             </wkWebView>
-                            <button opaque="NO" contentMode="scaleToFill" ambiguous="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Bmf-YC-zBR">
-                                <rect key="frame" x="169" y="302" width="24" height="24"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Bmf-YC-zBR" userLabel="NavBackButton">
+                                <rect key="frame" x="16" y="59" width="44" height="44"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="44" id="QXE-ix-VL0"/>
                                     <constraint firstAttribute="height" constant="44" id="q1U-Gg-Zd1"/>
                                 </constraints>
                                 <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                 <state key="normal" image="BackArrowBlack"/>
+                                <connections>
+                                    <action selector="didTapNavBackButton:" destination="hjM-UW-NDw" eventType="touchUpInside" id="0qC-hl-3Vu"/>
+                                </connections>
                             </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="vZv-Mb-E9E"/>
@@ -302,6 +305,8 @@
                             <constraint firstAttribute="trailing" secondItem="W5o-Jm-SHv" secondAttribute="trailing" id="Ft5-bY-XLU"/>
                             <constraint firstAttribute="bottom" secondItem="W5o-Jm-SHv" secondAttribute="bottom" id="KpF-rU-4z5"/>
                             <constraint firstItem="W5o-Jm-SHv" firstAttribute="top" secondItem="TcO-oN-ttA" secondAttribute="top" id="UZO-qk-Kcv"/>
+                            <constraint firstItem="Bmf-YC-zBR" firstAttribute="leading" secondItem="vZv-Mb-E9E" secondAttribute="leading" constant="16" id="gP6-Pw-mqx"/>
+                            <constraint firstItem="Bmf-YC-zBR" firstAttribute="top" secondItem="vZv-Mb-E9E" secondAttribute="top" id="tbH-pJ-D3U"/>
                             <constraint firstItem="W5o-Jm-SHv" firstAttribute="leading" secondItem="TcO-oN-ttA" secondAttribute="leading" id="vxu-wO-6NE"/>
                         </constraints>
                     </view>

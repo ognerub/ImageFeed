@@ -10,4 +10,8 @@ import WebKit
 
 final class WebViewViewController: UIViewController {
     @IBOutlet private var WebView: WKWebView!
+    
+    @IBAction func didTapNavBackButton(_ sender: Any) {
+        dismiss(animated: true)
+    }
 }
