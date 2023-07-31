@@ -16,8 +16,8 @@ final class SingleImageViewController: UIViewController {
         }
     }
     
-    @IBOutlet weak var scrollView: UIScrollView!
-    @IBOutlet var singleImageView: UIImageView!
+    @IBOutlet private weak var scrollView: UIScrollView!
+    @IBOutlet private weak var singleImageView: UIImageView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -32,7 +32,7 @@ final class SingleImageViewController: UIViewController {
         rescaleAndCenterImageInScrollViewV2()
     }
     
-    @IBAction func didTapShareButton(_ sender: UIButton) {
+    @IBAction private func didTapShareButton(_ sender: UIButton) {
         let item = [image]
         let ac = UIActivityViewController(activityItems: item as [Any], applicationActivities: nil)
         present(ac, animated: true)
@@ -43,6 +43,7 @@ final class SingleImageViewController: UIViewController {
     }
 }
 
+// MARK: - UIScrollViewDelegate
 extension SingleImageViewController: UIScrollViewDelegate {
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
         singleImageView
@@ -67,20 +68,20 @@ extension SingleImageViewController {
     }
     
     /// способ 1 позиционирования картинки (из учебника)
-//    private func rescaleAndCenterImageInScrollView(image: UIImage) {
-//        let minZoomScale = scrollView.minimumZoomScale
-//        let maxZoomScale = scrollView.maximumZoomScale
-//        view.layoutIfNeeded()
-//        let visibleRectSize = scrollView.bounds.size
-//        let imageSize = image.size
-//        let hScale = visibleRectSize.width / imageSize.width
-//        let vScale = visibleRectSize.height / imageSize.height
-//        let scale = min(maxZoomScale, max(minZoomScale, max(hScale, vScale)))
-//        scrollView.setZoomScale(scale, animated: false)
-//        scrollView.layoutIfNeeded()
-//        let newContentSize = scrollView.contentSize
-//        let x = (newContentSize.width - visibleRectSize.width) / 2
-//        let y = (newContentSize.width - visibleRectSize.height) / 2
-//        scrollView.setContentOffset(CGPoint(x: x, y: y), animated: false)
-//    }
+    //    private func rescaleAndCenterImageInScrollView(image: UIImage) {
+    //        let minZoomScale = scrollView.minimumZoomScale
+    //        let maxZoomScale = scrollView.maximumZoomScale
+    //        view.layoutIfNeeded()
+    //        let visibleRectSize = scrollView.bounds.size
+    //        let imageSize = image.size
+    //        let hScale = visibleRectSize.width / imageSize.width
+    //        let vScale = visibleRectSize.height / imageSize.height
+    //        let scale = min(maxZoomScale, max(minZoomScale, max(hScale, vScale)))
+    //        scrollView.setZoomScale(scale, animated: false)
+    //        scrollView.layoutIfNeeded()
+    //        let newContentSize = scrollView.contentSize
+    //        let x = (newContentSize.width - visibleRectSize.width) / 2
+    //        let y = (newContentSize.width - visibleRectSize.height) / 2
+    //        scrollView.setContentOffset(CGPoint(x: x, y: y), animated: false)
+    //    }
 }

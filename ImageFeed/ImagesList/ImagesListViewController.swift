@@ -47,6 +47,7 @@ final class ImagesListViewController: UIViewController {
        }
 }
 
+// MARK: - UITableViewDataSource
 extension ImagesListViewController: UITableViewDataSource {
     /// данный метод устанавливает количество строк (в нашем случае кастомных ячеек) в секции
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
