@@ -249,14 +249,17 @@
                                         <integer key="value" value="16"/>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <segue destination="hjM-UW-NDw" kind="presentation" identifier="ShowWebView" modalPresentationStyle="overFullScreen" id="Zht-6D-fHd"/>
+                                </connections>
                             </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="dZh-wk-YX3"/>
                         <color key="backgroundColor" name="YP Black"/>
                         <constraints>
                             <constraint firstItem="eCS-vf-hxc" firstAttribute="leading" secondItem="qbV-He-GyO" secondAttribute="leading" constant="16" id="TAW-Zv-sFy"/>
-                            <constraint firstItem="MWh-8f-cRC" firstAttribute="centerY" secondItem="dZh-wk-YX3" secondAttribute="centerY" id="a3B-LR-KTa"/>
-                            <constraint firstItem="MWh-8f-cRC" firstAttribute="centerX" secondItem="dZh-wk-YX3" secondAttribute="centerX" id="aM4-Dn-ExZ"/>
+                            <constraint firstItem="MWh-8f-cRC" firstAttribute="centerY" secondItem="qbV-He-GyO" secondAttribute="centerY" constant="34.666666666666686" id="a3B-LR-KTa"/>
+                            <constraint firstItem="MWh-8f-cRC" firstAttribute="centerX" secondItem="qbV-He-GyO" secondAttribute="centerX" id="aM4-Dn-ExZ"/>
                             <constraint firstAttribute="trailing" secondItem="eCS-vf-hxc" secondAttribute="trailing" constant="16" id="eLp-3D-rw8"/>
                             <constraint firstAttribute="bottom" secondItem="eCS-vf-hxc" secondAttribute="bottom" constant="124" id="zoj-b6-42E"/>
                         </constraints>
@@ -267,16 +270,44 @@
             </objects>
             <point key="canvasLocation" x="-127.48091603053435" y="314.78873239436621"/>
         </scene>
-        <!--View Controller-->
+        <!--Web View View Controller-->
         <scene sceneID="Cpk-z2-sr1">
             <objects>
-                <viewController id="hjM-UW-NDw" sceneMemberID="viewController">
+                <viewController id="hjM-UW-NDw" customClass="WebViewViewController" customModule="ImageFeed" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="TcO-oN-ttA">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <wkWebView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="W5o-Jm-SHv" userLabel="WebView">
+                                <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                                <color key="backgroundColor" name="YP White"/>
+                                <wkWebViewConfiguration key="configuration">
+                                    <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
+                                    <wkPreferences key="preferences"/>
+                                </wkWebViewConfiguration>
+                            </wkWebView>
+                            <button opaque="NO" contentMode="scaleToFill" ambiguous="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Bmf-YC-zBR">
+                                <rect key="frame" x="169" y="302" width="24" height="24"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="44" id="QXE-ix-VL0"/>
+                                    <constraint firstAttribute="height" constant="44" id="q1U-Gg-Zd1"/>
+                                </constraints>
+                                <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                <state key="normal" image="BackArrowBlack"/>
+                            </button>
+                        </subviews>
                         <viewLayoutGuide key="safeArea" id="vZv-Mb-E9E"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="W5o-Jm-SHv" secondAttribute="trailing" id="Ft5-bY-XLU"/>
+                            <constraint firstAttribute="bottom" secondItem="W5o-Jm-SHv" secondAttribute="bottom" id="KpF-rU-4z5"/>
+                            <constraint firstItem="W5o-Jm-SHv" firstAttribute="top" secondItem="TcO-oN-ttA" secondAttribute="top" id="UZO-qk-Kcv"/>
+                            <constraint firstItem="W5o-Jm-SHv" firstAttribute="leading" secondItem="TcO-oN-ttA" secondAttribute="leading" id="vxu-wO-6NE"/>
+                        </constraints>
                     </view>
+                    <connections>
+                        <outlet property="WebView" destination="W5o-Jm-SHv" id="8Gi-xC-ZSk"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="qcs-il-LOJ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
@@ -305,6 +336,7 @@
         <image name="0" width="200" height="132"/>
         <image name="AuthScreenLogo" width="60" height="60"/>
         <image name="BackArrow" width="9" height="16"/>
+        <image name="BackArrowBlack" width="24" height="24"/>
         <image name="LikeOn" width="42" height="42"/>
         <image name="Sharing" width="51" height="50"/>
         <image name="tab_editorial_active" width="75" height="49"/>

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		84041D582A78414A0085D28A /* WebViewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84041D572A78414A0085D28A /* WebViewViewController.swift */; };
 		842BC8F52A66FB2600B09935 /* SingleImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 842BC8F42A66FB2600B09935 /* SingleImageViewController.swift */; };
 		8431A3512A5754370056E618 /* ImagesListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8431A3502A5754370056E618 /* ImagesListCell.swift */; };
 		8431A3542A58A80C0056E618 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8431A3532A58A80C0056E618 /* Assets.xcassets */; };
@@ -21,6 +22,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		84041D572A78414A0085D28A /* WebViewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewViewController.swift; sourceTree = "<group>"; };
 		842BC8F42A66FB2600B09935 /* SingleImageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleImageViewController.swift; sourceTree = "<group>"; };
 		8431A3502A5754370056E618 /* ImagesListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesListCell.swift; sourceTree = "<group>"; };
 		8431A3532A58A80C0056E618 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -60,6 +62,7 @@
 			isa = PBXGroup;
 			children = (
 				844E955C2A783F720037DCE9 /* AuthViewController.swift */,
+				84041D572A78414A0085D28A /* WebViewViewController.swift */,
 			);
 			path = Auth;
 			sourceTree = "<group>";
@@ -192,6 +195,7 @@
 				844E955D2A783F720037DCE9 /* AuthViewController.swift in Sources */,
 				848BC92E2A76B6620084D082 /* Constants.swift in Sources */,
 				842BC8F52A66FB2600B09935 /* SingleImageViewController.swift in Sources */,
+				84041D582A78414A0085D28A /* WebViewViewController.swift in Sources */,
 				84FB04352A507D170084F445 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
