@@ -36,7 +36,7 @@ final class WebViewViewController: UIViewController {
         webView.load(request)
     }
     
-    /// добавляем observer перед появлением WVVC
+    /// добавляем observer за текущим прогрессом загрузки WKWebView перед появлением WVVC
     override func viewWillAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         webView.addObserver(
@@ -56,7 +56,7 @@ final class WebViewViewController: UIViewController {
     }
     
     
-    /// обработчик обновлений
+    /// обработчик обновлений текущего прогресса загрузки WKWebVIew
     override func observeValue(
         forKeyPath keyPath: String?,
         of object: Any?,
@@ -69,7 +69,7 @@ final class WebViewViewController: UIViewController {
             }
         }
     
-    /// метод обновления процесса загрузки
+    /// метод, мешяющий параметры отображения progressView в зависимости от прогресса загрузки WKWebView
     private func updateProgress() {
         progressView.progress = Float(webView.estimatedProgress)
         progressView.isHidden = fabs(webView.estimatedProgress - 1.0) <= 0.0001
@@ -100,7 +100,7 @@ extension WebViewViewController: WKNavigationDelegate {
         if
             let url = navigationAction.request.url, // получаем URL из навигационного действия navigationAction
             let urlComponents = URLComponents(string: url.absoluteString), // создаем структуру URLComponents только теперь получаем компонены из URL, а не формируем URL
-            urlComponents.path == "/oauth/authorize/native", // проверяем совпадаем ли адрес запроса с адресом получания кода
+            urlComponents.path == "/oauth/authorize/native", // проверяем совпадает ли адрес запроса с адресом получания кода
             let items = urlComponents.queryItems, // проверяем есть ли в urlComponents компоненты запроса (URLQueryItem - это структура, которая содержит имя компонента name и его значение value)
             let codeItem = items.first(where: { $0.name == "code" }) // ищем в массиве компонентов такой, у которого значение == code
         {
