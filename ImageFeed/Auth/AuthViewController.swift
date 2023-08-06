@@ -8,12 +8,10 @@
 import UIKit
 
 final class AuthViewController: UIViewController {
-    
-    
-    
+      
     private let showWebViewIdentifier: String = "ShowWebView"
-    
     private var oAuth2Service = OAuth2Service()
+    private var oAuth2TokenStorage = OAuth2TokenStorage()
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == showWebViewIdentifier {
@@ -28,15 +26,13 @@ final class AuthViewController: UIViewController {
 
 extension AuthViewController: WebViewViewControllerDelegate {
     func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) {
-        oAuth2Service.fetchOAuthToken(code, completion: { [weak self] result in
-            guard let self = self else { return }
+        print("Old token was: \(self.oAuth2TokenStorage.token)")
+        oAuth2Service.fetchOAuthToken(code, completion: { result in
             switch result {
-            case .success(let body):
-                let authToken = body
-                self.oAuth2Service.authToken = authToken
+            case .success(let result):
+                print("We`ve got new token! \(result)")
             case .failure(let error):
-                print("Result is \(result)")
-                print("error! \(error)")
+                print("We`ve got error! \(error)")
             }
         }
         )
