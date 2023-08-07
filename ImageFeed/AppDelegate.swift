@@ -18,7 +18,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     // MARK: UISceneSession Lifecycle
-
+    
+    /// UIWindowScene управляет графическим интерфейсом приложения, создается системой на базе UISceneConfiguration вызовом соответствующего метода AppDelegat'а
     func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
         // Called when a new scene session is being created.
         // Use this method to select a configuration to create the new scene with.
