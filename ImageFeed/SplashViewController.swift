@@ -16,8 +16,6 @@ final class SplashViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-//        // очищаем userToken в userDefaults
-//        oAuth2TokenStorage.userDefaults.set("", forKey: OAuth2TokenStorage.Keys.userToken.rawValue)
         if oAuth2TokenStorage.userDefaults.string(forKey: OAuth2TokenStorage.Keys.userToken.rawValue) == oAuth2TokenStorage.token && oAuth2TokenStorage.token?.count ?? 0 > 10  {
             switchToTabBarController()
         } else {
