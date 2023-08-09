@@ -21,15 +21,15 @@ final class WebViewViewController: UIViewController {
     weak var delegate: WebViewViewControllerDelegate?
     
     override func viewDidLoad() {
-        
+        super.viewDidLoad()
         webView.navigationDelegate = self // делаем WebViewViewController навигационным делегатом для webView
         
-        var urlComponents = URLComponents(string: UnsplashAuthorizeURLString)! // инициализируем структуру URLComponents с указанием адреса запроса
+        var urlComponents = URLComponents(string: Constants.unsplashAuthorizeURLString)! // инициализируем структуру URLComponents с указанием адреса запроса
         urlComponents.queryItems = [
-        URLQueryItem(name: "client_id", value: AccessKey), // устанавливаем значение client_id - код доступа приложения
-        URLQueryItem(name: "redirect_uri", value: RedirectURI), // устанавливаем redirect_URI - который обрабатывает успешную авторизацию пользователя
-        URLQueryItem(name: "response_type", value: "code"), // устанавлваем тип ответа, который мы ожидаем, Unsplash ожидает от нас code
-        URLQueryItem(name: "scope", value: AccessScope) // устанавливаем значение scope - списка доступов, разделенных плюсом
+            URLQueryItem(name: "client_id", value: Constants.accessKey), // устанавливаем значение client_id - код доступа приложения
+            URLQueryItem(name: "redirect_uri", value: Constants.redirectURI), // устанавливаем redirect_URI - который обрабатывает успешную авторизацию пользователя
+            URLQueryItem(name: "response_type", value: "code"), // устанавлваем тип ответа, который мы ожидаем, Unsplash ожидает от нас code
+            URLQueryItem(name: "scope", value: Constants.accessScope) // устанавливаем значение scope - списка доступов, разделенных плюсом
         ]
         let url = urlComponents.url!
         let request = URLRequest(url: url)
@@ -61,13 +61,14 @@ final class WebViewViewController: UIViewController {
         forKeyPath keyPath: String?,
         of object: Any?,
         change: [NSKeyValueChangeKey: Any]?,
-        context: UnsafeMutableRawPointer?) {
-            if keyPath == #keyPath(WKWebView.estimatedProgress) {
-                updateProgress()
-            } else {
-                super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
-            }
+        context: UnsafeMutableRawPointer?)
+    {
+        if keyPath == #keyPath(WKWebView.estimatedProgress) {
+            updateProgress()
+        } else {
+            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
         }
+    }
     
     /// метод, мешяющий параметры отображения progressView в зависимости от прогресса загрузки WKWebView
     private func updateProgress() {
@@ -80,6 +81,7 @@ final class WebViewViewController: UIViewController {
     }
 }
 
+// MARK: - WKNavigationDelegate
 extension WebViewViewController: WKNavigationDelegate {
     func webView(
         _ webView: WKWebView,
