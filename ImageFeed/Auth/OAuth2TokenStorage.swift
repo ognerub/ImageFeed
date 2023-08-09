@@ -9,9 +9,10 @@ import Foundation
 
 final class OAuth2TokenStorage {
     
-    let userDefaults: UserDefaults
+    private let userDefaults: UserDefaults
     init(userDefaults: UserDefaults = .standard) {
-        self.userDefaults = userDefaults}
+        self.userDefaults = userDefaults
+    }
     
     enum Keys: String {
         case userToken
