@@ -9,26 +9,27 @@ import UIKit
 
 final class SplashViewController: UIViewController {
         
-    private let ShowAuthenticationScreenSegueIdentifier = "ShowAuthenticationScreen"
-    private var oAuth2TokenStorage = OAuth2TokenStorage()
-    private var oAuth2Service = OAuth2Service()
+    private let showAuthenticationScreenSegueIdentifier = "ShowAuthenticationScreen"
+    private let tabBarViewControllerIdentifier = "TabBarViewController"
+    private let mainUIStoryboard = "Main"
+    private let oAuth2TokenStorage = OAuth2TokenStorage()
+    private let oAuth2Service = OAuth2Service()
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-
         if oAuth2TokenStorage.token != nil  {
             switchToTabBarController()
         } else {
-            performSegue(withIdentifier: ShowAuthenticationScreenSegueIdentifier, sender: nil)
+            performSegue(withIdentifier: showAuthenticationScreenSegueIdentifier, sender: nil)
         }
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == ShowAuthenticationScreenSegueIdentifier {
+        if segue.identifier == showAuthenticationScreenSegueIdentifier {
             guard
                 let navigationController = segue.destination as? UINavigationController,
                 let viewController = navigationController.viewControllers[0] as? AuthViewController
-            else { fatalError("Failed to prepare for \(ShowAuthenticationScreenSegueIdentifier)")}
+            else { fatalError("Failed to prepare for \(showAuthenticationScreenSegueIdentifier)")}
             viewController.delegate = self
         } else {
             super.prepare(for: segue, sender: sender)
@@ -37,8 +38,8 @@ final class SplashViewController: UIViewController {
     
     private func switchToTabBarController() {
         guard let window = UIApplication.shared.windows.first else { fatalError("Invalid Configuration") }
-        let tabBarController = UIStoryboard(name: "Main", bundle: .main)
-            .instantiateViewController(withIdentifier: "TabBarViewController")
+        let tabBarController = UIStoryboard(name: mainUIStoryboard, bundle: .main)
+            .instantiateViewController(withIdentifier: tabBarViewControllerIdentifier)
         window.rootViewController = tabBarController
     }
     
@@ -53,15 +54,12 @@ extension SplashViewController: AuthViewControllerDelegate {
         }
     }
     private func fetchOAuthToken(_ code: String) {
-        print("Old token was: \(String(describing: oAuth2TokenStorage.token))")
         oAuth2Service.fetchOAuthToken(code) { [weak self] result in
             guard let self = self else { return }
             switch result {
             case .success:
-                print("We`ve got new token! \(result)")
                 self.switchToTabBarController()
-            case .failure(let error):
-                print("We`ve got error! \(error)")
+            case .failure:
                 // TODO [Sprint 11]
                 break
             }

@@ -46,6 +46,7 @@ private extension OAuth2Service {
         completion: @escaping (Result<OAuthTokenResponseBody, Error>) -> Void
     ) -> URLSessionTask {
         let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
         return urlSession.data(for: request) { (result: Result<Data, Error>) in
             let response = result.flatMap { data -> Result<OAuthTokenResponseBody, Error> in
                 Result { try decoder.decode(OAuthTokenResponseBody.self, from: data) }
@@ -57,14 +58,14 @@ private extension OAuth2Service {
     /// метод для запроса токена
     func authTokenRequest(code: String) -> URLRequest {
         URLRequest.makeHTTPRequest(
-            path: "/oauth/token/"
+            path: Constants.unsplashOauthTokenPath
             + "?client_id=\(Constants.accessKey)"
             + "&&client_secret=\(Constants.secretKey)"
             + "&&redirect_uri=\(Constants.redirectURI)"
             + "&&code=\(code)"
             + "&&grant_type=authorization_code",
             httpMethod: "POST",
-            baseURL: URL(string: "http://unsplash.com")!
+            baseURL: Constants.defaultBaseURL
         )
     }
 }

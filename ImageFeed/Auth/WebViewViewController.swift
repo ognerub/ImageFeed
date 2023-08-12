@@ -28,7 +28,7 @@ final class WebViewViewController: UIViewController {
         urlComponents.queryItems = [
             URLQueryItem(name: "client_id", value: Constants.accessKey), // устанавливаем значение client_id - код доступа приложения
             URLQueryItem(name: "redirect_uri", value: Constants.redirectURI), // устанавливаем redirect_URI - который обрабатывает успешную авторизацию пользователя
-            URLQueryItem(name: "response_type", value: "code"), // устанавлваем тип ответа, который мы ожидаем, Unsplash ожидает от нас code
+            URLQueryItem(name: "response_type", value: Constants.code), // устанавлваем тип ответа, который мы ожидаем, Unsplash ожидает от нас code
             URLQueryItem(name: "scope", value: Constants.accessScope) // устанавливаем значение scope - списка доступов, разделенных плюсом
         ]
         let url = urlComponents.url!
