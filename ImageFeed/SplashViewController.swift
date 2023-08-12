@@ -6,9 +6,10 @@
 //
 
 import UIKit
+import ProgressHUD
 
 final class SplashViewController: UIViewController {
-        
+    
     private let showAuthenticationScreenSegueIdentifier = "ShowAuthenticationScreen"
     private let tabBarViewControllerIdentifier = "TabBarViewController"
     private let mainUIStoryboard = "Main"
@@ -48,8 +49,10 @@ final class SplashViewController: UIViewController {
 // MARK: - SplashViewControllerDelegate
 extension SplashViewController: AuthViewControllerDelegate {
     func authViewController(_ vc: AuthViewController, didAuthenticateWithCode code: String) {
-        dismiss(animated: true) { [weak self] in
-            guard let self = self else { return }
+        ProgressHUD.show()
+        dismiss(animated: true) {
+            [weak self] in guard let self = self
+            else { return }
             self.fetchOAuthToken(code)
         }
     }
@@ -59,7 +62,9 @@ extension SplashViewController: AuthViewControllerDelegate {
             switch result {
             case .success:
                 self.switchToTabBarController()
+                ProgressHUD.dismiss()
             case .failure:
+                ProgressHUD.dismiss()
                 // TODO [Sprint 11]
                 break
             }
