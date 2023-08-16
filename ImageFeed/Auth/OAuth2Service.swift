@@ -28,17 +28,12 @@ final class OAuth2Service {
     ) {
         assert(Thread.isMainThread) // проверяем что код выполняется из главного потока
         print("The task is \(String(describing: task)) and lastCode is \(String(describing: lastCode)). Check if the task is not nil")
-        if task != nil {
-            print("The task is not nil, check if the lastCode is not equal to code")
-            if lastCode != code {
-                print("The last code is not equal to code, task is canceled")
-                task?.cancel() // если в запросе, который в данный момент выполняется, значение code не совпадает со значением в переданном аргументе lastCode, отменяем предыдущий запрос и выполняем новый
-            } else {
-                print("Exit from if task != nil, if lastCode != nil")
-                return
-            }
+        if lastCode == code {
+            print("Check for lastCode == code")
+            return // должны выполнить новый запрос
         }
-        lastCode = code
+        task?.cancel() // старый запрос при этом нужно отменить, но если task == nil но ничеко не произойдет
+        lastCode = code // запоминаем code, использованный в запросе
         let request = authTokenRequest(code: code)
         let task = object(for: request) { [weak self] result in
             guard let self = self else { return }

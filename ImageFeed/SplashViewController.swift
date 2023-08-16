@@ -15,9 +15,11 @@ final class SplashViewController: UIViewController {
     private let mainUIStoryboard = "Main"
     private let oAuth2TokenStorage = OAuth2TokenStorage()
     private let oAuth2Service = OAuth2Service()
+    private let uiBlockingProgressHUD = UIBlockingProgressHUD.self
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        // сравниваем с "" хотя должны с nil
         if oAuth2TokenStorage.token != ""  {
             switchToTabBarController()
         } else {
@@ -49,7 +51,7 @@ final class SplashViewController: UIViewController {
 // MARK: - SplashViewControllerDelegate
 extension SplashViewController: AuthViewControllerDelegate {
     func authViewController(_ vc: AuthViewController, didAuthenticateWithCode code: String) {
-        ProgressHUD.show()
+        uiBlockingProgressHUD.show()
         dismiss(animated: true) {
             [weak self] in guard let self = self
             else { return }
@@ -62,10 +64,11 @@ extension SplashViewController: AuthViewControllerDelegate {
             switch result {
             case .success:
                 self.switchToTabBarController()
+                // чтобы обнулить присваиваем "", удаляем когда не нужно будет проверять
                 self.oAuth2TokenStorage.token = ""
-                ProgressHUD.dismiss()
+                self.uiBlockingProgressHUD.dismiss()
             case .failure:
-                ProgressHUD.dismiss()
+                self.uiBlockingProgressHUD.dismiss()
                 // TODO [Sprint 11]
                 break
             }
