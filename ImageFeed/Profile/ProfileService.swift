@@ -9,12 +9,16 @@ import Foundation
 
 final class ProfileService {
     
-    struct ProfileResult: Codable {
+    struct ProfileResult: Decodable {
         let username: String // логин пользователя
         let firstName: String // имя
-        let lastName: String // фамилия
-        let bio: String // краткая информация
+        let lastName: String? // фамилия
+        let bio: String? // краткая информация
         //let profileImage: String // картинка профиля
+        //
+        //        enum CodingKeys: String, CodingKey {
+        //            case id = "id"
+        //        }
     }
     
     struct Profile {
@@ -38,25 +42,28 @@ final class ProfileService {
             let request = urlRequestWithBearerToken(token: token)
             let task = object(for: request) { [weak self] result in
                 guard let self = self else { return }
+                DispatchQueue.main.async {
                     switch result {
                     case .success(let body):
                         let username = body.username
                         let firstName = body.firstName
                         let lastName = body.lastName
                         let bio = body.bio
-                        let profile = Profile(username: username, name: "\(firstName) \(lastName)", loginName: "@\(username)", bio: bio)
+                        let profile = Profile(username: username, name: "\(firstName) \(lastName)", loginName: "@\(username)", bio: bio ?? "")
                         self.profile = profile
                         completion(.success(profile))
                     case .failure(let error):
+                        print("Error result is \(result)")
                         completion(.failure(error))
                     }
+                }
                 
             }
             task.resume()
         }
-                
+    
     func urlRequestWithBearerToken(token: String) -> URLRequest {
-        let url: URL = URL(string: "\(Constants.defaultBaseURL)/me")!
+        let url: URL = URL(string: "\(Constants.defaultAPIURL)/me")!
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
@@ -70,10 +77,23 @@ final class ProfileService {
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
         return urlSession.data(for: request) { (result: Result<Data, Error>) in
-            let response = result.flatMap { data -> Result<ProfileResult, Error> in
-                Result { try decoder.decode(ProfileResult.self, from: data) }
+            switch result {
+            case .success(let data):
+                do {
+                    let object = try decoder.decode(
+                        ProfileResult.self,
+                        from: data
+                    )
+                    print("All ok, the object is \(object)")
+                    completion(.success(object))
+                } catch {
+                    print("First error \(error)")
+                    completion(.failure(error))
+                }
+            case .failure(let error):
+                print("Second error \(error)")
+                completion(.failure(error))
             }
-            completion(response)
         }
     }
 }

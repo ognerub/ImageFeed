@@ -11,12 +11,13 @@ import Foundation
 final class OAuth2Service {
     static let shared = OAuth2Service()
     private let urlSession = URLSession.shared
+    private let oAuth2TokenStorage = OAuth2TokenStorage()
     private (set) var authToken: String? {
         get {
-            return OAuth2TokenStorage().token
+            return oAuth2TokenStorage.token
         }
         set {
-            OAuth2TokenStorage().token = newValue
+            oAuth2TokenStorage.token = newValue
         }
     }
     private var task: URLSessionTask?

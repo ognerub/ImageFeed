@@ -69,12 +69,17 @@ final class ProfileViewController: UIViewController {
         
     }
     
+    let profileService = ProfileService()
+    
     func fetchProfileSimple(_ token: String) {
-        ProfileService().fetchProfile(token) { [weak self] result in
+        profileService.fetchProfile(token) { [weak self] result in
             guard let self = self else { return }
             switch result {
             case .success (let body):
-                self.personNameLabel.text = body.username
+                self.personNameLabel.text = body.name
+                self.personHashTagLabel.text = body.loginName
+                self.personInfoTextLabel.text = body.bio
+                
                 print("success fetchProfile")
             case .failure:
                 print("error fetchProfile")

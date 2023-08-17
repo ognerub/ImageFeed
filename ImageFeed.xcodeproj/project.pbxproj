@@ -102,6 +102,7 @@
 			isa = PBXGroup;
 			children = (
 				848282672A62EBF400B0C492 /* ProfileViewController.swift */,
+				8429895A2A8E26BA002D3C97 /* ProfileService.swift */,
 			);
 			path = Profile;
 			sourceTree = "<group>";
@@ -149,7 +150,6 @@
 				84FB043D2A507D1B0084F445 /* LaunchScreen.storyboard */,
 				8431A3532A58A80C0056E618 /* Assets.xcassets */,
 				84FB04402A507D1B0084F445 /* Info.plist */,
-				8429895A2A8E26BA002D3C97 /* ProfileService.swift */,
 			);
 			path = ImageFeed;
 			sourceTree = "<group>";
