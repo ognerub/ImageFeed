@@ -16,7 +16,7 @@ final class OAuth2Service {
             return OAuth2TokenStorage().token
         }
         set {
-            OAuth2TokenStorage().token = newValue ?? ""
+            OAuth2TokenStorage().token = newValue
         }
     }
     private var task: URLSessionTask?

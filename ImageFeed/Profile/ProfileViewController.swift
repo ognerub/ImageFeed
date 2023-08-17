@@ -54,10 +54,33 @@ final class ProfileViewController: UIViewController {
         return exitButton
     }()
     
+    let authToken = OAuth2TokenStorage().token
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         addSubViews()
         configureConstraints()
+        guard let authToken = authToken else {
+            print("error to guard authToken")
+            return
+        }
+        fetchProfileSimple(authToken)
+
+        
+    }
+    
+    func fetchProfileSimple(_ token: String) {
+        ProfileService().fetchProfile(token) { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success (let body):
+                self.personNameLabel.text = body.username
+                print("success fetchProfile")
+            case .failure:
+                print("error fetchProfile")
+                break
+            }
+        }
     }
     
     private func addSubViews() {
