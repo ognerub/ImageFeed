@@ -15,11 +15,17 @@ final class SplashViewController: UIViewController {
     private let mainUIStoryboard = "Main"
     private let oAuth2TokenStorage = OAuth2TokenStorage()
     private let oAuth2Service = OAuth2Service()
+    // обращаемся к синглтону shared из ProfileService (локализованный способ)
+    private let profileService = ProfileService.shared
     private let uiBlockingProgressHUD = UIBlockingProgressHUD.self
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         if oAuth2TokenStorage.token != nil  {
+            guard let token = oAuth2TokenStorage.token else {
+                print("Error to guard oAuth2TokenStorage.token while viewDidAppear in SplashVC")
+                return }
+            fetchProfileSimple(token: token)
             switchToTabBarController()
         } else {
             performSegue(withIdentifier: showAuthenticationScreenSegueIdentifier, sender: nil)
@@ -39,7 +45,7 @@ final class SplashViewController: UIViewController {
     }
     
     private func switchToTabBarController() {
-        guard let window = UIApplication.shared.windows.first else { fatalError("Invalid Configuration") }
+        guard let window = UIApplication.shared.windows.first else { fatalError("Invalid Configuration of switchToTabBarController") }
         let tabBarController = UIStoryboard(name: mainUIStoryboard, bundle: .main)
             .instantiateViewController(withIdentifier: tabBarViewControllerIdentifier)
         window.rootViewController = tabBarController
@@ -57,18 +63,40 @@ extension SplashViewController: AuthViewControllerDelegate {
             self.fetchOAuthToken(code)
         }
     }
+    
     private func fetchOAuthToken(_ code: String) {
         oAuth2Service.fetchOAuthToken(code) { [weak self] result in
             guard let self = self else { return }
             switch result {
             case .success:
+                print("Success to fetchOAuthToken in SplashVC")
                 self.switchToTabBarController()
                 self.uiBlockingProgressHUD.dismiss()
             case .failure:
+                print("Error to fetchOAuthToken in SplashVC")
                 self.uiBlockingProgressHUD.dismiss()
                 // TODO [Sprint 11]
                 break
             }
         }
     }
+    
+    private func fetchProfileSimple(token: String) {
+        profileService.fetchProfile(token) { [weak self] result in
+            guard let self = self else {return }
+            switch result {
+            case .success:
+                print("Success to fetchProfileSimple in SplashVC")
+                UIBlockingProgressHUD.dismiss()
+                self.switchToTabBarController()
+            case .failure:
+                print("Error to fetchProfileSimple in SplashVC")
+                UIBlockingProgressHUD.dismiss()
+                // TODO [Sprint 11]
+                break
+            }
+        }
+        
+    }
 }
+

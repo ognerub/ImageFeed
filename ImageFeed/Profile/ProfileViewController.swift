@@ -15,7 +15,6 @@ final class ProfileViewController: UIViewController {
         personImageView.translatesAutoresizingMaskIntoConstraints = false
         return personImageView
     }()
-    
     private let personHashTagLabel: UILabel = {
         let label = UILabel()
         label.text = "@ekaterina_now"
@@ -24,7 +23,6 @@ final class ProfileViewController: UIViewController {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-    
     private let personNameLabel: UILabel = {
         let personNameLabel = UILabel()
         personNameLabel.text = "Екатерина Новикова"
@@ -33,7 +31,6 @@ final class ProfileViewController: UIViewController {
         personNameLabel.translatesAutoresizingMaskIntoConstraints = false
         return personNameLabel
     }()
-    
     private let personInfoTextLabel: UILabel = {
         let personInfoTextLabel = UILabel()
         personInfoTextLabel.text = "Hello, world!"
@@ -42,7 +39,6 @@ final class ProfileViewController: UIViewController {
         personInfoTextLabel.translatesAutoresizingMaskIntoConstraints = false
         return personInfoTextLabel
     }()
-    
     private lazy var exitButton: UIButton = {
         let exitButton = UIButton.systemButton(
             with: UIImage(named: "LogOut") ?? UIImage(systemName: "ipad.and.arrow.forward")!,
@@ -53,39 +49,21 @@ final class ProfileViewController: UIViewController {
         exitButton.translatesAutoresizingMaskIntoConstraints = false
         return exitButton
     }()
-    
-    let authToken = OAuth2TokenStorage().token
+    // обращаемся к синглтону shared из ProfileService (локализованный способ)
+    private let profileService = ProfileService.shared
     
     override func viewDidLoad() {
         super.viewDidLoad()
         addSubViews()
         configureConstraints()
-        guard let authToken = authToken else {
-            print("error to guard authToken")
-            return
-        }
-        fetchProfileSimple(authToken)
-
-        
+        guard let profile = profileService.profile else { return }
+        updateProfileDetails(profile: profile)
     }
-    
-    let profileService = ProfileService()
-    
-    func fetchProfileSimple(_ token: String) {
-        profileService.fetchProfile(token) { [weak self] result in
-            guard let self = self else { return }
-            switch result {
-            case .success (let body):
-                self.personNameLabel.text = body.name
-                self.personHashTagLabel.text = body.loginName
-                self.personInfoTextLabel.text = body.bio
-                
-                print("success fetchProfile")
-            case .failure:
-                print("error fetchProfile")
-                break
-            }
-        }
+
+    private func updateProfileDetails(profile: Profile) {
+        personNameLabel.text = profile.name
+        personHashTagLabel.text = profile.loginName
+        personInfoTextLabel.text = profile.bio
     }
     
     private func addSubViews() {
