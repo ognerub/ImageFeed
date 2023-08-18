@@ -52,14 +52,32 @@ final class ProfileViewController: UIViewController {
     // обращаемся к синглтону shared из ProfileService (локализованный способ)
     private let profileService = ProfileService.shared
     
+    private let oAuth2TokenStorage = OAuth2TokenStorage()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         addSubViews()
         configureConstraints()
         guard let profile = profileService.profile else { return }
         updateProfileDetails(profile: profile)
+        fetchProfileImageSimple(token: oAuth2TokenStorage.token ?? "")
     }
 
+    private func fetchProfileImageSimple(token: String) {
+        ProfileImageService().fetchProfileImageURL(username: profileService.profile?.username ?? "username") { [weak self] result in
+            guard let self = self else {return }
+            switch result {
+            case .success:
+                print("Success to fetchProfileImageSimple in ProfileVC")
+            case .failure:
+                print("Error to fetchProfileImageSimple in ProfileVC")
+                // TODO [Sprint 11]
+                break
+            }
+        }
+        
+    }
+    
     private func updateProfileDetails(profile: Profile) {
         personNameLabel.text = profile.name
         personHashTagLabel.text = profile.loginName

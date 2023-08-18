@@ -17,6 +17,7 @@
 		848282682A62EBF400B0C492 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 848282672A62EBF400B0C492 /* ProfileViewController.swift */; };
 		848BC92E2A76B6620084D082 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 848BC92D2A76B6620084D082 /* Constants.swift */; };
 		849E21EF2A8FEF5C0006B247 /* ProfileResponseBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = 849E21EE2A8FEF5C0006B247 /* ProfileResponseBody.swift */; };
+		849E21F12A8FF1B10006B247 /* ProfileImageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 849E21F02A8FF1B10006B247 /* ProfileImageService.swift */; };
 		84B4C6012A839A4F003901B1 /* URLRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B4C6002A839A4F003901B1 /* URLRequest.swift */; };
 		84B4C6032A839A75003901B1 /* URLSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B4C6022A839A75003901B1 /* URLSession.swift */; };
 		84B4C6052A839AC2003901B1 /* NetworkErrorModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B4C6042A839AC2003901B1 /* NetworkErrorModel.swift */; };
@@ -43,6 +44,7 @@
 		848282672A62EBF400B0C492 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		848BC92D2A76B6620084D082 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		849E21EE2A8FEF5C0006B247 /* ProfileResponseBody.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileResponseBody.swift; sourceTree = "<group>"; };
+		849E21F02A8FF1B10006B247 /* ProfileImageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileImageService.swift; sourceTree = "<group>"; };
 		84B4C6002A839A4F003901B1 /* URLRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLRequest.swift; sourceTree = "<group>"; };
 		84B4C6022A839A75003901B1 /* URLSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSession.swift; sourceTree = "<group>"; };
 		84B4C6042A839AC2003901B1 /* NetworkErrorModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkErrorModel.swift; sourceTree = "<group>"; };
@@ -104,8 +106,9 @@
 			isa = PBXGroup;
 			children = (
 				848282672A62EBF400B0C492 /* ProfileViewController.swift */,
-				8429895A2A8E26BA002D3C97 /* ProfileService.swift */,
 				849E21EE2A8FEF5C0006B247 /* ProfileResponseBody.swift */,
+				8429895A2A8E26BA002D3C97 /* ProfileService.swift */,
+				849E21F02A8FF1B10006B247 /* ProfileImageService.swift */,
 			);
 			path = Profile;
 			sourceTree = "<group>";
@@ -251,6 +254,7 @@
 				848BC92E2A76B6620084D082 /* Constants.swift in Sources */,
 				842BC8F52A66FB2600B09935 /* SingleImageViewController.swift in Sources */,
 				84041D582A78414A0085D28A /* WebViewViewController.swift in Sources */,
+				849E21F12A8FF1B10006B247 /* ProfileImageService.swift in Sources */,
 				84FB04352A507D170084F445 /* SceneDelegate.swift in Sources */,
 				84D5D1902A8A8C740089A7BE /* UIBlockingProgressHUD.swift in Sources */,
 			);
