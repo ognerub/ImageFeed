@@ -5,29 +5,28 @@
 //  Created by Admin on 18.08.2023.
 //
 
-import Foundation
+import UIKit
 
 final class ProfileImageService {
+    
+    struct ImageSizes: Decodable {
+        var small: String
+    }
     struct UserResult: Decodable {
-        
         let profileImage: ImageSizes
-        
-        struct ImageSizes: Codable {
-            let small: String
-            let medium: String
-            let large: String
-        }
     }
     
     private let urlSession = URLSession.shared
-    
     private let authToken: String? = OAuth2TokenStorage().token
+    
+    // добвили второй синглтон
+    static let shared = ProfileImageService()
+    private (set) var avatarURL: String?
     
     func fetchProfileImageURL(
         username: String,
-        _ completion: @escaping (Result<UserResult, Error>) -> Void) {
+        _ completion: @escaping (Result<String, Error>) -> Void) {
             guard let token = authToken else {
-                //print("Token is empty while fetchPtofile in ProfileService")
                 return
             }
             let request = urlRequestWithBearerToken(token: token, username: username)
@@ -36,11 +35,12 @@ final class ProfileImageService {
                 DispatchQueue.main.async {
                     switch result {
                     case .success(let body):
-                        print("We`ve got: \(body)")
-                        //guard let url: String? = first else { return }
-                        completion(.success(body))
+                        let imageURLString = body.profileImage.small
+                        self.avatarURL = imageURLString
+                        //print("We`ve got URL: \(imageURLString)")
+                        completion(.success(imageURLString))
                     case .failure(let error):
-                        //print("Error while fetchProfile in ProfileService. Result is \(result) ")
+                        //print("Error while fetchImageProfile in ProfileImageService. Result is \(result) ")
                         completion(.failure(error))
                     }
                 }
@@ -71,18 +71,11 @@ private extension ProfileImageService {
             switch result {
             case .success(let data):
                 do {
-//                    if let jsonData = try? JSONSerialization.data(withJSONObject: data, options: []) {
-//                        do {
-//                            let userResult = try JSONDecoder().decode(UserResult.self, from: jsonData)
-//                            print("JSON now is \(userResult)")
-//                        } catch { print ("error") }
-//                    }
-                    
-                    
                     let object = try decoder.decode(
                         UserResult.self,
                         from: data)
-                    print("All ok, the object is \(object)")
+                    let urlString = object.profileImage.small
+                    print("All ok, the object is \(urlString)")
                     completion(.success(object))
                 } catch {
                     print("First error \(error)")

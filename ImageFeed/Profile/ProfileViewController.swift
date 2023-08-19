@@ -62,13 +62,28 @@ final class ProfileViewController: UIViewController {
         updateProfileDetails(profile: profile)
         fetchProfileImageSimple(token: oAuth2TokenStorage.token ?? "")
     }
-
+    
+    private let profileImageService = ProfileImageService()
+    
     private func fetchProfileImageSimple(token: String) {
-        ProfileImageService().fetchProfileImageURL(username: profileService.profile?.username ?? "username") { [weak self] result in
+        profileImageService.fetchProfileImageURL(username: profileService.profile?.username ?? "username") { [weak self] result in
             guard let self = self else {return }
             switch result {
-            case .success:
-                print("Success to fetchProfileImageSimple in ProfileVC")
+            case .success(let smallURLString):
+                if let url = URL(string: smallURLString) {
+                    DispatchQueue.global().async {
+                        if let data = try? Data(contentsOf: url) {
+                            DispatchQueue.main.async {
+                                self.personImageView.image = UIImage(data: data)!
+                                self.personImageView.layer.masksToBounds = true
+                                self.personImageView.layer.cornerRadius = 32
+                            }
+                        }
+                    }
+                } else {
+                    self.personImageView.image = UIImage(systemName: "person.crop.circle.fill")!
+                }
+                print("Success to fetchProfileImageSimple in ProfileVC \(smallURLString)")
             case .failure:
                 print("Error to fetchProfileImageSimple in ProfileVC")
                 // TODO [Sprint 11]

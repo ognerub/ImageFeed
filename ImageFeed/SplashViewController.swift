@@ -17,6 +17,9 @@ final class SplashViewController: UIViewController {
     private let oAuth2Service = OAuth2Service()
     // обращаемся к синглтону shared из ProfileService (локализованный способ)
     private let profileService = ProfileService.shared
+    // также обращаемся к shared из ProfileImageService
+    private let profileImageService = ProfileImageService.shared
+    // обращаемся к расширению ProgressHUD
     private let uiBlockingProgressHUD = UIBlockingProgressHUD.self
     
     override func viewDidAppear(_ animated: Bool) {
@@ -63,8 +66,11 @@ extension SplashViewController: AuthViewControllerDelegate {
             self.fetchOAuthToken(code)
         }
     }
-    
-    private func fetchOAuthToken(_ code: String) {
+}
+
+// MARK: - Fetch functions
+extension SplashViewController {
+    func fetchOAuthToken(_ code: String) {
         oAuth2Service.fetchOAuthToken(code) { [weak self] result in
             guard let self = self else { return }
             switch result {
@@ -81,7 +87,7 @@ extension SplashViewController: AuthViewControllerDelegate {
         }
     }
     
-    private func fetchProfileSimple(token: String) {
+    func fetchProfileSimple(token: String) {
         profileService.fetchProfile(token) { [weak self] result in
             guard let self = self else {return }
             switch result {
@@ -96,7 +102,8 @@ extension SplashViewController: AuthViewControllerDelegate {
                 break
             }
         }
-        
     }
+    
+    
 }
 
