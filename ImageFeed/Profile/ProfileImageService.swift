@@ -29,26 +29,24 @@ final class ProfileImageService {
     func fetchProfileImageURL(
         username: String,
         _ completion: @escaping (Result<String, Error>) -> Void) {
-            
             guard let token = authToken else {
                 return
             }
             let request = urlRequestWithBearerToken(token: token, username: username)
             let task = object(for: request) { [weak self] result in
                 guard let self = self else { return }
-                
                 DispatchQueue.main.async {
                     switch result {
                     case .success(let body):
                         let profileImageURL = body.profileImage.small
                         self.avatarURL = profileImageURL
                         
-                        Notification.default
+                        NotificationCenter.default
                             .post(
                                 name: ProfileImageService.DidChangeNotification,
                                 object: self,
                                 userInfo: ["URL": profileImageURL])
-                        
+
                         completion(.success(profileImageURL))
                         
                     case .failure(let error):
