@@ -23,22 +23,34 @@ final class ProfileImageService {
     static let shared = ProfileImageService()
     private (set) var avatarURL: String?
     
+    // добавляем новое имя нотификации
+    static let DidChangeNotification = Notification.Name(rawValue: "ProfileImageProviderDidChange")
+    
     func fetchProfileImageURL(
         username: String,
         _ completion: @escaping (Result<String, Error>) -> Void) {
+            
             guard let token = authToken else {
                 return
             }
             let request = urlRequestWithBearerToken(token: token, username: username)
             let task = object(for: request) { [weak self] result in
                 guard let self = self else { return }
+                
                 DispatchQueue.main.async {
                     switch result {
                     case .success(let body):
-                        let imageURLString = body.profileImage.small
-                        self.avatarURL = imageURLString
-                        //print("We`ve got URL: \(imageURLString)")
-                        completion(.success(imageURLString))
+                        let profileImageURL = body.profileImage.small
+                        self.avatarURL = profileImageURL
+                        
+                        Notification.default
+                            .post(
+                                name: ProfileImageService.DidChangeNotification,
+                                object: self,
+                                userInfo: ["URL": profileImageURL])
+                        
+                        completion(.success(profileImageURL))
+                        
                     case .failure(let error):
                         //print("Error while fetchImageProfile in ProfileImageService. Result is \(result) ")
                         completion(.failure(error))

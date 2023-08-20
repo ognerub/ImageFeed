@@ -29,6 +29,7 @@ final class SplashViewController: UIViewController {
                 print("Error to guard oAuth2TokenStorage.token while viewDidAppear in SplashVC")
                 return }
             fetchProfileSimple(token: token)
+            fetchProfileImageSimple(avatarURL: profileImageService.avatarURL ?? "https://unsplash.com")
             switchToTabBarController()
         } else {
             performSegue(withIdentifier: showAuthenticationScreenSegueIdentifier, sender: nil)
@@ -104,6 +105,28 @@ extension SplashViewController {
         }
     }
     
-    
+    private func fetchProfileImageSimple(avatarURL: String) {
+        profileImageService.fetchProfileImageURL(username: profileService.profile?.username ?? "username") { [weak self] result in
+            guard let self = self else {return }
+            switch result {
+            case .success:
+//                if let url = URL(string: avatarURL) {
+//                    DispatchQueue.global().async {
+//                        if let data = try? Data(contentsOf: url) {
+//                            DispatchQueue.main.async {
+//                                //ProfileViewController().personImageView.image = UIImage(data: data)!
+//                            }
+//                        }
+//                    }
+//                } else {
+//                    //ProfileViewController().personImageView.image = UIImage(systemName: "person.crop.circle.fill")!
+//                }
+                print("All ok, avatar URL")
+            case .failure:
+                // TODO [Sprint 11]
+                break
+            }
+        }
+    }
 }
 

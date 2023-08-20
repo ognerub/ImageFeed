@@ -51,8 +51,25 @@ final class ProfileViewController: UIViewController {
     }()
     // обращаемся к синглтону shared из ProfileService (локализованный способ)
     private let profileService = ProfileService.shared
+    // обращаемся ко второму shared из ProfileImageService
+    private let profileImageService = ProfileImageService.shared
     
     private let oAuth2TokenStorage = OAuth2TokenStorage()
+    
+    // перегружаем конструктор
+    override init(nibName: String?, bundle: Bundle?) {
+        super.init(nibName: nibName, bundle: bundle)
+        addObserver()
+    }
+    // определяем конструктор, необходимый при декодировании класса из Storyboard
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        addObserver()
+    }
+    // определям деструктор
+    deinit {
+        removeObserver()
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -60,43 +77,48 @@ final class ProfileViewController: UIViewController {
         configureConstraints()
         guard let profile = profileService.profile else { return }
         updateProfileDetails(profile: profile)
-        fetchProfileImageSimple(token: oAuth2TokenStorage.token ?? "")
-    }
-    
-    private let profileImageService = ProfileImageService()
-    
-    private func fetchProfileImageSimple(token: String) {
-        profileImageService.fetchProfileImageURL(username: profileService.profile?.username ?? "username") { [weak self] result in
-            guard let self = self else {return }
-            switch result {
-            case .success(let smallURLString):
-                if let url = URL(string: smallURLString) {
-                    DispatchQueue.global().async {
-                        if let data = try? Data(contentsOf: url) {
-                            DispatchQueue.main.async {
-                                self.personImageView.image = UIImage(data: data)!
-                                self.personImageView.layer.masksToBounds = true
-                                self.personImageView.layer.cornerRadius = 32
-                            }
-                        }
-                    }
-                } else {
-                    self.personImageView.image = UIImage(systemName: "person.crop.circle.fill")!
-                }
-                print("Success to fetchProfileImageSimple in ProfileVC \(smallURLString)")
-            case .failure:
-                print("Error to fetchProfileImageSimple in ProfileVC")
-                // TODO [Sprint 11]
-                break
-            }
-        }
         
+        if let avatarURL = ProfileImageService.shared.avatarURL,
+           let url = URL(string: avatarURL) {
+               // TODO обновить аватар, если нотификация была опубликована до того, как мы подписались
+           }
     }
+    
+    private func addObserver() {
+        NotificationCenter.default.addObserver(
+        self,
+        selector: #selector(updateAvatar(notification:)),
+        name: ProfileImageService.DidChangeNotification,
+        object: nil)
+    }
+    private func removeObserver() {
+        NotificationCenter.default.removeObserver(
+            self,
+            name: ProfileImageService.DidChangeNotification,
+            object: nil)
+    }
+    @objc
+        private func updateAvatar(notification: Notification) {
+            guard
+                isViewLoaded,
+                let userInfo = notification.userInfo,
+                let profileImageURL = userInfo["URL"] as? String,
+                let url = URL(string: profileImageURL)
+            else {return}
+            
+            // TODO обновить аватар используя Kingfisher
+        }
     
     private func updateProfileDetails(profile: Profile) {
+        // change profile text
         personNameLabel.text = profile.name
         personHashTagLabel.text = profile.loginName
         personInfoTextLabel.text = profile.bio
+        
+        // change profile image
+        //self.personImageView.image = profile.avatarImage
+        personImageView.layer.masksToBounds = true
+        personImageView.layer.cornerRadius = 32
     }
     
     private func addSubViews() {
