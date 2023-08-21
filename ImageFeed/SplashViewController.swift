@@ -22,19 +22,48 @@ final class SplashViewController: UIViewController {
     // обращаемся к расширению ProgressHUD
     private let uiBlockingProgressHUD = UIBlockingProgressHUD.self
     
+    private var alertPresenter: AlertPresenterProtocol?
+    
+    var showError: Bool = false
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+    }
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        
+        alertPresenter = AlertPresenterImpl(viewController: self)
+        
         if oAuth2TokenStorage.token != nil  {
             guard let token = oAuth2TokenStorage.token else {
                 print("Error to guard oAuth2TokenStorage.token while viewDidAppear in SplashVC")
                 return }
+            showError = false
             fetchProfileSimple(token: token)
-            fetchProfileImageSimple(avatarURL: profileImageService.avatarURL ?? "https://unsplash.com")
+            //fetchProfileImageSimple(avatarURL: profileImageService.avatarURL ?? "https://unsplash.com")
             switchToTabBarController()
         } else {
-            performSegue(withIdentifier: showAuthenticationScreenSegueIdentifier, sender: nil)
+            if showError == true {
+                showNetWorkErrorForSpashVC()
+            } else {
+                performSegue(withIdentifier: showAuthenticationScreenSegueIdentifier, sender: nil)
+            }
         }
     }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+    }
+    
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == showAuthenticationScreenSegueIdentifier {
@@ -53,6 +82,19 @@ final class SplashViewController: UIViewController {
         let tabBarController = UIStoryboard(name: mainUIStoryboard, bundle: .main)
             .instantiateViewController(withIdentifier: tabBarViewControllerIdentifier)
         window.rootViewController = tabBarController
+    }
+    
+    private func showNetWorkErrorForSpashVC() {
+        DispatchQueue.main.async {
+            let model = AlertModel(
+                title: "Что-то пошло не так(",
+                message: "Не удалось войти в систему",
+                buttonText: "OK",
+                completion: { [weak self] in guard let self = self else { return }
+                    self.performSegue(withIdentifier: self.showAuthenticationScreenSegueIdentifier, sender: nil)
+                })
+            self.alertPresenter?.show(with: model)
+        }
     }
     
 }
@@ -77,12 +119,14 @@ extension SplashViewController {
             switch result {
             case .success:
                 print("Success to fetchOAuthToken in SplashVC")
+                self.showError = false
                 self.switchToTabBarController()
                 self.uiBlockingProgressHUD.dismiss()
             case .failure:
                 print("Error to fetchOAuthToken in SplashVC")
+                self.showError = true
                 self.uiBlockingProgressHUD.dismiss()
-                // TODO [Sprint 11]
+                // TODO 11 sprint
                 break
             }
         }
@@ -94,12 +138,17 @@ extension SplashViewController {
             switch result {
             case .success:
                 print("Success to fetchProfileSimple in SplashVC")
+                self.showError = false
                 UIBlockingProgressHUD.dismiss()
                 self.switchToTabBarController()
             case .failure:
                 print("Error to fetchProfileSimple in SplashVC")
+                self.showError = true
                 UIBlockingProgressHUD.dismiss()
-                // TODO [Sprint 11]
+                // TODO 11 sprint
+                
+                self.showNetWorkErrorForSpashVC()
+                
                 break
             }
         }

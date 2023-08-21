@@ -12,10 +12,11 @@ protocol AuthViewControllerDelegate: AnyObject {
 }
 
 final class AuthViewController: UIViewController {
-      
+    
     private let showWebViewIdentifier: String = "ShowWebView"
     private var oAuth2Service = OAuth2Service()
     private var oAuth2TokenStorage = OAuth2TokenStorage()
+    private var splashViewController = SplashViewController()
     
     weak var delegate: AuthViewControllerDelegate?
     
@@ -40,6 +41,7 @@ extension AuthViewController: WebViewViewControllerDelegate {
     }
     
     func webViewViewControllerDidCancel(_ vc: WebViewViewController) {
+        splashViewController.showError = true
         dismiss(animated: true)
     }
 }
