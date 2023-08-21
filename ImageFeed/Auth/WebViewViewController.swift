@@ -20,6 +20,9 @@ final class WebViewViewController: UIViewController {
     
     weak var delegate: WebViewViewControllerDelegate?
     
+    /// переменная для нового API
+    private var estimatedProgressObservation: NSKeyValueObservation?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         webView.navigationDelegate = self // делаем WebViewViewController навигационным делегатом для webView
@@ -34,41 +37,51 @@ final class WebViewViewController: UIViewController {
         let url = urlComponents.url!
         let request = URLRequest(url: url)
         webView.load(request)
+        
+        /// Добавляем новое API --->
+        estimatedProgressObservation = webView.observe(
+            \.estimatedProgress,
+             options: [],
+             changeHandler: {[weak self] _, _ in
+                 guard let self = self else { return }
+                 self.updateProgress()
+             })
+        /// ---<
+        
     }
     
-    /// добавляем observer за текущим прогрессом загрузки WKWebView перед появлением WVVC
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        webView.addObserver(
-            self,
-            forKeyPath: #keyPath(WKWebView.estimatedProgress),
-            options: .new,
-            context: nil)
-    }
-    
-    /// обязательно удаляем observer перед исчезновением WVVC
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        webView.removeObserver(
-            self,
-            forKeyPath: #keyPath(WKWebView.estimatedProgress),
-            context: nil)
-    }
-    
-    
-    /// обработчик обновлений текущего прогресса загрузки WKWebVIew
-    override func observeValue(
-        forKeyPath keyPath: String?,
-        of object: Any?,
-        change: [NSKeyValueChangeKey: Any]?,
-        context: UnsafeMutableRawPointer?)
-    {
-        if keyPath == #keyPath(WKWebView.estimatedProgress) {
-            updateProgress()
-        } else {
-            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
-        }
-    }
+//    /// Старое API - удаляем --->
+//    /// добавляем observer за текущим прогрессом загрузки WKWebView перед появлением WVVC
+//    override func viewWillAppear(_ animated: Bool) {
+//        super.viewDidAppear(animated)
+//        webView.addObserver(
+//            self,
+//            forKeyPath: #keyPath(WKWebView.estimatedProgress),
+//            options: .new,
+//            context: nil)
+//    }
+//    /// обязательно удаляем observer перед исчезновением WVVC
+//    override func viewWillDisappear(_ animated: Bool) {
+//        super.viewWillDisappear(animated)
+//        webView.removeObserver(
+//            self,
+//            forKeyPath: #keyPath(WKWebView.estimatedProgress),
+//            context: nil)
+//    }
+//    /// обработчик обновлений текущего прогресса загрузки WKWebVIew
+//    override func observeValue(
+//        forKeyPath keyPath: String?,
+//        of object: Any?,
+//        change: [NSKeyValueChangeKey: Any]?,
+//        context: UnsafeMutableRawPointer?)
+//    {
+//        if keyPath == #keyPath(WKWebView.estimatedProgress) {
+//            updateProgress()
+//        } else {
+//            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
+//        }
+//    }
+//    /// ---<
     
     /// метод, мешяющий параметры отображения progressView в зависимости от прогресса загрузки WKWebView
     private func updateProgress() {

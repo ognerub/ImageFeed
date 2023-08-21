@@ -56,6 +56,10 @@ final class ProfileViewController: UIViewController {
     
     private let oAuth2TokenStorage = OAuth2TokenStorage()
     
+    private let splashViewControllerIdentifier = "SplashViewController"
+    private let mainUIStoryboard = "Main"
+    
+    
     /// Example with selectors --->
 //    // перегружаем конструктор
 //    override init(nibName: String?, bundle: Bundle?) {
@@ -182,9 +186,19 @@ final class ProfileViewController: UIViewController {
         ])
     }
     
+    private func switchToSplashViewController() {
+        guard let window = UIApplication.shared.windows.first else { fatalError("Invalid Configuration of switchToSplashViewController") }
+        let splashViewController = UIStoryboard(name: mainUIStoryboard, bundle: .main)
+            .instantiateViewController(withIdentifier: splashViewControllerIdentifier)
+        window.rootViewController = splashViewController
+    }
+    
     @objc
     private func didTapButton() {
-        
+        oAuth2TokenStorage.nilTokenInUserDefaults()
+        switchToSplashViewController()
     }
+    
+    
     
 }

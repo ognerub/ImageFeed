@@ -26,4 +26,9 @@ final class OAuth2TokenStorage {
             userDefaults.set(newValue, forKey: Keys.userToken.rawValue)
         }
     }
+    
+    func nilTokenInUserDefaults() {
+        token = nil
+        userDefaults.set(nil, forKey: Keys.userToken.rawValue)
+    }
 }

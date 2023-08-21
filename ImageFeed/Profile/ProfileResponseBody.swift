@@ -8,7 +8,7 @@
 import UIKit
 
 /// струетура, которая будет использоваться для парсинга (decode JSON)
-struct ProfileResult: Codable {
+struct ProfileResult: Decodable {
     let username: String // логин пользователя
     let firstName: String // имя
     let lastName: String // фамилия

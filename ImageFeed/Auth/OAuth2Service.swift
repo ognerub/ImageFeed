@@ -20,7 +20,7 @@ final class OAuth2Service {
             oAuth2TokenStorage.token = newValue
         }
     }
-    private var task: URLSessionTask?
+    private var taskProtect: URLSessionTask?
     private var lastCode: String?
     
     func fetchOAuthToken(
@@ -28,55 +28,44 @@ final class OAuth2Service {
         completion: @escaping (Result<String, Error>) -> Void
     ) {
         assert(Thread.isMainThread) // проверяем что код выполняется из главного потока
-        print("The task is \(String(describing: task)) and lastCode is \(String(describing: lastCode)). Check if the task is not nil")
+        print("The task is \(String(describing: taskProtect)) and lastCode is \(String(describing: lastCode)). Check if the task is not nil")
         if lastCode == code {
             print("Check for lastCode == code")
             return // должны выполнить новый запрос
         }
-        task?.cancel() // старый запрос при этом нужно отменить, но если task == nil но ничеко не произойдет
+        taskProtect?.cancel() // старый запрос при этом нужно отменить, но если task == nil но ничеко не произойдет
         lastCode = code // запоминаем code, использованный в запросе
         let request = authTokenRequest(code: code)
-        let task = object(for: request) { [weak self] result in
-            guard let self = self else { return }
+        let task = urlSession.objectTask(for: request) { [weak self] (result: Result<OAuthTokenResponseBody,Error>) in
             print("Switch to main.async")
             DispatchQueue.main.async {
                 switch result {
                 case .success(let body):
                     print("Success block, do task = nil")
-                    self.task = nil
-                    print("Success block. Task now is \(String(describing: self.task))")
+                    self?.taskProtect = nil
+                    print("Success block. Task now is \(String(describing: self?.taskProtect))")
                     let authToken = body.accessToken
-                    self.authToken = authToken
+                    self?.authToken = authToken
                     completion(.success(authToken))
                 case .failure(let error):
                     print("Error block, do lastCode = nil")
-                    self.lastCode = nil
-                    print("lastCode now is \(String(describing: self.lastCode))")
+                    self?.lastCode = nil
+                    print("lastCode now is \(String(describing: self?.lastCode))")
                     completion(.failure(error))
                 }
             }
         }
         print("Do task = task")
-        self.task = task
+        self.taskProtect = task
         print("Task now is \(task)")
         task.resume()
     }
 }
 
 private extension OAuth2Service {
-    func object(
-        for request: URLRequest,
-        completion: @escaping (Result<OAuthTokenResponseBody, Error>) -> Void
-    ) -> URLSessionTask {
-        let decoder = JSONDecoder()
-        decoder.keyDecodingStrategy = .convertFromSnakeCase
-        return urlSession.data(for: request) { (result: Result<Data, Error>) in
-            let response = result.flatMap { data -> Result<OAuthTokenResponseBody, Error> in
-                Result { try decoder.decode(OAuthTokenResponseBody.self, from: data) }
-            }
-            completion(response)
-        }
-    }
+    
+    
+
     
     /// метод для запроса токена
     func authTokenRequest(code: String) -> URLRequest {

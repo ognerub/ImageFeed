@@ -33,7 +33,9 @@ final class ProfileImageService {
                 return
             }
             let request = urlRequestWithBearerToken(token: token, username: username)
-            let task = object(for: request) { [weak self] result in
+            /// также удаляем старый task и прописываем новый
+            //let task = object(for: request) { [weak self] result in
+            let task = urlSession.objectTask(for: request) { [weak self] (result: Result<UserResult,Error>) in
                 guard let self = self else { return }
                 DispatchQueue.main.async {
                     switch result {
@@ -70,31 +72,31 @@ private extension ProfileImageService {
         return request
     }
     
-    /// пытаемся распрарсить (decode JSON) в соответсвии с заданной структурой
-    func object(
-        for request: URLRequest,
-        completion: @escaping (Result<UserResult, Error>) -> Void
-    ) -> URLSessionTask {
-        let decoder = JSONDecoder()
-        decoder.keyDecodingStrategy = .convertFromSnakeCase
-        return urlSession.data(for: request) { (result: Result<Data, Error>) in
-            switch result {
-            case .success(let data):
-                do {
-                    let object = try decoder.decode(
-                        UserResult.self,
-                        from: data)
-                    let urlString = object.profileImage.small
-                    print("All ok, the object is \(urlString)")
-                    completion(.success(object))
-                } catch {
-                    print("First error \(error)")
-                    completion(.failure(error))
-                }
-            case .failure(let error):
-                print("Second error \(error)")
-                completion(.failure(error))
-            }
-        }
-    }
+//    /// пытаемся распрарсить (decode JSON) в соответсвии с заданной структурой
+//    func object(
+//        for request: URLRequest,
+//        completion: @escaping (Result<UserResult, Error>) -> Void
+//    ) -> URLSessionTask {
+//        let decoder = JSONDecoder()
+//        decoder.keyDecodingStrategy = .convertFromSnakeCase
+//        return urlSession.data(for: request) { (result: Result<Data, Error>) in
+//            switch result {
+//            case .success(let data):
+//                do {
+//                    let object = try decoder.decode(
+//                        UserResult.self,
+//                        from: data)
+//                    let urlString = object.profileImage.small
+//                    print("All ok, the object is \(urlString)")
+//                    completion(.success(object))
+//                } catch {
+//                    print("First error \(error)")
+//                    completion(.failure(error))
+//                }
+//            case .failure(let error):
+//                print("Second error \(error)")
+//                completion(.failure(error))
+//            }
+//        }
+//    }
 }
