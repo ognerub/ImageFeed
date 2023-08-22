@@ -195,7 +195,7 @@ final class ProfileViewController: UIViewController {
     
     @objc
     private func didTapButton() {
-        oAuth2TokenStorage.nilTokenInUserDefaults()
+        //oAuth2TokenStorage.nilTokenInUserDefaults()
         switchToSplashViewController()
     }
     

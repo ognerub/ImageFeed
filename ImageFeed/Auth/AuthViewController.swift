@@ -19,7 +19,7 @@ final class AuthViewController: UIViewController {
     
     weak var delegate: AuthViewControllerDelegate?
     
-    var alertPresenter: AlertPresenterProtocol?
+    
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == showWebViewIdentifier {
@@ -34,18 +34,7 @@ final class AuthViewController: UIViewController {
         }
     }
     
-    func showNetWorkErrorForSpashVC() {
-        DispatchQueue.main.async {
-            let model = AlertModel(
-                title: "Что-то пошло не так(",
-                message: "Не удалось войти в систему",
-                buttonText: "OK",
-                completion: { [weak self] in guard let self = self else { return }
-                    // something to do
-                })
-            self.alertPresenter?.show(with: model)
-        }
-    }
+    
     
 
 }

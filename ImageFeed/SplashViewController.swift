@@ -24,14 +24,18 @@ final class SplashViewController: UIViewController {
     
     private let auth: AuthViewController = AuthViewController()
     
+    var alertPresenter: AlertPresenterProtocol?
+    
+    private var showError: Bool = true
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        auth.alertPresenter = AlertPresenterImpl(viewController: self)
+        alertPresenter = AlertPresenterImpl(viewController: self)
         
        
         
-        if oAuth2TokenStorage.token != nil  {
+        if oAuth2TokenStorage.token != nil && showError == false {
             guard let token = oAuth2TokenStorage.token else {
                 print("Error to guard oAuth2TokenStorage.token while viewDidAppear in SplashVC")
                 return }
@@ -39,8 +43,12 @@ final class SplashViewController: UIViewController {
             //fetchProfileImageSimple(avatarURL: profileImageService.avatarURL ?? "https://unsplash.com")
             switchToTabBarController()
         } else {
+            if showError == true {
+                showNetWorkErrorForSpashVC()
+            } else {
                 performSegue(withIdentifier: showAuthenticationScreenSegueIdentifier, sender: nil)
             }
+        }
                 
         
     }
@@ -65,7 +73,18 @@ final class SplashViewController: UIViewController {
     }
     
     
-    
+    func showNetWorkErrorForSpashVC() {
+        DispatchQueue.main.async {
+            let model = AlertModel(
+                title: "Что-то пошло не так(",
+                message: "Не удалось войти в систему",
+                buttonText: "OK",
+                completion: { [weak self] in guard let self = self else { return }
+                    self.performSegue(withIdentifier: self.showAuthenticationScreenSegueIdentifier, sender: nil)
+                })
+            self.alertPresenter?.show(with: model)
+        }
+    }
     
     
 }
@@ -78,6 +97,8 @@ extension SplashViewController: AuthViewControllerDelegate {
             [weak self] in guard let self = self
             else { return }
             self.fetchOAuthToken(code)
+            self.fetchProfileSimple(token: self.oAuth2TokenStorage.token ?? "")
+            //self.fetchProfileImageSimple(avatarURL: )
         }
     }
 }
@@ -94,8 +115,8 @@ extension SplashViewController {
                 self.uiBlockingProgressHUD.dismiss()
             case .failure:
                 print("Error to fetchOAuthToken in SplashVC")
+                self.showError = true
                 self.uiBlockingProgressHUD.dismiss()
-                self.auth.showNetWorkErrorForSpashVC()
                 break
             }
         }
@@ -111,8 +132,8 @@ extension SplashViewController {
                 self.switchToTabBarController()
             case .failure:
                 print("Error to fetchProfileSimple in SplashVC")
+                self.showError = true
                 UIBlockingProgressHUD.dismiss()
-                // TODO 11 sprint
                 break
             }
         }
@@ -137,7 +158,6 @@ extension SplashViewController {
                 //                }
                 print("All ok, avatar URL")
             case .failure:
-                // TODO [Sprint 11]
                 break
             }
         }
