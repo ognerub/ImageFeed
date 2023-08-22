@@ -16,9 +16,10 @@ final class AuthViewController: UIViewController {
     private let showWebViewIdentifier: String = "ShowWebView"
     private var oAuth2Service = OAuth2Service()
     private var oAuth2TokenStorage = OAuth2TokenStorage()
-    private var splashViewController = SplashViewController()
     
     weak var delegate: AuthViewControllerDelegate?
+    
+    var alertPresenter: AlertPresenterProtocol?
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == showWebViewIdentifier {
@@ -32,6 +33,21 @@ final class AuthViewController: UIViewController {
             super.prepare(for: segue, sender: sender) // 6
         }
     }
+    
+    func showNetWorkErrorForSpashVC() {
+        DispatchQueue.main.async {
+            let model = AlertModel(
+                title: "Что-то пошло не так(",
+                message: "Не удалось войти в систему",
+                buttonText: "OK",
+                completion: { [weak self] in guard let self = self else { return }
+                    // something to do
+                })
+            self.alertPresenter?.show(with: model)
+        }
+    }
+    
+
 }
 
 // MARK: - WebViewViewController Delegate
@@ -40,8 +56,6 @@ extension AuthViewController: WebViewViewControllerDelegate {
         delegate?.authViewController(self, didAuthenticateWithCode: code)
     }
     
-    func webViewViewControllerDidCancel(_ vc: WebViewViewController) {
-        splashViewController.showError = true
-        dismiss(animated: true)
+    func webViewViewControllerDidCancel(_ vc: WebViewViewController) {        dismiss(animated: true)
     }
 }
