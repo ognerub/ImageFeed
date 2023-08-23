@@ -59,7 +59,6 @@ final class ProfileViewController: UIViewController {
     private let splashViewControllerIdentifier = "SplashViewController"
     private let mainUIStoryboard = "Main"
     
-    
     /// Example with selectors --->
 //    // перегружаем конструктор
 //    override init(nibName: String?, bundle: Bundle?) {
@@ -195,7 +194,7 @@ final class ProfileViewController: UIViewController {
     
     @objc
     private func didTapButton() {
-        //oAuth2TokenStorage.nilTokenInUserDefaults()
+        oAuth2TokenStorage.nilTokenInUserDefaults()
         switchToSplashViewController()
     }
     

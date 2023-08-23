@@ -26,16 +26,20 @@ final class SplashViewController: UIViewController {
     
     var alertPresenter: AlertPresenterProtocol?
     
-    private var showError: Bool = true
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        print("SplashVC viewWillAppear")
+    }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
+        print("SplashVC viewDidAppear")
+        
         alertPresenter = AlertPresenterImpl(viewController: self)
         
-       
         
-        if oAuth2TokenStorage.token != nil && showError == false {
+        if oAuth2TokenStorage.token != nil {
             guard let token = oAuth2TokenStorage.token else {
                 print("Error to guard oAuth2TokenStorage.token while viewDidAppear in SplashVC")
                 return }
@@ -43,15 +47,22 @@ final class SplashViewController: UIViewController {
             //fetchProfileImageSimple(avatarURL: profileImageService.avatarURL ?? "https://unsplash.com")
             switchToTabBarController()
         } else {
-            if showError == true {
-                showNetWorkErrorForSpashVC()
-            } else {
-                performSegue(withIdentifier: showAuthenticationScreenSegueIdentifier, sender: nil)
-            }
-        }
+                if self.oAuth2Service.errorVar != nil {
+                        self.showNetWorkErrorForSpashVC()
+                    
+                    
+                } else {
+                    self.performSegue(withIdentifier: self.showAuthenticationScreenSegueIdentifier, sender: nil)
                 
+            }
+            
+        }
         
+        print("SplashVC ends")
     }
+            
+        
+    
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == showAuthenticationScreenSegueIdentifier {
@@ -75,30 +86,51 @@ final class SplashViewController: UIViewController {
     
     func showNetWorkErrorForSpashVC() {
         DispatchQueue.main.async {
-            let model = AlertModel(
-                title: "Что-то пошло не так(",
-                message: "Не удалось войти в систему",
-                buttonText: "OK",
-                completion: { [weak self] in guard let self = self else { return }
+            //            let model = AlertModel(
+            //                title: "Что-то пошло не так(",
+            //                message: "Не удалось войти в систему",
+            //                buttonText: "OK",
+            //                completion: { [weak self] in guard let self = self else { return }
+            //                    // nothing to do
+            //
+            //                })
+            //            self.alertPresenter?.show(with: model)
+            //}
+            let alert = UIAlertController(title: "Alert!", message: "No message", preferredStyle: .alert)
+            let action = UIAlertAction(title: "OK", style: .cancel, handler: nil)
+            alert.addAction(action)
+            //vc.view.layoutIfNeeded()
+                self.present(alert, animated: true, completion: {
+                    self.oAuth2Service.errorVar = nil
                     self.performSegue(withIdentifier: self.showAuthenticationScreenSegueIdentifier, sender: nil)
                 })
-            self.alertPresenter?.show(with: model)
+            
+//            self.addChild(vc)
+//            vc.didMove(toParent: self)
+//            self.view.addSubview(vc.view)
+            
         }
     }
+    
     
     
 }
 
 // MARK: - SplashViewControllerDelegate
 extension SplashViewController: AuthViewControllerDelegate {
+    
     func authViewController(_ vc: AuthViewController, didAuthenticateWithCode code: String) {
-        uiBlockingProgressHUD.show()
-        dismiss(animated: true) {
-            [weak self] in guard let self = self
-            else { return }
-            self.fetchOAuthToken(code)
-            self.fetchProfileSimple(token: self.oAuth2TokenStorage.token ?? "")
-            //self.fetchProfileImageSimple(avatarURL: )
+        
+            self.uiBlockingProgressHUD.show()
+            
+            self.dismiss(animated: true) {
+                [weak self] in guard let self = self
+                else { return }
+                self.fetchOAuthToken(code)
+                self.fetchProfileSimple(token: self.oAuth2TokenStorage.token ?? "")
+                //self.fetchProfileImageSimple(avatarURL: )
+                
+            
         }
     }
 }
@@ -107,18 +139,26 @@ extension SplashViewController: AuthViewControllerDelegate {
 extension SplashViewController {
     func fetchOAuthToken(_ code: String) {
         oAuth2Service.fetchOAuthToken(code) { [weak self] result in
-            guard let self = self else { return }
-            switch result {
-            case .success:
-                print("Success to fetchOAuthToken in SplashVC")
-                self.switchToTabBarController()
-                self.uiBlockingProgressHUD.dismiss()
-            case .failure:
-                print("Error to fetchOAuthToken in SplashVC")
-                self.showError = true
-                self.uiBlockingProgressHUD.dismiss()
+            
+               
+                guard let self = self else { return }
+                switch result {
+                case .success:
+                    print("Success to fetchOAuthToken in SplashVC")
+                    self.switchToTabBarController()
+                    self.uiBlockingProgressHUD.dismiss()
+                case .failure (let error):
+                    print("Error to fetchOAuthToken in SplashVC \(error)")
+                    self.uiBlockingProgressHUD.dismiss()
+                    // TODO 11 sprint
+                    
+                    self.oAuth2Service.errorVar = error
+                    
+                    
                 break
+                
             }
+            
         }
     }
     
@@ -132,7 +172,6 @@ extension SplashViewController {
                 self.switchToTabBarController()
             case .failure:
                 print("Error to fetchProfileSimple in SplashVC")
-                self.showError = true
                 UIBlockingProgressHUD.dismiss()
                 break
             }

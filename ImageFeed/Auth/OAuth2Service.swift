@@ -6,7 +6,7 @@
 //
 
 import Foundation
-
+import UIKit
 
 final class OAuth2Service {
     static let shared = OAuth2Service()
@@ -22,6 +22,7 @@ final class OAuth2Service {
     }
     private var taskProtect: URLSessionTask?
     private var lastCode: String?
+    var errorVar: Error?
     
     func fetchOAuthToken(
         _ code: String,
@@ -51,6 +52,8 @@ final class OAuth2Service {
                     print("Error block, do lastCode = nil")
                     self?.lastCode = nil
                     print("lastCode now is \(String(describing: self?.lastCode))")
+                    self?.errorVar = error
+                    //print("ErrorVar is \(String(describing: self?.errorVar))")
                     completion(.failure(error))
                 }
             }
