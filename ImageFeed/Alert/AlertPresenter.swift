@@ -11,32 +11,25 @@ protocol AlertPresenterProtocol: AnyObject {
     func show(with alertModel: AlertModel)
 }
 
-final class AlertPresenterImpl {
-    private weak var viewController: UIViewController?
+final class AlertPresenter {
     
-    init(viewController: UIViewController?) {
-        self.viewController = viewController
-    }
-
-}
-
-extension AlertPresenterImpl: AlertPresenterProtocol {
-   
-    func show(with alertModel: AlertModel) {
-        DispatchQueue.main.async {
-            let alert = UIAlertController(
-                title: alertModel.title,
-                message: alertModel.message,
-                preferredStyle: .alert)
-            let action = UIAlertAction(
-                title: alertModel.buttonText,
-                style: .default) { _ in
-                alertModel.completion()
+    weak var delegate: UIViewController?
+    
+    func show(with alertModel: AlertModel, completion: @escaping () -> Void) {
+        
+        let alert = UIAlertController(
+            title: alertModel.title,
+            message: alertModel.message,
+            preferredStyle: .alert)
+        let action = UIAlertAction(
+            title: alertModel.buttonText,
+            style: .default) { _ in
+                completion()
             }
-            alert.addAction(action)
-            self.viewController?.present(alert,
-                                    animated: true)
-        }
-       
+        alert.addAction(action)
+        delegate?.present(alert, animated: true)
+              
+               
     }
 }
+

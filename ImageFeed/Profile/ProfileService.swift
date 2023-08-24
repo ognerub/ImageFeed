@@ -20,7 +20,6 @@ final class ProfileService {
     
     /// получаем информаю профиля в соответсвии с заданной структурой
     func fetchProfile(
-        _ token: String,
         completion: @escaping (Result<Profile, Error>) -> Void) {
             guard let token = authToken else {
                 //print("Token is empty while fetchPtofile in ProfileService")
@@ -31,7 +30,7 @@ final class ProfileService {
             //let task = object(for: request) { [weak self] result in
             let task = urlSession.objectTask(for: request) { [weak self] (result: Result<ProfileResult,Error>) in
                 guard let self = self else { return }
-                DispatchQueue.main.sync {
+                DispatchQueue.global(qos: .background).async {
                     switch result {
                     case .success(let body):
                         let username = body.username

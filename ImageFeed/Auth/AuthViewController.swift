@@ -19,6 +19,8 @@ final class AuthViewController: UIViewController {
     
     weak var delegate: AuthViewControllerDelegate?
     
+    static let shared = AuthViewController()
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         print("AuthVC viewWillAppear")
@@ -59,15 +61,18 @@ final class AuthViewController: UIViewController {
     }
     
     
-    func showNetWorkErrorForSpashVC(_ vc: UIViewController) {
+    func showNetWorkErrorForSpashVC() {
     
+        DispatchQueue.main.async {
+            let alert = UIAlertController(title: "Alert!", message: "No message", preferredStyle: .alert)
+                            let action = UIAlertAction(title: "OK", style: .cancel, handler: nil)
+                            alert.addAction(action)
+            self.view.layoutIfNeeded()
+                            self.present(alert, animated: true, completion: {
+                                //self.oAuth2Service.errorVar = nil
+                            })
+        }
         
-        let alert = UIAlertController(title: "Alert!", message: "No message", preferredStyle: .alert)
-                        let action = UIAlertAction(title: "OK", style: .cancel, handler: nil)
-                        alert.addAction(action)
-                        vc.present(alert, animated: true, completion: {
-                            //self.oAuth2Service.errorVar = nil
-                        })
     }
 
 }

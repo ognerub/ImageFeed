@@ -24,6 +24,10 @@ final class OAuth2Service {
     private var lastCode: String?
     var errorVar: Error?
     
+    var isAuthenticated: Bool {
+        oAuth2TokenStorage.token != nil
+    }
+    
     func fetchOAuthToken(
         _ code: String,
         completion: @escaping (Result<String, Error>) -> Void
@@ -39,7 +43,7 @@ final class OAuth2Service {
         let request = authTokenRequest(code: code)
         let task = urlSession.objectTask(for: request) { [weak self] (result: Result<OAuthTokenResponseBody,Error>) in
             print("Switch to main.async")
-            DispatchQueue.main.async {
+            DispatchQueue.global(qos: .background).async {
                 switch result {
                 case .success(let body):
                     print("Success block, do task = nil")
