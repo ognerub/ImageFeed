@@ -326,24 +326,6 @@
             </objects>
             <point key="canvasLocation" x="2801" y="-1468"/>
         </scene>
-        <!--Navigation Controller-->
-        <scene sceneID="d8T-NR-i7G">
-            <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="ijW-NM-Bzb" sceneMemberID="viewController">
-                    <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="vvM-6q-A9s">
-                        <rect key="frame" x="0.0" y="59" width="393" height="44"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                    </navigationBar>
-                    <nil name="viewControllers"/>
-                    <connections>
-                        <segue destination="Zuf-dC-fgj" kind="relationship" relationship="rootViewController" id="Yek-4V-0js"/>
-                    </connections>
-                </navigationController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="NJ8-oH-LXE" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="894" y="-1468"/>
-        </scene>
         <!--SplashViewController-->
         <scene sceneID="I0T-Ta-Qr7">
             <objects>
@@ -368,7 +350,7 @@
                         </constraints>
                     </view>
                     <connections>
-                        <segue destination="ijW-NM-Bzb" kind="presentation" identifier="ShowAuthenticationScreen" modalPresentationStyle="fullScreen" id="mjo-J6-lmo"/>
+                        <segue destination="Zuf-dC-fgj" kind="presentation" identifier="ShowAuthenticationScreen" modalPresentationStyle="fullScreen" id="BUI-yV-uiU"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="GBe-Xd-ZSj" userLabel="First Responder" sceneMemberID="firstResponder"/>

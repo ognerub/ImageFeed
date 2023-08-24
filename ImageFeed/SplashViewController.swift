@@ -28,6 +28,9 @@ final class SplashViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        alertPresenter = AlertPresenterImpl(viewController: self)
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -37,22 +40,18 @@ final class SplashViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        alertPresenter = AlertPresenterImpl(viewController: self)
+        
         
         if oAuth2TokenStorage.token != nil  {
             guard let token = oAuth2TokenStorage.token else {
                 print("Error to guard oAuth2TokenStorage.token while viewDidAppear in SplashVC")
                 return }
-            showError = false
-            fetchProfileSimple(token: token)
             //fetchProfileImageSimple(avatarURL: profileImageService.avatarURL ?? "https://unsplash.com")
             switchToTabBarController()
         } else {
-            if showError == true {
-                showNetWorkErrorForSpashVC()
-            } else {
-                performSegue(withIdentifier: showAuthenticationScreenSegueIdentifier, sender: nil)
-            }
+            //showNetWorkErrorForSpashVC()
+            performSegue(withIdentifier: showAuthenticationScreenSegueIdentifier, sender: nil)
+            
         }
     }
     
@@ -67,10 +66,7 @@ final class SplashViewController: UIViewController {
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == showAuthenticationScreenSegueIdentifier {
-            guard
-                let navigationController = segue.destination as? UINavigationController,
-                let viewController = navigationController.viewControllers[0] as? AuthViewController
-            else { fatalError("Failed to prepare for \(showAuthenticationScreenSegueIdentifier)")}
+            guard let viewController = segue.destination as? AuthViewController else { return }
             viewController.delegate = self
         } else {
             super.prepare(for: segue, sender: sender)
@@ -106,6 +102,7 @@ extension SplashViewController: AuthViewControllerDelegate {
         dismiss(animated: true) {
             [weak self] in guard let self = self
             else { return }
+            
             self.fetchOAuthToken(code)
         }
     }
@@ -119,37 +116,34 @@ extension SplashViewController {
             switch result {
             case .success:
                 print("Success to fetchOAuthToken in SplashVC")
-                self.showError = false
-                self.switchToTabBarController()
-                self.uiBlockingProgressHUD.dismiss()
+                self.fetchProfileSimple()
+                //self.switchToTabBarController()
+                //self.uiBlockingProgressHUD.dismiss()
             case .failure:
                 print("Error to fetchOAuthToken in SplashVC")
-                self.showError = true
+                self.showNetWorkErrorForSpashVC()
                 self.uiBlockingProgressHUD.dismiss()
                 // TODO 11 sprint
-                break
+                //break
             }
         }
     }
     
-    func fetchProfileSimple(token: String) {
-        profileService.fetchProfile(token) { [weak self] result in
+    func fetchProfileSimple() {
+        profileService.fetchProfile() { [weak self] result in
             guard let self = self else {return }
             switch result {
             case .success:
                 print("Success to fetchProfileSimple in SplashVC")
-                self.showError = false
                 UIBlockingProgressHUD.dismiss()
                 self.switchToTabBarController()
             case .failure:
                 print("Error to fetchProfileSimple in SplashVC")
-                self.showError = true
+                self.showNetWorkErrorForSpashVC()
                 UIBlockingProgressHUD.dismiss()
                 // TODO 11 sprint
                 
-                self.showNetWorkErrorForSpashVC()
-                
-                break
+                //break
             }
         }
     }
