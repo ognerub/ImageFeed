@@ -26,6 +26,15 @@ final class SplashViewController: UIViewController {
     
     var showError: Bool = false
     
+    var topVC: UIViewController {
+        var topController: UIViewController = UIApplication.shared.keyWindow!.rootViewController!
+        while (topController.presentedViewController != nil) {
+            topController = topController.presentedViewController!
+        }
+        return topController
+    }
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -80,17 +89,32 @@ final class SplashViewController: UIViewController {
         window.rootViewController = tabBarController
     }
     
-    private func showNetWorkErrorForSpashVC() {
+    private func showNetWorkErrorForSpashVC(title: String, error: Error) {
         DispatchQueue.main.async {
             let model = AlertModel(
-                title: "Что-то пошло не так(",
-                message: "Не удалось войти в систему",
+                title: title, //"Что-то пошло не так(",
+                message: "Не удалось войти в систему \(error)",
                 buttonText: "OK",
                 completion: { [weak self] in guard let self = self else { return }
                     self.performSegue(withIdentifier: self.showAuthenticationScreenSegueIdentifier, sender: nil)
                 })
-            self.alertPresenter?.show(with: model)
+            self.show(with: model)
         }
+    }
+    
+    func show(with alertModel: AlertModel) {
+        let alert = UIAlertController(
+            title: alertModel.title,
+            message: alertModel.message,
+            preferredStyle: .alert)
+        let action = UIAlertAction(
+            title: alertModel.buttonText,
+            style: .default) { _ in
+            alertModel.completion()
+        }
+        alert.addAction(action)
+        topVC.present(alert,
+                                animated: true)
     }
     
 }
@@ -104,6 +128,7 @@ extension SplashViewController: AuthViewControllerDelegate {
             else { return }
             
             self.fetchOAuthToken(code)
+            self.fetchProfileSimple()
         }
     }
 }
@@ -116,12 +141,12 @@ extension SplashViewController {
             switch result {
             case .success:
                 print("Success to fetchOAuthToken in SplashVC")
-                self.fetchProfileSimple()
+                //self.fetchProfileSimple()
                 //self.switchToTabBarController()
                 //self.uiBlockingProgressHUD.dismiss()
-            case .failure:
+            case .failure (let error):
                 print("Error to fetchOAuthToken in SplashVC")
-                self.showNetWorkErrorForSpashVC()
+                self.showNetWorkErrorForSpashVC(title: "1", error: error)
                 self.uiBlockingProgressHUD.dismiss()
                 // TODO 11 sprint
                 //break
@@ -137,9 +162,9 @@ extension SplashViewController {
                 print("Success to fetchProfileSimple in SplashVC")
                 UIBlockingProgressHUD.dismiss()
                 self.switchToTabBarController()
-            case .failure:
+            case .failure (let error):
                 print("Error to fetchProfileSimple in SplashVC")
-                self.showNetWorkErrorForSpashVC()
+                self.showNetWorkErrorForSpashVC(title: "2", error: error)
                 UIBlockingProgressHUD.dismiss()
                 // TODO 11 sprint
                 
