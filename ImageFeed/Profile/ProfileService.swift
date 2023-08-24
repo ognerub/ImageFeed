@@ -30,7 +30,7 @@ final class ProfileService {
             //let task = object(for: request) { [weak self] result in
             let task = urlSession.objectTask(for: request) { [weak self] (result: Result<ProfileResult,Error>) in
                 guard let self = self else { return }
-                DispatchQueue.global(qos: .background).async {
+                //DispatchQueue.global(qos: .background).async {
                     switch result {
                     case .success(let body):
                         let username = body.username
@@ -44,7 +44,7 @@ final class ProfileService {
                         //print("Error while fetchProfile in ProfileService. Result is \(result) ")
                         completion(.failure(error))
                     }
-                }
+                
             }
             task.resume()
         }

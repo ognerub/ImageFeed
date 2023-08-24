@@ -36,7 +36,7 @@ final class SplashViewController: UIViewController {
         
         alertPresenter.delegate = self
         
-        
+        //checkAuthStatus()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -45,6 +45,8 @@ final class SplashViewController: UIViewController {
         print("SplashVC viewDidAppear")
         
         checkAuthStatus()
+        
+        
         
         
         
@@ -117,7 +119,7 @@ final class SplashViewController: UIViewController {
     }
     
     func showNetWorkErrorForSpashVC() {
-        DispatchQueue.main.async {
+        //DispatchQueue.main.async {
             //                        let model = AlertModel(
             //                            title: "Что-то пошло не так(",
             //                            message: "Не удалось войти в систему",
@@ -137,7 +139,7 @@ final class SplashViewController: UIViewController {
             //        self.addChild(vc)
             //        vc.didMove(toParent: self)
             //        self.view.addSubview(vc.view)
-        }
+        //}
     }
 }
     

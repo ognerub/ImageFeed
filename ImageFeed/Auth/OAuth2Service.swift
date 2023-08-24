@@ -43,7 +43,7 @@ final class OAuth2Service {
         let request = authTokenRequest(code: code)
         let task = urlSession.objectTask(for: request) { [weak self] (result: Result<OAuthTokenResponseBody,Error>) in
             print("Switch to main.async")
-            DispatchQueue.global(qos: .background).async {
+            //DispatchQueue.global(qos: .background).async {
                 switch result {
                 case .success(let body):
                     print("Success block, do task = nil")
@@ -59,7 +59,7 @@ final class OAuth2Service {
                     self?.errorVar = error
                     //print("ErrorVar is \(String(describing: self?.errorVar))")
                     completion(.failure(error))
-                }
+                
             }
         }
         print("Do task = task")
