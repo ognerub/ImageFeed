@@ -113,7 +113,7 @@ final class SplashViewController: UIViewController {
             alertModel.completion()
         }
         alert.addAction(action)
-        topVC.present(alert,
+        presentedViewController?.present(alert,
                                 animated: true)
     }
     
@@ -128,7 +128,7 @@ extension SplashViewController: AuthViewControllerDelegate {
             else { return }
             
             self.fetchOAuthToken(code)
-            self.fetchProfileSimple()
+            //self.fetchProfileSimple()
         }
     }
 }
@@ -141,7 +141,7 @@ extension SplashViewController {
             switch result {
             case .success:
                 print("Success to fetchOAuthToken in SplashVC")
-                //self.fetchProfileSimple()
+                self.fetchProfileSimple()
                 //self.switchToTabBarController()
                 //self.uiBlockingProgressHUD.dismiss()
             case .failure (let error):

@@ -21,7 +21,7 @@ final class ProfileService {
     /// получаем информаю профиля в соответсвии с заданной структурой
     func fetchProfile(completion: @escaping (Result<Profile, Error>) -> Void) {
             guard let token = authToken else {
-                //print("Token is empty while fetchPtofile in ProfileService")
+                print("Token is empty while fetchPtofile in ProfileService")
                 return
             }
             let request = urlRequestWithBearerToken(token: token)
