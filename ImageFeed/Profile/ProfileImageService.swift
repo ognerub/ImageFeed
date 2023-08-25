@@ -10,7 +10,7 @@ import UIKit
 final class ProfileImageService {
     
     struct ImageSizes: Decodable {
-        var small: String
+        var small: String?
     }
     struct UserResult: Decodable {
         let profileImage: ImageSizes
@@ -22,11 +22,15 @@ final class ProfileImageService {
     // добавляем новое имя нотификации
     static let DidChangeNotification = Notification.Name(rawValue: "ProfileImageProviderDidChange")
     
+    private var currentTask: URLSessionTask?
+    
+    private (set) var avatarURL: URL?
+    
+    private (set) var avatarImage: UIImage = UIImage(systemName: "person.crop.circle.fill")!
+    
     private let urlSession: URLSession
     private let storage: OAuth2TokenStorage
     private let builder: URLRequestBuilder
-    
-    private (set) var avatarURL: String?
     
     init (
         urlSession: URLSession = .shared,
@@ -43,81 +47,40 @@ final class ProfileImageService {
     func fetchProfileImageURL(
         username: String,
         _ completion: @escaping (Result<String, Error>) -> Void) {
+            assert(Thread.isMainThread)
+            
             guard let request = urlRequestWithBearerToken(username: username) else {
                 print("Nil request in fetchProfileImageURL")
                 return
             }            
-            /// также удаляем старый task и прописываем новый
-            //let task = object(for: request) { [weak self] result in
+            
             let task = urlSession.objectTask(for: request) { [weak self] (result: Result<UserResult,Error>) in
                 guard let self = self else { return }
-                DispatchQueue.main.async {
                     switch result {
                     case .success(let body):
-                        let profileImageURL = body.profileImage.small
-                        self.avatarURL = profileImageURL
-                        
-                        NotificationCenter.default
-                            .post(
+                        guard let profileImageURL = body.profileImage.small else {return}
+                        self.avatarURL = URL(string: profileImageURL)
+                        completion(.success(profileImageURL))
+                        NotificationCenter.default.post(
                                 name: ProfileImageService.DidChangeNotification,
                                 object: self,
-                                userInfo: ["URL": profileImageURL])
-                        
-                        completion(.success(profileImageURL))
-                        
+                                userInfo: ["URL": profileImageURL]
+                            )
                     case .failure(let error):
-                        //print("Error while fetchImageProfile in ProfileImageService. Result is \(result) ")
                         completion(.failure(error))
                     }
-                }
+                self.currentTask = nil
             }
+            self.currentTask = task
             task.resume()
         }
 }
 
 private extension ProfileImageService {
-    
-    /// создаем GET запрос с использованием Bearer токена, планурием получить в ответе JSON
     func urlRequestWithBearerToken(username: String) -> URLRequest? {
-        
         builder.makeHTTPRequest(
             path: "/users/\(username)",
             httpMethod: "GET",
             baseURLString: Constants.defaultAPIURLString)
-        //
-        //
-        //        let url: URL = URL(string: "\(Constants.defaultAPIURL)/users/\(username)")!
-        //        var request = URLRequest(url: url)
-        //        request.httpMethod = "GET"
-        //        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        //        return request
     }
-    
-    //    /// пытаемся распрарсить (decode JSON) в соответсвии с заданной структурой
-    //    func object(
-    //        for request: URLRequest,
-    //        completion: @escaping (Result<UserResult, Error>) -> Void
-    //    ) -> URLSessionTask {
-    //        let decoder = JSONDecoder()
-    //        decoder.keyDecodingStrategy = .convertFromSnakeCase
-    //        return urlSession.data(for: request) { (result: Result<Data, Error>) in
-    //            switch result {
-    //            case .success(let data):
-    //                do {
-    //                    let object = try decoder.decode(
-    //                        UserResult.self,
-    //                        from: data)
-    //                    let urlString = object.profileImage.small
-    //                    print("All ok, the object is \(urlString)")
-    //                    completion(.success(object))
-    //                } catch {
-    //                    print("First error \(error)")
-    //                    completion(.failure(error))
-    //                }
-    //            case .failure(let error):
-    //                print("Second error \(error)")
-    //                completion(.failure(error))
-    //            }
-    //        }
-    //    }
 }

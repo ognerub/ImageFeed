@@ -139,17 +139,6 @@ extension SplashViewController {
             guard let self = self else {return }
             switch result {
             case .success:
-                if let url = URL(string: self.profileImageService.avatarURL ?? "") {
-                    DispatchQueue.global().async {
-                        if let data = try? Data(contentsOf: url) {
-                            DispatchQueue.main.async {
-                                self.profileViewController.personImageView.image = UIImage(data: data)!
-                            }
-                        }
-                    }
-                } else {
-                    self.profileViewController.personImageView.image = UIImage(systemName: "person.crop.circle.fill")!
-                }
                 UIBlockingProgressHUD.dismiss()
                 self.switchToTabBarController()
                 print("All ok, all data fetched")

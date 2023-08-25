@@ -61,27 +61,7 @@ final class ProfileViewController: UIViewController {
     private let splashViewControllerIdentifier = "SplashViewController"
     private let mainUIStoryboard = "Main"
     
-    
-    /// Example with selectors --->
-//    // перегружаем конструктор
-//    override init(nibName: String?, bundle: Bundle?) {
-//        super.init(nibName: nibName, bundle: bundle)
-//        addObserver()
-//    }
-//    // определяем конструктор, необходимый при декодировании класса из Storyboard
-//    required init?(coder: NSCoder) {
-//        super.init(coder: coder)
-//        addObserver()
-//    }
-//    // определям деструктор
-//    deinit {
-//        removeObserver()
-//    }
-    /// ---<
-    
-    /// Example with blocks --->
-    private var profileImageServiceObserver: NSObjectProtocol? // 1 объявляем свойство для хранения обсервера
-    /// ---<
+    private var profileImageServiceObserver: NSObjectProtocol?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -90,63 +70,53 @@ final class ProfileViewController: UIViewController {
         guard let profile = profileService.profile else { return }
         updateProfileDetails(profile: profile)
         
-        /// Example with selectors continue --->
-//        if let avatarURL = ProfileImageService.shared.avatarURL,
-//           let url = URL(string: avatarURL) {
-//               // TODO обновить аватар, если нотификация была опубликована до того, как мы подписались
-//           }
-        /// ---<
-        
-        /// Example with blocks continue --->
-        profileImageServiceObserver = NotificationCenter.default // 2 присваиваем в свойство обсервер, возвращаемый функцией .addObserver
-            .addObserver(
-                forName: ProfileImageService.DidChangeNotification, // 3 имя уведомления
-                object: nil, // 4 так как хотим получать уведомления от любых источников
-                queue: .main // 5 указываем главную очередь, так как в обработчике нотификаций будем обновлять UI!
-            ) { [weak self] _ in
+        profileImageServiceObserver = NotificationCenter.default.addObserver(
+                forName: ProfileImageService.DidChangeNotification,
+                object: nil,
+                queue: .main
+            ) { [weak self] notification in
                 guard let self = self else { return }
-                self.updateAvatar() // 6 вызываем функцию для обновления аватара
+                self.updateAvatar(notification: notification)
             }
-        updateAvatar() // 7 добавленный наблюдатель (обсервер) будет получать уведомления (нотификацию) после добавления, но может случится, что запрос на получение аватарки уже успел завершиться, поэтому во viewDidLoad также пытаеся обновить аватарку
-        /// ---<
+        if let url = profileImageService.avatarURL {
+            updateAvatar(url: url)
+        }
     }
     
-    /// Example with blocks continue --->
-    private func updateAvatar() { // 8 метод обновления аватарки
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        guard let profile = profileService.profile else {
+            print("no saved profile")
+            return
+        }
+        updateProfileDetails(profile: profile)
+        guard let avatarURL = profileImageService.avatarURL else {
+            print("no saved avatarURL")
+            return
+        }
+        profileImageService.fetchProfileImageURL(username: profile.username) { _ in
+            self.updateAvatar(url: avatarURL)
+        }
+    }
+    
+    
+    @objc
+    private func updateAvatar(notification: Notification) {
         guard
-            let profileImageURL = profileImageService.avatarURL,
+            isViewLoaded,
+            let userInfo = notification.userInfo,
+            let profileImageURL = userInfo["URL"] as? String,
             let url = URL(string: profileImageURL)
         else { return }
+        updateAvatar(url: url)
         // TODO обновление аватара используя Kingfisher
     }
-    /// ---<
     
-    /// Example with selectors continue --->
-//    private func addObserver() {
-//        NotificationCenter.default.addObserver(
-//        self,
-//        selector: #selector(updateAvatar(notification:)),
-//        name: ProfileImageService.DidChangeNotification,
-//        object: nil)
-//    }
-//    private func removeObserver() {
-//        NotificationCenter.default.removeObserver(
-//            self,
-//            name: ProfileImageService.DidChangeNotification,
-//            object: nil)
-//    }
-//    @objc
-//        private func updateAvatar(notification: Notification) {
-//            guard
-//                isViewLoaded,
-//                let userInfo = notification.userInfo,
-//                let profileImageURL = userInfo["URL"] as? String,
-//                let url = URL(string: profileImageURL)
-//            else {return}
-//
-//            // TODO обновить аватар используя Kingfisher
-//        }
-    /// ---<
+    private func updateAvatar(url: URL) {
+        personImageView.image = profileImageService.avatarImage
+        personImageView.layer.masksToBounds = true
+        personImageView.layer.cornerRadius = 32
+    }
     
     private func updateProfileDetails(profile: Profile) {
         // change profile text
@@ -155,9 +125,7 @@ final class ProfileViewController: UIViewController {
         personInfoTextLabel.text = profile.bio
         
         // change profile image
-        //self.personImageView.image = profile.avatarImage
-        personImageView.layer.masksToBounds = true
-        personImageView.layer.cornerRadius = 32
+        
     }
     
     private func addSubViews() {
