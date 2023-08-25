@@ -9,7 +9,7 @@ import UIKit
 
 final class ProfileViewController: UIViewController {
     
-    private let personImageView: UIImageView = {
+    var personImageView: UIImageView = {
         let personImage = UIImage(named: "Avatar") ?? UIImage(systemName: "person.crop.circle.fill")!
         let personImageView = UIImageView(image: personImage)
         personImageView.translatesAutoresizingMaskIntoConstraints = false
