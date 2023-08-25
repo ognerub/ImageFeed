@@ -14,35 +14,36 @@ final class SplashViewController: UIViewController {
     private let tabBarViewControllerIdentifier = "TabBarViewController"
     private let mainUIStoryboard = "Main"
     
-    private let storage: OAuth2TokenStorage
-    private let oAuth2Service: OAuth2Service
+    private let storage = OAuth2TokenStorage.shared
+    private let oAuth2Service = OAuth2Service.shared
     // обращаемся к синглтону shared из ProfileService (локализованный способ)
-    private let profileService: ProfileService
+    private let profileService = ProfileService.shared
     // также обращаемся к shared из ProfileImageService
-    private let profileImageService: ProfileImageService
+    private let profileImageService = ProfileImageService.shared
+    
+    private let profileViewController = ProfileViewController.shared
+    
     // обращаемся к расширению ProgressHUD
     private let uiBlockingProgressHUD = UIBlockingProgressHUD.self
     
     private var alertPresenter: AlertPresenterProtocol?
     
-    private var allDataFetched: Bool = false
-    
-    init (
-        storage: OAuth2TokenStorage = .shared,
-        oAuth2Service: OAuth2Service = .shared,
-        profileService: ProfileService = .shared,
-        profileImageService: ProfileImageService = .shared
-    ) {
-        self.storage = storage
-        self.oAuth2Service = oAuth2Service
-        self.profileService = profileService
-        self.profileImageService = profileImageService
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
+//    init (
+//        storage: OAuth2TokenStorage = .shared,
+//        oAuth2Service: OAuth2Service = .shared,
+//        profileService: ProfileService = .shared,
+//        profileImageService: ProfileImageService = .shared
+//    ) {
+//        self.storage = storage
+//        self.oAuth2Service = oAuth2Service
+//        self.profileService = profileService
+//        self.profileImageService = profileImageService
+//        super.init(nibName: nil, bundle: nil)
+//    }
+//
+//    required init?(coder: NSCoder) {
+//        fatalError("init(coder:) has not been implemented")
+//    }
     
 //    /// используем эту переменную для определения VC находящегося на самом верхнем слое отображения
 //    var topVC: UIViewController {
@@ -60,7 +61,7 @@ final class SplashViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        if storage.token != nil && allDataFetched {
+        if storage.token != nil {
             guard let token = storage.token else {
                 print("Error to guard oAuth2TokenStorage.token while viewDidAppear in SplashVC")
                 return }
@@ -123,7 +124,7 @@ extension SplashViewController {
             switch result {
             case .success:
                 print("Success to fetchProfileSimple in SplashVC")
-                self.fetchProfileImageSimple(avatarURL: self.profileImageService.avatarURL ?? "")
+                self.fetchProfileImageSimple()
             case .failure (let error):
                 print("Error to fetchProfileSimple in SplashVC")
                 self.showNetWorkErrorForSpashVC(title: "2", error: error)
@@ -132,25 +133,24 @@ extension SplashViewController {
         }
     }
     
-    private func fetchProfileImageSimple(avatarURL: String) {
+    private func fetchProfileImageSimple() {
         profileImageService.fetchProfileImageURL(username: profileService.profile?.username ?? "username") { [weak self] result in
             
             guard let self = self else {return }
             switch result {
             case .success:
-                if let url = URL(string: avatarURL) {
+                if let url = URL(string: self.profileImageService.avatarURL ?? "") {
                     DispatchQueue.global().async {
                         if let data = try? Data(contentsOf: url) {
                             DispatchQueue.main.async {
-                                ProfileViewController().personImageView.image = UIImage(data: data)!
+                                self.profileViewController.personImageView.image = UIImage(data: data)!
                             }
                         }
                     }
                 } else {
-                    ProfileViewController().personImageView.image = UIImage(systemName: "person.crop.circle.fill")!
+                    self.profileViewController.personImageView.image = UIImage(systemName: "person.crop.circle.fill")!
                 }
                 UIBlockingProgressHUD.dismiss()
-                self.allDataFetched = true
                 self.switchToTabBarController()
                 print("All ok, all data fetched")
             case .failure (let error):

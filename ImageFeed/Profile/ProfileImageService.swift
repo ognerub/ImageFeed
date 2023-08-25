@@ -81,7 +81,7 @@ private extension ProfileImageService {
     func urlRequestWithBearerToken(username: String) -> URLRequest? {
         
         builder.makeHTTPRequest(
-            path: "users/\(username)",
+            path: "/users/\(username)",
             httpMethod: "GET",
             baseURLString: Constants.defaultAPIURLString)
         //
