@@ -12,19 +12,29 @@ final class ProfileService {
     // создаем наш первый и самый простой синглтон
     static let shared = ProfileService()
     
-    private let urlSession = URLSession.shared
-    
-    private let authToken: String? = OAuth2TokenStorage().token
+    private let builder: URLRequestBuilder
+    private let urlSession: URLSession    
+    private let storage: OAuth2TokenStorage
     
     private (set) var profile: Profile?
     
+    init(
+        urlSession: URLSession = .shared,
+        builder: URLRequestBuilder = .shared,
+        storage: OAuth2TokenStorage = .shared
+    ) {
+        self.urlSession = urlSession
+        self.storage = storage
+        self.builder = builder
+    }
+    
     /// получаем информаю профиля в соответсвии с заданной структурой
     func fetchProfile(completion: @escaping (Result<Profile, Error>) -> Void) {
-            guard let token = authToken else {
-                print("Token is empty while fetchPtofile in ProfileService")
-                return
-            }
-            let request = urlRequestWithBearerToken(token: token)
+        guard let request = urlRequestWithBearerToken() else {
+            assertionFailure("Invalide request in fetchProfile")
+            completion(.failure(NetworkError.urlSessionError))
+            return
+        }
             /// удаляем старый task и делаем новый
             //let task = object(for: request) { [weak self] result in
             let task = urlSession.objectTask(for: request) { [weak self] (result: Result<ProfileResult,Error>) in
@@ -52,12 +62,16 @@ final class ProfileService {
 private extension ProfileService {
     
     /// создаем GET запрос с использованием Bearer токена, планурием получить в ответе JSON
-    func urlRequestWithBearerToken(token: String) -> URLRequest {
-        let url: URL = URL(string: "\(Constants.defaultAPIURL)/me")!
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        return request
+    func urlRequestWithBearerToken() -> URLRequest? {
+        builder.makeHTTPRequest(
+            path: "/me",
+            httpMethod: "GET",
+            baseURLString: Constants.defaultAPIURLString)
+//        let url: URL = URL(string: "\(Constants.defaultAPIURL)/me")!
+//        var request = URLRequest(url: url)
+//        request.httpMethod = "GET"
+//        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+//        return request
     }
     
 //    /// пытаемся распрарсить (decode JSON) в соответсвии с заданной структурой

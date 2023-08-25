@@ -16,23 +16,37 @@ final class ProfileImageService {
         let profileImage: ImageSizes
     }
     
-    private let urlSession = URLSession.shared
-    private let authToken: String? = OAuth2TokenStorage().token
-    
     // добвили второй синглтон
     static let shared = ProfileImageService()
-    private (set) var avatarURL: String?
     
     // добавляем новое имя нотификации
     static let DidChangeNotification = Notification.Name(rawValue: "ProfileImageProviderDidChange")
     
+    private let urlSession: URLSession
+    private let storage: OAuth2TokenStorage
+    private let builder: URLRequestBuilder
+    
+    private (set) var avatarURL: String?
+    
+    init (
+        urlSession: URLSession = .shared,
+        storage: OAuth2TokenStorage = .shared,
+        builder: URLRequestBuilder = .shared
+    ) {
+        self.urlSession = urlSession
+        self.storage = storage
+        self.builder = builder
+    }
+    
+    
+    
     func fetchProfileImageURL(
         username: String,
         _ completion: @escaping (Result<String, Error>) -> Void) {
-            guard let token = authToken else {
+            guard let request = urlRequestWithBearerToken(username: username) else {
+                print("Nil request in fetchProfileImageURL")
                 return
-            }
-            let request = urlRequestWithBearerToken(token: token, username: username)
+            }            
             /// также удаляем старый task и прописываем новый
             //let task = object(for: request) { [weak self] result in
             let task = urlSession.objectTask(for: request) { [weak self] (result: Result<UserResult,Error>) in
@@ -48,7 +62,7 @@ final class ProfileImageService {
                                 name: ProfileImageService.DidChangeNotification,
                                 object: self,
                                 userInfo: ["URL": profileImageURL])
-
+                        
                         completion(.success(profileImageURL))
                         
                     case .failure(let error):
@@ -64,39 +78,46 @@ final class ProfileImageService {
 private extension ProfileImageService {
     
     /// создаем GET запрос с использованием Bearer токена, планурием получить в ответе JSON
-    func urlRequestWithBearerToken(token: String, username: String) -> URLRequest {
-        let url: URL = URL(string: "\(Constants.defaultAPIURL)/users/\(username)")!
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        return request
+    func urlRequestWithBearerToken(username: String) -> URLRequest? {
+        
+        builder.makeHTTPRequest(
+            path: "users/\(username)",
+            httpMethod: "GET",
+            baseURLString: Constants.defaultAPIURLString)
+        //
+        //
+        //        let url: URL = URL(string: "\(Constants.defaultAPIURL)/users/\(username)")!
+        //        var request = URLRequest(url: url)
+        //        request.httpMethod = "GET"
+        //        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        //        return request
     }
     
-//    /// пытаемся распрарсить (decode JSON) в соответсвии с заданной структурой
-//    func object(
-//        for request: URLRequest,
-//        completion: @escaping (Result<UserResult, Error>) -> Void
-//    ) -> URLSessionTask {
-//        let decoder = JSONDecoder()
-//        decoder.keyDecodingStrategy = .convertFromSnakeCase
-//        return urlSession.data(for: request) { (result: Result<Data, Error>) in
-//            switch result {
-//            case .success(let data):
-//                do {
-//                    let object = try decoder.decode(
-//                        UserResult.self,
-//                        from: data)
-//                    let urlString = object.profileImage.small
-//                    print("All ok, the object is \(urlString)")
-//                    completion(.success(object))
-//                } catch {
-//                    print("First error \(error)")
-//                    completion(.failure(error))
-//                }
-//            case .failure(let error):
-//                print("Second error \(error)")
-//                completion(.failure(error))
-//            }
-//        }
-//    }
+    //    /// пытаемся распрарсить (decode JSON) в соответсвии с заданной структурой
+    //    func object(
+    //        for request: URLRequest,
+    //        completion: @escaping (Result<UserResult, Error>) -> Void
+    //    ) -> URLSessionTask {
+    //        let decoder = JSONDecoder()
+    //        decoder.keyDecodingStrategy = .convertFromSnakeCase
+    //        return urlSession.data(for: request) { (result: Result<Data, Error>) in
+    //            switch result {
+    //            case .success(let data):
+    //                do {
+    //                    let object = try decoder.decode(
+    //                        UserResult.self,
+    //                        from: data)
+    //                    let urlString = object.profileImage.small
+    //                    print("All ok, the object is \(urlString)")
+    //                    completion(.success(object))
+    //                } catch {
+    //                    print("First error \(error)")
+    //                    completion(.failure(error))
+    //                }
+    //            case .failure(let error):
+    //                print("Second error \(error)")
+    //                completion(.failure(error))
+    //            }
+    //        }
+    //    }
 }

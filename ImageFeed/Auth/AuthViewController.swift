@@ -41,7 +41,6 @@ extension AuthViewController: WebViewViewControllerDelegate {
     }
     
     func webViewViewControllerDidCancel(_ vc: WebViewViewController) {
-        splashViewController.showError = true
         dismiss(animated: true)
     }
 }

@@ -10,6 +10,9 @@ import Foundation
 final class OAuth2TokenStorage {
     
     private let userDefaults: UserDefaults
+    
+    static let shared = OAuth2TokenStorage()
+    
     init(userDefaults: UserDefaults = .standard) {
         self.userDefaults = userDefaults
     }

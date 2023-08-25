@@ -24,7 +24,7 @@ final class SplashViewController: UIViewController {
     
     private var alertPresenter: AlertPresenterProtocol?
     
-    var showError: Bool = false
+    private var allDataFetched: Bool = false
     
     var topVC: UIViewController {
         var topController: UIViewController = UIApplication.shared.keyWindow!.rootViewController!
@@ -51,7 +51,7 @@ final class SplashViewController: UIViewController {
         
         
         
-        if oAuth2TokenStorage.token != nil  {
+        if oAuth2TokenStorage.token != nil && allDataFetched {
             guard let token = oAuth2TokenStorage.token else {
                 print("Error to guard oAuth2TokenStorage.token while viewDidAppear in SplashVC")
                 return }
@@ -98,24 +98,24 @@ final class SplashViewController: UIViewController {
                 completion: { [weak self] in guard let self = self else { return }
                     self.performSegue(withIdentifier: self.showAuthenticationScreenSegueIdentifier, sender: nil)
                 })
-            self.show(with: model)
+            self.alertPresenter?.show(with: model)
         }
     }
     
-    func show(with alertModel: AlertModel) {
-        let alert = UIAlertController(
-            title: alertModel.title,
-            message: alertModel.message,
-            preferredStyle: .alert)
-        let action = UIAlertAction(
-            title: alertModel.buttonText,
-            style: .default) { _ in
-            alertModel.completion()
-        }
-        alert.addAction(action)
-        presentedViewController?.present(alert,
-                                animated: true)
-    }
+//    func show(with alertModel: AlertModel) {
+//        let alert = UIAlertController(
+//            title: alertModel.title,
+//            message: alertModel.message,
+//            preferredStyle: .alert)
+//        let action = UIAlertAction(
+//            title: alertModel.buttonText,
+//            style: .default) { _ in
+//            alertModel.completion()
+//        }
+//        alert.addAction(action)
+//        presentedViewController?.present(alert,
+//                                animated: true)
+//    }
     
 }
 
@@ -161,6 +161,7 @@ extension SplashViewController {
             case .success:
                 print("Success to fetchProfileSimple in SplashVC")
                 UIBlockingProgressHUD.dismiss()
+                self.allDataFetched = true
                 self.switchToTabBarController()
             case .failure (let error):
                 print("Error to fetchProfileSimple in SplashVC")

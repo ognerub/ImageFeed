@@ -9,19 +9,34 @@ import Foundation
 
 
 final class OAuth2Service {
+    
     static let shared = OAuth2Service()
-    private let urlSession = URLSession.shared
-    private let oAuth2TokenStorage = OAuth2TokenStorage()
+    
+    private let urlSession: URLSession
+    private let storage: OAuth2TokenStorage
+    private let builder: URLRequestBuilder
+    
     private (set) var authToken: String? {
         get {
-            return oAuth2TokenStorage.token
+            return storage.token
         }
         set {
-            oAuth2TokenStorage.token = newValue
+            storage.token = newValue
         }
     }
+    
     private var taskProtect: URLSessionTask?
     private var lastCode: String?
+    
+    init (
+        urlSession: URLSession = .shared,
+        storage: OAuth2TokenStorage = .shared,
+        builder: URLRequestBuilder = .shared
+    ) {
+        self.urlSession = urlSession
+        self.storage = storage
+        self.builder = builder
+    }
     
     func fetchOAuthToken(
         _ code: String,
@@ -35,7 +50,10 @@ final class OAuth2Service {
         }
         taskProtect?.cancel() // старый запрос при этом нужно отменить, но если task == nil но ничеко не произойдет
         lastCode = code // запоминаем code, использованный в запросе
-        let request = authTokenRequest(code: code)
+        guard let request = authTokenRequest(code: code) else {
+            print("Nil request in fetchOAuthToken")
+            return
+        }
         let task = urlSession.objectTask(for: request) { [weak self] (result: Result<OAuthTokenResponseBody,Error>) in
             print("Switch to main.async")
             DispatchQueue.main.async {
@@ -63,26 +81,36 @@ final class OAuth2Service {
 }
 
 private extension OAuth2Service {
-    
-    
-
-    
     /// метод для запроса токена
-    func authTokenRequest(code: String) -> URLRequest {
+    func authTokenRequest(code: String) -> URLRequest? {
+//        var urlComponents = URLComponents(string: Constants.unsplashOauthTokenPath)
+//        urlComponents?.queryItems = [
+//            URLQueryItem(name: "client_id", value: Constants.accessKey),
+//            URLQueryItem(name: "client_secret", value: Constants.secretKey),
+//            URLQueryItem(name: "redirect_uri", value: Constants.redirectURI),
+//            URLQueryItem(name: "code", value: code),
+//            URLQueryItem(name: "grant_type", value: "authorization_code")
+//        ]
         let path: String = Constants.unsplashOauthTokenPath
-        + "?client_id=\(Constants.accessKey)"
-        + "&&client_secret=\(Constants.secretKey)"
-        + "&&redirect_uri=\(Constants.redirectURI)"
-        + "&&code=\(code)"
-        + "&&grant_type=authorization_code"
-        guard let url = URL(string: path) else {
-            fatalError("Failed to create path URL at authTokenRequest!")
-        }
-        print("The authTokenRequest URL is: \(url)")
-        return URLRequest.makeHTTPRequest(
+                + "?client_id=\(Constants.accessKey)"
+                + "&&client_secret=\(Constants.secretKey)"
+                + "&&redirect_uri=\(Constants.redirectURI)"
+                + "&&code=\(code)"
+                + "&&grant_type=authorization_code"
+                guard let url = URL(string: path) else {
+                    fatalError("Failed to create path URL at authTokenRequest! Path is \(path)")
+                }
+        return builder.makeHTTPRequest(
             path: path,
             httpMethod: "POST",
-            baseURL: Constants.defaultBaseURL
-        )
+            baseURLString: Constants.defaultBaseURLString)
+        
+//
+//        print("The authTokenRequest URL is: \(url)")
+//        return URLRequest.makeHTTPRequest(
+//            path: path,
+//            httpMethod: "POST",
+//            baseURL: Constants.defaultBaseURL
+//        )
     }
 }
