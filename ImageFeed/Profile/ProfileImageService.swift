@@ -10,7 +10,7 @@ import UIKit
 final class ProfileImageService {
     
     struct ImageSizes: Decodable {
-        var small: String?
+        var medium: String?
     }
     struct UserResult: Decodable {
         let profileImage: ImageSizes
@@ -26,7 +26,7 @@ final class ProfileImageService {
     
     private (set) var avatarURL: URL?
     
-    private (set) var avatarImage: UIImage = UIImage(systemName: "person.crop.circle.fill")!
+    //private (set) var avatarImage: UIImage = UIImage(systemName: "person.crop.circle.fill")!
     
     private let urlSession: URLSession
     private let storage: OAuth2TokenStorage
@@ -58,7 +58,7 @@ final class ProfileImageService {
                 guard let self = self else { return }
                     switch result {
                     case .success(let body):
-                        guard let profileImageURL = body.profileImage.small else {return}
+                        guard let profileImageURL = body.profileImage.medium else {return}
                         self.avatarURL = URL(string: profileImageURL)
                         completion(.success(profileImageURL))
                         NotificationCenter.default.post(

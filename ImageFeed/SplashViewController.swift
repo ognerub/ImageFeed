@@ -65,7 +65,8 @@ final class SplashViewController: UIViewController {
             guard let token = storage.token else {
                 print("Error to guard oAuth2TokenStorage.token while viewDidAppear in SplashVC")
                 return }
-            //fetchProfileImageSimple(avatarURL: profileImageService.avatarURL ?? "https://unsplash.com")
+            fetchProfileSimple()
+            fetchProfileImageSimple()
             switchToTabBarController()
         } else {
             performSegue(withIdentifier: showAuthenticationScreenSegueIdentifier, sender: nil)
@@ -157,7 +158,7 @@ extension SplashViewController {
         DispatchQueue.main.async {
             let model = AlertModel(
                 title: title, //"Что-то пошло не так(",
-                message: "Не удалось войти в систему \(error)",
+                message: "Не удалось войти в систему",
                 buttonText: "OK",
                 completion: { [weak self] in guard let self = self else { return }
                     self.performSegue(withIdentifier: self.showAuthenticationScreenSegueIdentifier, sender: nil)
