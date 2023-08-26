@@ -16,34 +16,13 @@ final class SplashViewController: UIViewController {
     
     private let storage = OAuth2TokenStorage.shared
     private let oAuth2Service = OAuth2Service.shared
-    // обращаемся к синглтону shared из ProfileService (локализованный способ)
     private let profileService = ProfileService.shared
-    // также обращаемся к shared из ProfileImageService
     private let profileImageService = ProfileImageService.shared
-    
     private let profileViewController = ProfileViewController.shared
-    
-    // обращаемся к расширению ProgressHUD
+
     private let uiBlockingProgressHUD = UIBlockingProgressHUD.self
     
     private var alertPresenter: AlertPresenterProtocol?
-    
-//    init (
-//        storage: OAuth2TokenStorage = .shared,
-//        oAuth2Service: OAuth2Service = .shared,
-//        profileService: ProfileService = .shared,
-//        profileImageService: ProfileImageService = .shared
-//    ) {
-//        self.storage = storage
-//        self.oAuth2Service = oAuth2Service
-//        self.profileService = profileService
-//        self.profileImageService = profileImageService
-//        super.init(nibName: nil, bundle: nil)
-//    }
-//
-//    required init?(coder: NSCoder) {
-//        fatalError("init(coder:) has not been implemented")
-//    }
     
 //    /// используем эту переменную для определения VC находящегося на самом верхнем слое отображения
 //    var topVC: UIViewController {
@@ -62,11 +41,8 @@ final class SplashViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         if storage.token != nil {
-            guard let token = storage.token else {
-                print("Error to guard oAuth2TokenStorage.token while viewDidAppear in SplashVC")
-                return }
             fetchProfileSimple()
-            fetchProfileImageSimple()
+            profileImageService.fetchProfileImageURL(username: profileService.profile?.username ?? "username") { _ in }
             switchToTabBarController()
         } else {
             performSegue(withIdentifier: showAuthenticationScreenSegueIdentifier, sender: nil)
@@ -109,11 +85,9 @@ extension SplashViewController {
             guard let self = self else { return }
             switch result {
             case .success:
-                print("Success to fetchOAuthToken in SplashVC")
                 self.fetchProfileSimple()
-            case .failure (let error):
-                print("Error to fetchOAuthToken in SplashVC")
-                self.showNetWorkErrorForSpashVC(title: "1", error: error)
+            case .failure:
+                self.showNetWorkErrorForSpashVC()
                 self.uiBlockingProgressHUD.dismiss()
             }
         }
@@ -124,28 +98,10 @@ extension SplashViewController {
             guard let self = self else {return }
             switch result {
             case .success:
-                print("Success to fetchProfileSimple in SplashVC")
-                self.fetchProfileImageSimple()
-            case .failure (let error):
-                print("Error to fetchProfileSimple in SplashVC")
-                self.showNetWorkErrorForSpashVC(title: "2", error: error)
-                UIBlockingProgressHUD.dismiss()
-            }
-        }
-    }
-    
-    private func fetchProfileImageSimple() {
-        profileImageService.fetchProfileImageURL(username: profileService.profile?.username ?? "username") { [weak self] result in
-            
-            guard let self = self else {return }
-            switch result {
-            case .success:
-                UIBlockingProgressHUD.dismiss()
+                self.profileImageService.fetchProfileImageURL(username: self.profileService.profile?.username ?? "username") { _ in }
                 self.switchToTabBarController()
-                print("All ok, all data fetched")
-            case .failure (let error):
-                print("Error to fetchProfileImageSimple in SplashVC")
-                self.showNetWorkErrorForSpashVC(title: "3", error: error)
+            case .failure:
+                self.showNetWorkErrorForSpashVC()
                 UIBlockingProgressHUD.dismiss()
             }
         }
@@ -154,14 +110,14 @@ extension SplashViewController {
 
 // MARK: ShowNetWorkError
 extension SplashViewController {
-    private func showNetWorkErrorForSpashVC(title: String, error: Error) {
+    private func showNetWorkErrorForSpashVC() {
         DispatchQueue.main.async {
             let model = AlertModel(
-                title: title, //"Что-то пошло не так(",
+                title: "Что-то пошло не так(",
                 message: "Не удалось войти в систему",
                 buttonText: "OK",
                 completion: { [weak self] in guard let self = self else { return }
-                    self.performSegue(withIdentifier: self.showAuthenticationScreenSegueIdentifier, sender: nil)
+                    self.storage.nilTokenInUserDefaults()
                 })
             self.alertPresenter?.show(with: model)
         }
