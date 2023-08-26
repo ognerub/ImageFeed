@@ -52,12 +52,10 @@ final class ProfileViewController: UIViewController {
         exitButton.translatesAutoresizingMaskIntoConstraints = false
         return exitButton
     }()
-    // обращаемся к синглтону shared из ProfileService (локализованный способ)
-    private let profileService = ProfileService.shared
-    // обращаемся ко второму shared из ProfileImageService
-    private let profileImageService = ProfileImageService.shared
     
-    private let oAuth2TokenStorage = OAuth2TokenStorage()
+    private let profileService = ProfileService.shared
+    private let profileImageService = ProfileImageService.shared
+    private let storage = OAuth2TokenStorage.shared
     
     private let splashViewControllerIdentifier = "SplashViewController"
     private let mainUIStoryboard = "Main"
@@ -72,13 +70,13 @@ final class ProfileViewController: UIViewController {
         updateProfileDetails(profile: profile)
         
         profileImageServiceObserver = NotificationCenter.default.addObserver(
-                forName: ProfileImageService.DidChangeNotification,
-                object: nil,
-                queue: .main
-            ) { [weak self] notification in
-                guard let self = self else { return }
-                self.updateAvatar(notification: notification)
-            }
+            forName: ProfileImageService.DidChangeNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            guard let self = self else { return }
+            self.updateAvatar(notification: notification)
+        }
         if let url = profileImageService.avatarURL {
             updateAvatar(url: url)
         }
@@ -168,10 +166,7 @@ final class ProfileViewController: UIViewController {
     
     @objc
     private func didTapButton() {
-        oAuth2TokenStorage.nilTokenInUserDefaults()
+        storage.nilTokenInUserDefaults()
         switchToSplashViewController()
     }
-    
-    
-    
 }

@@ -17,5 +17,6 @@ struct Constants {
     static let code = "code"
     static let unsplashAuthorizeURLString = "https://unsplash.com/oauth/authorize"
     static let unsplashOauthTokenPath = "/oauth/token/"
+    static let bearerToken = "bearerToken"
 }
 
