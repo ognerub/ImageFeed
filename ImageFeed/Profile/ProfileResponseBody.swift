@@ -22,3 +22,11 @@ struct Profile {
     let loginName: String // логин пользователя со знаком @ перед первым символом
     let bio: String // совпадает с ProfileResult.bio
 }
+
+/// cтруктуры для картинки профиля
+struct ImageSizes: Decodable {
+    var medium: String?
+}
+struct UserResult: Decodable {
+    let profileImage: ImageSizes
+}

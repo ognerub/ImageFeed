@@ -9,13 +9,6 @@ import UIKit
 
 final class ProfileImageService {
     
-    struct ImageSizes: Decodable {
-        var medium: String?
-    }
-    struct UserResult: Decodable {
-        let profileImage: ImageSizes
-    }
-    
     static let shared = ProfileImageService()
     static let DidChangeNotification = Notification.Name(rawValue: "ProfileImageProviderDidChange")
     
