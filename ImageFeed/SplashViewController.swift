@@ -10,6 +10,26 @@ import ProgressHUD
 
 final class SplashViewController: UIViewController {
     
+    var unsplashLogo: UIImageView = {
+        let unsplashLogoImage = UIImage(named: "Vector") ?? UIImage(systemName: "sun")!
+        let unsplashLogoView = UIImageView(image: unsplashLogoImage)
+        unsplashLogoView.translatesAutoresizingMaskIntoConstraints = false
+        return unsplashLogoView
+    }()
+    
+    private func addSubViews() {
+        view.addSubview(unsplashLogo)
+    }
+    
+    private func configureConstraints() {
+        NSLayoutConstraint.activate([
+            unsplashLogo.widthAnchor.constraint(equalToConstant: 75),
+            unsplashLogo.heightAnchor.constraint(equalToConstant: 77.67),
+            unsplashLogo.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor),
+            unsplashLogo.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
+        ])
+    }
+    
     private let showAuthenticationScreenSegueIdentifier = "ShowAuthenticationScreen"
     private let tabBarViewControllerIdentifier = "TabBarController"
     private let mainUIStoryboard = "Main"
@@ -25,6 +45,8 @@ final class SplashViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         alertPresenter = AlertPresenterImpl(viewController: self)
+        addSubViews()
+        configureConstraints()
     }
     
     override func viewDidAppear(_ animated: Bool) {
