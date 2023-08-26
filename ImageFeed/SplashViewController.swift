@@ -10,28 +10,9 @@ import ProgressHUD
 
 final class SplashViewController: UIViewController {
     
-    var unsplashLogo: UIImageView = {
-        let unsplashLogoImage = UIImage(named: "Vector") ?? UIImage(systemName: "sun")!
-        let unsplashLogoView = UIImageView(image: unsplashLogoImage)
-        unsplashLogoView.translatesAutoresizingMaskIntoConstraints = false
-        return unsplashLogoView
-    }()
-    
-    private func addSubViews() {
-        view.addSubview(unsplashLogo)
-    }
-    
-    private func configureConstraints() {
-        NSLayoutConstraint.activate([
-            unsplashLogo.widthAnchor.constraint(equalToConstant: 75),
-            unsplashLogo.heightAnchor.constraint(equalToConstant: 77.67),
-            unsplashLogo.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor),
-            unsplashLogo.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
-        ])
-    }
-    
     private let showAuthenticationScreenSegueIdentifier = "ShowAuthenticationScreen"
     private let tabBarViewControllerIdentifier = "TabBarController"
+    private let authViewControllerIdentifier = "AuthViewController"
     private let mainUIStoryboard = "Main"
     private let storage = OAuth2TokenStorage.shared
     private let oAuth2Service = OAuth2Service.shared
@@ -41,6 +22,13 @@ final class SplashViewController: UIViewController {
     private let uiBlockingProgressHUD = UIBlockingProgressHUD.self
     
     private var alertPresenter: AlertPresenterProtocol?
+    
+    private var unsplashLogo: UIImageView = {
+        let unsplashLogoImage = UIImage(named: "Vector") ?? UIImage(systemName: "sun")!
+        let unsplashLogoView = UIImageView(image: unsplashLogoImage)
+        unsplashLogoView.translatesAutoresizingMaskIntoConstraints = false
+        return unsplashLogoView
+    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -52,21 +40,20 @@ final class SplashViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         if storage.token != nil {
-            //fetchProfileSimple()
-            //fetchProfileImageSimple()
+            fetchProfileSimple()
+            fetchProfileImageSimple()
             switchToTabBarController()
         } else {
-            performSegue(withIdentifier: showAuthenticationScreenSegueIdentifier, sender: nil)
+            showAuthViewController()
         }
     }
     
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == showAuthenticationScreenSegueIdentifier {
-            guard let viewController = segue.destination as? AuthViewController else { return }
-            viewController.delegate = self
-        } else {
-            super.prepare(for: segue, sender: sender)
-        }
+    private func showAuthViewController() {
+    let viewController = UIStoryboard(name: mainUIStoryboard, bundle: .main).instantiateViewController(identifier: authViewControllerIdentifier)
+    guard let authViewController = viewController as? AuthViewController else { return }
+    authViewController.delegate = self
+    authViewController.modalPresentationStyle = .fullScreen
+    present(authViewController, animated: true)
     }
     
     private func switchToTabBarController() {
@@ -74,6 +61,20 @@ final class SplashViewController: UIViewController {
         let tabBarController = UIStoryboard(name: mainUIStoryboard, bundle: .main)
             .instantiateViewController(withIdentifier: tabBarViewControllerIdentifier)
         window.rootViewController = tabBarController
+    }
+    
+    private func addSubViews() {
+        view.backgroundColor = UIColor(named: "YP Black")
+        view.addSubview(unsplashLogo)
+    }
+    
+    private func configureConstraints() {
+        NSLayoutConstraint.activate([
+            unsplashLogo.widthAnchor.constraint(equalToConstant: 75),
+            unsplashLogo.heightAnchor.constraint(equalToConstant: 77.67),
+            unsplashLogo.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: -37.5),
+            unsplashLogo.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor, constant: -38.835),
+        ])
     }
 }
 

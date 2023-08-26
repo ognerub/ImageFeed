@@ -19,14 +19,25 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 //        guard let _ = (scene as? UIWindowScene) else { return }
 //    }
     
-    func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-        guard let scene = (scene as? UIWindowScene) else { return }
-        window = UIWindow(windowScene: scene)                   // 1
-        window?.rootViewController = UIStoryboard(              // 2
-            name: "Main",
-            bundle: .main
-        ).SplashViewController()
-    }
+//    func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
+//        guard let scene = (scene as? UIWindowScene) else { return }
+//        window = UIWindow(windowScene: scene)                   // 1
+//        window?.rootViewController = UIStoryboard(              // 2
+//            name: "Main",
+//            bundle: .main
+//        ).SplashViewController()
+//    }
+
+         func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
+             if let windowScene = scene as? UIWindowScene {
+                 let window = UIWindow(windowScene: windowScene)
+
+                  window.rootViewController = SplashViewController()
+
+                  self.window = window
+                  window.makeKeyAndVisible()
+             }
+        }
 
     func sceneDidDisconnect(_ scene: UIScene) {
         // Called as the scene is being released by the system.

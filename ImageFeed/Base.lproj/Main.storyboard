@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="PDg-rA-BEd">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
@@ -306,37 +306,6 @@
             </objects>
             <point key="canvasLocation" x="2801" y="-1468"/>
         </scene>
-        <!--SplashViewController-->
-        <scene sceneID="I0T-Ta-Qr7">
-            <objects>
-                <viewController storyboardIdentifier="SplashViewController" title="SplashViewController" id="PDg-rA-BEd" customClass="SplashViewController" customModule="ImageFeed" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="XQb-pB-iHK">
-                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Vector" translatesAutoresizingMaskIntoConstraints="NO" id="aPT-mO-vRm">
-                                <rect key="frame" x="159" y="399.66666666666669" width="75" height="77.666666666666686"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="75" id="0zZ-Yq-gpn"/>
-                                    <constraint firstAttribute="height" constant="77.680000000000007" id="Bbz-MP-xe9"/>
-                                </constraints>
-                            </imageView>
-                        </subviews>
-                        <viewLayoutGuide key="safeArea" id="8u4-NC-crN"/>
-                        <color key="backgroundColor" name="YP Black"/>
-                        <constraints>
-                            <constraint firstItem="aPT-mO-vRm" firstAttribute="centerX" secondItem="8u4-NC-crN" secondAttribute="centerX" id="od3-AD-lto"/>
-                            <constraint firstItem="aPT-mO-vRm" firstAttribute="centerY" secondItem="8u4-NC-crN" secondAttribute="centerY" id="sik-9z-yh3"/>
-                        </constraints>
-                    </view>
-                    <connections>
-                        <segue destination="Zuf-dC-fgj" kind="presentation" identifier="ShowAuthenticationScreen" modalPresentationStyle="fullScreen" id="BUI-yV-uiU"/>
-                    </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="GBe-Xd-ZSj" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="894" y="-1468"/>
-        </scene>
     </scenes>
     <resources>
         <image name="0" width="200" height="132"/>
@@ -345,7 +314,6 @@
         <image name="BackArrowBlack" width="24" height="24"/>
         <image name="LikeOn" width="42" height="42"/>
         <image name="Sharing" width="51" height="50"/>
-        <image name="Vector" width="75" height="78"/>
         <image name="tab_editorial_active" width="75" height="49"/>
         <namedColor name="YP Black">
             <color red="0.10199999809265137" green="0.10599999874830246" blue="0.13300000131130219" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
