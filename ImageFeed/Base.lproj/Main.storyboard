@@ -351,6 +351,7 @@
                     </view>
                     <connections>
                         <segue destination="Zuf-dC-fgj" kind="presentation" identifier="ShowAuthenticationScreen" modalPresentationStyle="fullScreen" id="BUI-yV-uiU"/>
+
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="GBe-Xd-ZSj" userLabel="First Responder" sceneMemberID="firstResponder"/>

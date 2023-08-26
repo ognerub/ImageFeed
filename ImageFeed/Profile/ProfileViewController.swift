@@ -61,7 +61,7 @@ final class ProfileViewController: UIViewController {
     
     private let splashViewControllerIdentifier = "SplashViewController"
     private let mainUIStoryboard = "Main"
-    
+  
     private var profileImageServiceObserver: NSObjectProtocol?
     
     override func viewDidLoad() {

@@ -22,8 +22,8 @@ final class SplashViewController: UIViewController {
 
     private let uiBlockingProgressHUD = UIBlockingProgressHUD.self
     
-    private var alertPresenter: AlertPresenterProtocol?
-    
+    private let auth = AuthViewController.shared
+  
 //    /// используем эту переменную для определения VC находящегося на самом верхнем слое отображения
 //    var topVC: UIViewController {
 //        var topController: UIViewController = UIApplication.shared.keyWindow!.rootViewController!
@@ -54,10 +54,31 @@ final class SplashViewController: UIViewController {
             guard let viewController = segue.destination as? AuthViewController else { return }
             viewController.delegate = self
         } else {
-            super.prepare(for: segue, sender: sender)
+            showAuthViewController()
+            //performSegue(withIdentifier: showAuthenticationScreenSegueIdentifier, sender: nil)
         }
     }
     
+    private func showAuthViewController() {
+        let viewController = UIStoryboard(name: "Main", bundle: .main).instantiateViewController(identifier: "AuthViewController")
+        guard let authViewController = viewController as? AuthViewController else { return }
+        authViewController.delegate = self
+        authViewController.modalPresentationStyle = .fullScreen
+        present(authViewController, animated: true)
+    }
+    
+//        override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+//            if segue.identifier == showAuthenticationScreenSegueIdentifier {
+//                guard
+//                    let navigationController = segue.destination as? UINavigationController,
+//                    let viewController = navigationController.viewControllers[0] as? AuthViewController
+//                else { fatalError("Failed to prepare for \(showAuthenticationScreenSegueIdentifier)")}
+//                viewController.delegate = self
+//            } else {
+//                super.prepare(for: segue, sender: sender)
+//            }
+//        }
+//
     private func switchToTabBarController() {
         guard let window = UIApplication.shared.windows.first else { fatalError("Invalid Configuration of switchToTabBarController") }
         let tabBarController = UIStoryboard(name: mainUIStoryboard, bundle: .main)
@@ -65,15 +86,27 @@ final class SplashViewController: UIViewController {
         window.rootViewController = tabBarController
     }
 }
+    
+    
+    
+    
+
 
 // MARK: - SplashViewControllerDelegate
 extension SplashViewController: AuthViewControllerDelegate {
+    
     func authViewController(_ vc: AuthViewController, didAuthenticateWithCode code: String) {
+        
         uiBlockingProgressHUD.show()
-        dismiss(animated: true) {
-            [weak self] in guard let self = self
-            else { return }
-            self.fetchOAuthToken(code)
+            
+            dismiss(animated: true) {
+                [weak self] in guard let self = self
+                else { return }
+                self.fetchOAuthToken(code)
+                //self.fetchProfileSimple(token: self.oAuth2TokenStorage.token ?? "")
+                //self.fetchProfileImageSimple(avatarURL: )
+                
+            
         }
     }
 }
@@ -81,6 +114,9 @@ extension SplashViewController: AuthViewControllerDelegate {
 // MARK: - Fetch functions
 extension SplashViewController {
     func fetchOAuthToken(_ code: String) {
+        
+        //self.uiBlockingProgressHUD.show()
+        
         oAuth2Service.fetchOAuthToken(code) { [weak self] result in
             guard let self = self else { return }
             switch result {
@@ -96,6 +132,7 @@ extension SplashViewController {
     func fetchProfileSimple() {
         profileService.fetchProfile() { [weak self] result in
             guard let self = self else {return }
+            
             switch result {
             case .success:
                 self.profileImageService.fetchProfileImageURL(username: self.profileService.profile?.username ?? "username") { _ in }
@@ -104,6 +141,7 @@ extension SplashViewController {
                 self.showNetWorkErrorForSpashVC()
                 UIBlockingProgressHUD.dismiss()
             }
+            completion()
         }
     }
 }

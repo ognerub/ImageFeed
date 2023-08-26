@@ -6,7 +6,7 @@
 //
 
 import Foundation
-
+import UIKit
 
 final class OAuth2Service {
     
@@ -27,6 +27,11 @@ final class OAuth2Service {
     
     private var taskProtect: URLSessionTask?
     private var lastCode: String?
+    var errorVar: Error?
+    
+    var isAuthenticated: Bool {
+        oAuth2TokenStorage.token != nil
+    }
     
     func fetchOAuthToken(
         _ code: String,
@@ -52,7 +57,7 @@ final class OAuth2Service {
                 case .failure(let error):
                     self?.lastCode = nil
                     completion(.failure(error))
-                }
+                
             }
         }
         self.taskProtect = task
