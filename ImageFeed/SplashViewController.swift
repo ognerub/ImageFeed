@@ -11,7 +11,7 @@ import ProgressHUD
 final class SplashViewController: UIViewController {
     
     private let showAuthenticationScreenSegueIdentifier = "ShowAuthenticationScreen"
-    private let tabBarViewControllerIdentifier = "TabBarViewController"
+    private let tabBarViewControllerIdentifier = "TabBarController"
     private let mainUIStoryboard = "Main"
     private let storage = OAuth2TokenStorage.shared
     private let oAuth2Service = OAuth2Service.shared
