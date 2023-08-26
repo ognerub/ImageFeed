@@ -10,6 +10,8 @@ import ProgressHUD
 
 final class SplashViewController: UIViewController {
     
+    static let shared = SplashViewController()
+    
     private let showAuthenticationScreenSegueIdentifier = "ShowAuthenticationScreen"
     private let tabBarViewControllerIdentifier = "TabBarController"
     private let authViewControllerIdentifier = "AuthViewController"
@@ -18,7 +20,6 @@ final class SplashViewController: UIViewController {
     private let oAuth2Service = OAuth2Service.shared
     private let profileService = ProfileService.shared
     private let profileImageService = ProfileImageService.shared
-    private let profileViewController = ProfileViewController.shared
     private let uiBlockingProgressHUD = UIBlockingProgressHUD.self
     
     private var alertPresenter: AlertPresenterProtocol?
@@ -48,7 +49,7 @@ final class SplashViewController: UIViewController {
         }
     }
     
-    private func showAuthViewController() {
+    func showAuthViewController() {
     let viewController = UIStoryboard(name: mainUIStoryboard, bundle: .main).instantiateViewController(identifier: authViewControllerIdentifier)
     guard let authViewController = viewController as? AuthViewController else { return }
     authViewController.delegate = self

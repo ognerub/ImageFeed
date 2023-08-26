@@ -10,8 +10,6 @@ import Kingfisher
 
 final class ProfileViewController: UIViewController {
     
-    static let shared = ProfileViewController()
-    
     var personImageView: UIImageView = {
         let personImage = UIImage(named: "Avatar") ?? UIImage(systemName: "person.crop.circle.fill")!
         let personImageView = UIImageView(image: personImage)
@@ -56,9 +54,7 @@ final class ProfileViewController: UIViewController {
     private let profileService = ProfileService.shared
     private let profileImageService = ProfileImageService.shared
     private let storage = OAuth2TokenStorage.shared
-    
-    private let splashViewControllerIdentifier = "SplashViewController"
-    private let mainUIStoryboard = "Main"
+    private let splashViewController = SplashViewController.shared
     
     private var profileImageServiceObserver: NSObjectProtocol?
     
@@ -158,16 +154,9 @@ final class ProfileViewController: UIViewController {
         ])
     }
     
-    private func switchToSplashViewController() {
-        guard let window = UIApplication.shared.windows.first else { fatalError("Invalid Configuration of switchToSplashViewController") }
-        let splashViewController = UIStoryboard(name: mainUIStoryboard, bundle: .main)
-            .instantiateViewController(withIdentifier: splashViewControllerIdentifier)
-        window.rootViewController = splashViewController
-    }
-    
     @objc
     private func didTapButton() {
         storage.nilTokenInUserDefaults()
-        switchToSplashViewController()
+        splashViewController.showAuthViewController()
     }
 }
