@@ -47,7 +47,7 @@ final class ProfileService {
                     let firstName = body.firstName
                     let lastName = body.lastName
                     let bio = body.bio
-                    let profile = Profile(username: username, name: "\(firstName) \(lastName)", loginName: "@\(username)", bio: bio)
+                    let profile = Profile(username: username, name: "\(firstName) \(lastName ?? "")", loginName: "@\(username)", bio: bio ?? "")
                     self.profile = profile
                     completion(.success(profile))
                 case .failure(let error):

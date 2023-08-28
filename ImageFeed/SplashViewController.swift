@@ -20,7 +20,6 @@ final class SplashViewController: UIViewController {
     private let oAuth2Service = OAuth2Service.shared
     private let profileService = ProfileService.shared
     private let profileImageService = ProfileImageService.shared
-    private let uiBlockingProgressHUD = UIBlockingProgressHUD.self
     
     private var alertPresenter: AlertPresenterProtocol?
     
@@ -50,11 +49,11 @@ final class SplashViewController: UIViewController {
     }
     
     func showAuthViewController() {
-    let viewController = UIStoryboard(name: mainUIStoryboard, bundle: .main).instantiateViewController(identifier: authViewControllerIdentifier)
-    guard let authViewController = viewController as? AuthViewController else { return }
-    authViewController.delegate = self
-    authViewController.modalPresentationStyle = .fullScreen
-    present(authViewController, animated: true)
+        let viewController = UIStoryboard(name: mainUIStoryboard, bundle: .main).instantiateViewController(identifier: authViewControllerIdentifier)
+        guard let authViewController = viewController as? AuthViewController else { return }
+        authViewController.delegate = self
+        authViewController.modalPresentationStyle = .fullScreen
+        present(authViewController, animated: true)
     }
     
     private func switchToTabBarController() {
@@ -82,7 +81,7 @@ final class SplashViewController: UIViewController {
 // MARK: - SplashViewControllerDelegate
 extension SplashViewController: AuthViewControllerDelegate {
     func authViewController(_ vc: AuthViewController, didAuthenticateWithCode code: String) {
-        uiBlockingProgressHUD.show()
+        UIBlockingProgressHUD.show()
         dismiss(animated: true) {
             [weak self] in guard let self = self
             else { return }
@@ -101,7 +100,7 @@ extension SplashViewController {
                 self.fetchProfileSimple()
             case .failure:
                 self.showNetWorkErrorForSpashVC()
-                self.uiBlockingProgressHUD.dismiss()
+                UIBlockingProgressHUD.dismiss()
             }
         }
     }
@@ -142,9 +141,7 @@ extension SplashViewController {
                 title: "Что-то пошло не так(",
                 message: "Не удалось войти в систему",
                 buttonText: "OK",
-                completion: { [weak self] in guard let self = self else { return }
-                    self.performSegue(withIdentifier: self.showAuthenticationScreenSegueIdentifier, sender: nil)
-                })
+                completion: { })
             self.alertPresenter?.show(with: model)
         }
     }

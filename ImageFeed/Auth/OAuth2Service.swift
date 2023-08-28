@@ -38,7 +38,6 @@ final class OAuth2Service {
         taskProtect?.cancel()
         lastCode = code
         guard let request = authTokenRequest(code: code) else {
-            print("Nil request in fetchOAuthToken")
             return
         }
         let task = urlSession.objectTask(for: request) { [weak self] (result: Result<OAuthTokenResponseBody,Error>) in
@@ -63,21 +62,12 @@ final class OAuth2Service {
 private extension OAuth2Service {
     /// метод для запроса токена
     func authTokenRequest(code: String) -> URLRequest? {
-        //                var urlComponents = URLComponents(string: Constants.unsplashOauthTokenPath)
-        //                urlComponents?.queryItems = [
-        //                    URLQueryItem(name: "client_id", value: Constants.accessKey),
-        //                    URLQueryItem(name: "client_secret", value: Constants.secretKey),
-        //                    URLQueryItem(name: "redirect_uri", value: Constants.redirectURI),
-        //                    URLQueryItem(name: "code", value: code),
-        //                    URLQueryItem(name: "grant_type", value: "authorization_code")
-        //                ]
-        var path: String = Constants.unsplashOauthTokenPath
+        let path: String = Constants.unsplashOauthTokenPath
         + "?client_id=\(Constants.accessKey)"
         + "&&client_secret=\(Constants.secretKey)"
         + "&&redirect_uri=\(Constants.redirectURI)"
         + "&&code=\(code)"
         + "&&grant_type=authorization_code"
-        
         return builder.makeHTTPRequest(
             path: path,
             httpMethod: "POST",

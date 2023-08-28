@@ -11,16 +11,16 @@ import UIKit
 struct ProfileResult: Decodable {
     let username: String // логин пользователя
     let firstName: String // имя
-    let lastName: String // фамилия
-    let bio: String // краткая информация
+    let lastName: String? // фамилия
+    let bio: String? // краткая информация
 }
 
 /// структура к кторой будем приводить распарсенные данные из JSON
 struct Profile {
-    let username: String // логин пользователя в том же виде, каком получаем его
-    let name: String // конкатенация имени и фамилии (firstName + lastName)
-    let loginName: String // логин пользователя со знаком @ перед первым символом
-    let bio: String // совпадает с ProfileResult.bio
+    let username: String
+    let name: String
+    let loginName: String
+    let bio: String
 }
 
 /// cтруктуры для картинки профиля

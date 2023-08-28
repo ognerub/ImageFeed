@@ -29,15 +29,12 @@ final class ProfileImageService {
         self.builder = builder
     }
     
-    
-    
     func fetchProfileImageURL(
         username: String,
         _ completion: @escaping (Result<String, Error>) -> Void) {
             assert(Thread.isMainThread)
             currentTask?.cancel()
             guard let request = urlRequestWithBearerToken(username: username) else {
-                print("Nil request in fetchProfileImageURL")
                 return
             }
             currentTask = urlSession.objectTask(for: request) { [weak self] (result: Result<UserResult,Error>) in

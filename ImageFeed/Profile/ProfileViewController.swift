@@ -82,12 +82,10 @@ final class ProfileViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         guard let profile = profileService.profile else {
-            print("no saved profile")
             return
         }
         updateProfileDetails(profile: profile)
         guard let avatarURL = profileImageService.avatarURL else {
-            print("no saved avatarURL")
             return
         }
         profileImageService.fetchProfileImageURL(username: profile.username) { _ in
@@ -111,19 +109,14 @@ final class ProfileViewController: UIViewController {
         personImageView.kf.indicatorType = .activity
         let processor = RoundCornerImageProcessor(cornerRadius: 61)
         personImageView.kf.setImage(with: url, options: [.processor(processor)])
-        //personImageView.image = profileImageService.avatarImage
         personImageView.layer.masksToBounds = true
         personImageView.layer.cornerRadius = 34
     }
     
     private func updateProfileDetails(profile: Profile) {
-        // change profile text
         personNameLabel.text = profile.name
         personHashTagLabel.text = profile.loginName
         personInfoTextLabel.text = profile.bio
-        
-        // change profile image
-        
     }
     
     private func addSubViews() {
