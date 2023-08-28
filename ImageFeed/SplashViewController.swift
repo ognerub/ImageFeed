@@ -12,7 +12,6 @@ final class SplashViewController: UIViewController {
     
     static let shared = SplashViewController()
     
-    private let showAuthenticationScreenSegueIdentifier = "ShowAuthenticationScreen"
     private let tabBarViewControllerIdentifier = "TabBarController"
     private let authViewControllerIdentifier = "AuthViewController"
     private let mainUIStoryboard = "Main"

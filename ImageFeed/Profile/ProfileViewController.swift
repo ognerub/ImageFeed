@@ -10,6 +10,14 @@ import Kingfisher
 
 final class ProfileViewController: UIViewController {
     
+    private let authViewControllerIdentifier = "AuthViewController"
+    private let mainUIStoryboard = "Main"
+    
+    private let profileService = ProfileService.shared
+    private let profileImageService = ProfileImageService.shared
+    private let storage = OAuth2TokenStorage.shared
+    private let splashViewController = SplashViewController.shared
+    
     var personImageView: UIImageView = {
         let personImage = UIImage(named: "Avatar") ?? UIImage(systemName: "person.crop.circle.fill")!
         let personImageView = UIImageView(image: personImage)
@@ -50,11 +58,6 @@ final class ProfileViewController: UIViewController {
         exitButton.translatesAutoresizingMaskIntoConstraints = false
         return exitButton
     }()
-    
-    private let profileService = ProfileService.shared
-    private let profileImageService = ProfileImageService.shared
-    private let storage = OAuth2TokenStorage.shared
-    private let splashViewController = SplashViewController.shared
     
     private var profileImageServiceObserver: NSObjectProtocol?
     
@@ -147,9 +150,16 @@ final class ProfileViewController: UIViewController {
         ])
     }
     
+    private func switchToAuthViewController() {
+        guard let window = UIApplication.shared.windows.first else { fatalError("Invalid Configuration of switchToAuthViewController") }
+        let authViewController = UIStoryboard(name: mainUIStoryboard, bundle: .main)
+            .instantiateViewController(withIdentifier: authViewControllerIdentifier)
+        window.rootViewController = authViewController
+    }
+    
     @objc
     private func didTapButton() {
         storage.nilTokenInUserDefaults()
-        splashViewController.showAuthViewController()
+        switchToAuthViewController()
     }
 }
