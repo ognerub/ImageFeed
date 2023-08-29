@@ -7,15 +7,30 @@
 
 import Foundation
 
-extension URLRequest {
-    /// функция для создания HTTP запроса
-    static func makeHTTPRequest (
+final class URLRequestBuilder {
+    static let shared = URLRequestBuilder()
+    
+    private let storage: OAuth2TokenStorage
+    
+    init(storage: OAuth2TokenStorage = .shared) {
+        self.storage = storage
+    }
+    
+    func makeHTTPRequest (
         path: String,
         httpMethod: String,
-        baseURL: URL = Constants.defaultBaseURL
-    ) -> URLRequest {
-        var request = URLRequest(url: URL(string: path, relativeTo: baseURL)!)
-        request.httpMethod = httpMethod
-        return request
-    }
+        baseURLString: String) -> URLRequest? {
+            guard
+                let url = URL(string: baseURLString),
+                let baseURL = URL(string: path, relativeTo: url)
+            else { return nil }
+            
+            var request = URLRequest(url: baseURL)
+            request.httpMethod = httpMethod
+            
+            if let token = storage.token {
+                request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+            }
+            return request
+        }
 }

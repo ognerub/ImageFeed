@@ -6,16 +6,24 @@
 //
 
 import UIKit
+import Kingfisher
 
 final class ProfileViewController: UIViewController {
     
-    private let personImageView: UIImageView = {
+    private let authViewControllerIdentifier = "AuthViewController"
+    private let mainUIStoryboard = "Main"
+    
+    private let profileService = ProfileService.shared
+    private let profileImageService = ProfileImageService.shared
+    private let storage = OAuth2TokenStorage.shared
+    private let splashViewController = SplashViewController.shared
+    
+    var personImageView: UIImageView = {
         let personImage = UIImage(named: "Avatar") ?? UIImage(systemName: "person.crop.circle.fill")!
         let personImageView = UIImageView(image: personImage)
         personImageView.translatesAutoresizingMaskIntoConstraints = false
         return personImageView
     }()
-    
     private let personHashTagLabel: UILabel = {
         let label = UILabel()
         label.text = "@ekaterina_now"
@@ -24,7 +32,6 @@ final class ProfileViewController: UIViewController {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-    
     private let personNameLabel: UILabel = {
         let personNameLabel = UILabel()
         personNameLabel.text = "Екатерина Новикова"
@@ -33,7 +40,6 @@ final class ProfileViewController: UIViewController {
         personNameLabel.translatesAutoresizingMaskIntoConstraints = false
         return personNameLabel
     }()
-    
     private let personInfoTextLabel: UILabel = {
         let personInfoTextLabel = UILabel()
         personInfoTextLabel.text = "Hello, world!"
@@ -42,7 +48,6 @@ final class ProfileViewController: UIViewController {
         personInfoTextLabel.translatesAutoresizingMaskIntoConstraints = false
         return personInfoTextLabel
     }()
-    
     private lazy var exitButton: UIButton = {
         let exitButton = UIButton.systemButton(
             with: UIImage(named: "LogOut") ?? UIImage(systemName: "ipad.and.arrow.forward")!,
@@ -54,10 +59,67 @@ final class ProfileViewController: UIViewController {
         return exitButton
     }()
     
+    private var profileImageServiceObserver: NSObjectProtocol?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = UIColor(named: "YP Black")
         addSubViews()
         configureConstraints()
+        guard let profile = profileService.profile else { return }
+        updateProfileDetails(profile: profile)
+        
+        profileImageServiceObserver = NotificationCenter.default.addObserver(
+            forName: ProfileImageService.DidChangeNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            guard let self = self else { return }
+            self.updateAvatar(notification: notification)
+        }
+        if let url = profileImageService.avatarURL {
+            updateAvatar(url: url)
+        }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        guard let profile = profileService.profile else {
+            return
+        }
+        updateProfileDetails(profile: profile)
+        guard let avatarURL = profileImageService.avatarURL else {
+            return
+        }
+        profileImageService.fetchProfileImageURL(username: profile.username) { _ in
+            self.updateAvatar(url: avatarURL)
+        }
+    }
+    
+    
+    @objc
+    private func updateAvatar(notification: Notification) {
+        guard
+            isViewLoaded,
+            let userInfo = notification.userInfo,
+            let profileImageURL = userInfo["URL"] as? String,
+            let url = URL(string: profileImageURL)
+        else { return }
+        updateAvatar(url: url)
+    }
+    
+    private func updateAvatar(url: URL) {
+        personImageView.kf.indicatorType = .activity
+        let processor = RoundCornerImageProcessor(cornerRadius: 61)
+        personImageView.kf.setImage(with: url, options: [.processor(processor)])
+        personImageView.layer.masksToBounds = true
+        personImageView.layer.cornerRadius = 34
+    }
+    
+    private func updateProfileDetails(profile: Profile) {
+        personNameLabel.text = profile.name
+        personHashTagLabel.text = profile.loginName
+        personInfoTextLabel.text = profile.bio
     }
     
     private func addSubViews() {
@@ -88,9 +150,16 @@ final class ProfileViewController: UIViewController {
         ])
     }
     
-    @objc
-    private func didTapButton() {
-        
+    private func switchToAuthViewController() {
+        guard let window = UIApplication.shared.windows.first else { fatalError("Invalid Configuration of switchToAuthViewController") }
+        let authViewController = UIStoryboard(name: mainUIStoryboard, bundle: .main)
+            .instantiateViewController(withIdentifier: authViewControllerIdentifier)
+        window.rootViewController = authViewController
     }
     
+    @objc
+    private func didTapButton() {
+        storage.nilTokenInUserDefaults()
+        switchToAuthViewController()
+    }
 }
