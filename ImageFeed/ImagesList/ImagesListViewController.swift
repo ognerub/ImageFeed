@@ -36,16 +36,16 @@ final class ImagesListViewController: UIViewController {
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-           if segue.identifier == ShowSingleImageSequeIdentifier {
-               let viewController = segue.destination as! SingleImageViewController
-               let indexPath = sender as! IndexPath
-               let image = UIImage(named: photosName[indexPath.row])
-               //_ = viewController.view // crash fixed
-               viewController.image = image
-           } else {
-               super.prepare(for: segue, sender: sender)
-           }
-       }
+        if segue.identifier == ShowSingleImageSequeIdentifier {
+            let viewController = segue.destination as! SingleImageViewController
+            let indexPath = sender as! IndexPath
+            let image = UIImage(named: photosName[indexPath.row])
+            //_ = viewController.view // crash fixed
+            viewController.image = image
+        } else {
+            super.prepare(for: segue, sender: sender)
+        }
+    }
 }
 
 // MARK: - UITableViewDataSource
@@ -57,13 +57,13 @@ extension ImagesListViewController: UITableViewDataSource {
     /// данный метод опредетяет какую ячейку выводить, если нет кастомной, то отработает quard else и отобразится стандартная ячейка. Также запускается метод из extension для MVC - configCell
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: ImagesListCell.reuseIdentifier, for: indexPath)
-
+        
         guard let imageListCell = cell as? ImagesListCell else {
             return UITableViewCell()
         }
-
+        
         configCell(for: imageListCell, with: indexPath)
-
+        
         return imageListCell
     }
 }
@@ -74,10 +74,10 @@ extension ImagesListViewController {
         guard let image = UIImage(named: photosName[indexPath.row]) else {
             return
         }
-
+        
         cell.cellImage.image = image
         cell.cellDateLabel.text = dateFormatter.string(from: Date())
-
+        
         let isLiked = indexPath.row % 2 == 0
         let likeImage = isLiked ? UIImage(named: "LikeOn") : UIImage(named: "LikeOff")
         cell.cellLikeButton.setImage(likeImage, for: .normal)
@@ -89,31 +89,43 @@ extension ImagesListViewController: UITableViewDelegate {
     func tableView(
         _ tableView: UITableView,
         didSelectRowAt indexPath: IndexPath) {
-        performSegue(withIdentifier: ShowSingleImageSequeIdentifier, sender: indexPath)
-    }
+            performSegue(withIdentifier: ShowSingleImageSequeIdentifier, sender: indexPath)
+        }
     
     /// добавлен новый метод, корректирующий высоту ячейки (строки) в зависимости от высоты изображения
     func tableView(
         _ tableView: UITableView,
         heightForRowAt indexPath: IndexPath) -> CGFloat {
-        guard let image = UIImage(named: photosName[indexPath.row]) else {
-            return 0
+            guard let image = UIImage(named: photosName[indexPath.row]) else {
+                return 0
+            }
+            let imageInsets = UIEdgeInsets(top: 4, left: 16, bottom: 4, right: 16)
+            let imageViewWidth = tableView.bounds.width - imageInsets.left - imageInsets.right
+            let imageWidth = image.size.width
+            let scale = imageViewWidth / imageWidth
+            let cellHeight = image.size.height * scale + imageInsets.top + imageInsets.bottom
+            return cellHeight
         }
-        let imageInsets = UIEdgeInsets(top: 4, left: 16, bottom: 4, right: 16)
-        let imageViewWidth = tableView.bounds.width - imageInsets.left - imageInsets.right
-        let imageWidth = image.size.width
-        let scale = imageViewWidth / imageWidth
-        let cellHeight = image.size.height * scale + imageInsets.top + imageInsets.bottom
-        return cellHeight
-    }
     
     func tableView(
         _ tableView: UITableView,
         willDisplay cell: UITableViewCell,
         forRowAt indexPath: IndexPath) {
-            if indexPath.row + 1 == imagesListService.photos.count {
-                imagesListService.fetchPhotosNextPage()
+//            if indexPath.row + 1 == imagesListService.photos.count {
+                imagesListService.fetchPhotosNextPage() { result in
+                    switch result {
+                    case .success(let result):
+                        var value = 0
+                        for item in result {
+                            value += 1
+                            print("\(value).Success result is \(item)")
+                        }
+                        
+                    case .failure(let error):
+                        print("Error is \(error)")
+//                    }
+                }
             }
-    }
+        }
 }
 

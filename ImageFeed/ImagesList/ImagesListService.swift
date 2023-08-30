@@ -11,7 +11,7 @@ final class ImagesListService {
     
     struct PhotoResult: Decodable {
         let id: String
-        let createdAt: Date?
+        let createdAt: String
         let width: CGFloat
         let height: CGFloat
         let likedByUser: Bool
@@ -44,7 +44,13 @@ final class ImagesListService {
     private var currentTask: URLSessionTask?
     private var lastLoadedPage: Int?
     private (set) var photos: [Photo] = []
-    private (set) var photo: Photo?
+    
+    private lazy var dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .long
+        formatter.timeStyle = .none
+        return formatter
+    } ()
     
     init (
         urlSession: URLSession = .shared,
@@ -55,7 +61,7 @@ final class ImagesListService {
     }
     
     
-    func fetchPhotosNextPage(completion: @escaping (Result<Photo, Error>) -> Void) {
+    func fetchPhotosNextPage(completion: @escaping (Result<[Photo], Error>) -> Void) {
         currentTask?.cancel()
         guard let request = urlRequestWithBearerToken() else {
             assertionFailure("Invalide request in fetchProfile")
@@ -65,33 +71,31 @@ final class ImagesListService {
         
         let nextPage = lastLoadedPage == nil ? 1 : (lastLoadedPage ?? 0) + 1
         
-        currentTask = urlSession.objectTask(for: request) { [weak self] (result: Result<PhotoResult,Error>) in
+        currentTask = urlSession.objectTask(for: request) { [weak self] (result: Result<[PhotoResult],Error>) in
             guard let self = self else { return }
             DispatchQueue.main.async {
                 self.currentTask = nil
                 switch result {
-                case .success(let body):
-                    let id = body.id
-                    let createdAt = body.createdAt
-                    let size = CGSize(width: body.width, height: body.height)
-                    let isLiked = body.likedByUser
-                    let welcomeDescription = body.description
-                    let thumbImageURL = body.urls.thumb ?? "PASTE THUMB"
-                    let largeImageURL = body.urls.full ?? "PASTE LARGE IMG"
-                    let photo = Photo(
-                        id: id,
-                        size: size,
-                        createdAt: createdAt,
-                        welcomeDescription: welcomeDescription,
-                        thumbImageURL: thumbImageURL,
-                        largeImageURL: largeImageURL,
-                        isLiked: isLiked)
-                    self.photo = photo
-                    completion(.success(photo))
+                case .success(let result):
+                    var photos: [Photo] = []
+                    for item in result {
+                        let photo = Photo(
+                            id: item.id,
+                            size: CGSize(width: item.width, height: item.height),
+                            createdAt: self.dateFormatter.date(from: item.createdAt),
+                            welcomeDescription: item.description,
+                            thumbImageURL: item.urls.thumb ?? "NO THUMB",
+                            largeImageURL: item.urls.full ?? "NO FULL IMG",
+                            isLiked: item.likedByUser)
+                        photos.append(photo)
+                    }
+                    self.photos.append(contentsOf: photos)
+                    self.lastLoadedPage? += 1
+                    completion(.success(photos))
                     NotificationCenter.default.post(
                         name: ImagesListService.DidChangeNotification,
                         object: self,
-                        userInfo: ["URL": photo]
+                        userInfo: ["PHOTOS": self.photos]
                     )
                 case .failure(let error):
                     completion(.failure(error))
@@ -108,7 +112,7 @@ private extension ImagesListService {
     /// создаем GET запрос с использованием Bearer токена, планурием получить в ответе JSON
     func urlRequestWithBearerToken() -> URLRequest? {
         builder.makeHTTPRequest(
-            path: "/photos",
+            path: "/photos/",
             httpMethod: "GET",
             baseURLString: Constants.defaultAPIURLString)
     }
