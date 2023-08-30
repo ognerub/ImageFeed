@@ -10,8 +10,9 @@ import UIKit
 final class ImagesListViewController: UIViewController {
     
     private let ShowSingleImageSequeIdentifier = "ShowSingleImage"
-    
     private let photosName: [String] = Array(0..<20).map{ "\($0)" }
+    private let imagesListService = ImagesListService.shared
+    private var imagesListServiceObserver: NSObjectProtocol?
     
     private lazy var dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -35,14 +36,14 @@ final class ImagesListViewController: UIViewController {
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-           if segue.identifier == ShowSingleImageSequeIdentifier { // 1
-               let viewController = segue.destination as! SingleImageViewController // 2
-               let indexPath = sender as! IndexPath // 3
-               let image = UIImage(named: photosName[indexPath.row]) // 4
+           if segue.identifier == ShowSingleImageSequeIdentifier {
+               let viewController = segue.destination as! SingleImageViewController
+               let indexPath = sender as! IndexPath
+               let image = UIImage(named: photosName[indexPath.row])
                //_ = viewController.view // crash fixed
-               viewController.image = image // 5
+               viewController.image = image
            } else {
-               super.prepare(for: segue, sender: sender) // 6
+               super.prepare(for: segue, sender: sender)
            }
        }
 }
@@ -85,12 +86,16 @@ extension ImagesListViewController {
 
 extension ImagesListViewController: UITableViewDelegate {
     /// в данном методе будем настраивать реагирование на нажатие пользователем на ячейку (строку)
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    func tableView(
+        _ tableView: UITableView,
+        didSelectRowAt indexPath: IndexPath) {
         performSegue(withIdentifier: ShowSingleImageSequeIdentifier, sender: indexPath)
     }
     
     /// добавлен новый метод, корректирующий высоту ячейки (строки) в зависимости от высоты изображения
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    func tableView(
+        _ tableView: UITableView,
+        heightForRowAt indexPath: IndexPath) -> CGFloat {
         guard let image = UIImage(named: photosName[indexPath.row]) else {
             return 0
         }
@@ -100,6 +105,15 @@ extension ImagesListViewController: UITableViewDelegate {
         let scale = imageViewWidth / imageWidth
         let cellHeight = image.size.height * scale + imageInsets.top + imageInsets.bottom
         return cellHeight
+    }
+    
+    func tableView(
+        _ tableView: UITableView,
+        willDisplay cell: UITableViewCell,
+        forRowAt indexPath: IndexPath) {
+            if indexPath.row + 1 == imagesListService.photos.count {
+                imagesListService.fetchPhotosNextPage()
+            }
     }
 }
 

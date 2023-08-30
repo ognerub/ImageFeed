@@ -14,18 +14,15 @@ final class ProfileService {
     
     private let builder: URLRequestBuilder
     private let urlSession: URLSession
-    private let storage: OAuth2TokenStorage
     
     private (set) var profile: Profile?
     private var currentTask: URLSessionTask?
     
     init(
         urlSession: URLSession = .shared,
-        builder: URLRequestBuilder = .shared,
-        storage: OAuth2TokenStorage = .shared
+        builder: URLRequestBuilder = .shared
     ) {
         self.urlSession = urlSession
-        self.storage = storage
         self.builder = builder
     }
     
