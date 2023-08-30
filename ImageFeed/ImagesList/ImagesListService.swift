@@ -62,15 +62,20 @@ final class ImagesListService {
     
     
     func fetchPhotosNextPage(completion: @escaping (Result<[Photo], Error>) -> Void) {
-        currentTask?.cancel()
+        if currentTask != nil {
+            print("TaskInProgress guard return from func")
+            return
+        } else {
+            print("No task make progress true")
+            currentTask?.cancel()
+        }
+        
         guard let request = urlRequestWithBearerToken() else {
             assertionFailure("Invalide request in fetchProfile")
             completion(.failure(NetworkError.urlSessionError))
             return
         }
-        
         let nextPage = lastLoadedPage == nil ? 1 : (lastLoadedPage ?? 0) + 1
-        
         currentTask = urlSession.objectTask(for: request) { [weak self] (result: Result<[PhotoResult],Error>) in
             guard let self = self else { return }
             DispatchQueue.main.async {

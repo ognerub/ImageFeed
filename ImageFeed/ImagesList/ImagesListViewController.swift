@@ -90,6 +90,7 @@ extension ImagesListViewController: UITableViewDelegate {
         _ tableView: UITableView,
         didSelectRowAt indexPath: IndexPath) {
             performSegue(withIdentifier: ShowSingleImageSequeIdentifier, sender: indexPath)
+            
         }
     
     /// добавлен новый метод, корректирующий высоту ячейки (строки) в зависимости от высоты изображения
@@ -111,21 +112,23 @@ extension ImagesListViewController: UITableViewDelegate {
         _ tableView: UITableView,
         willDisplay cell: UITableViewCell,
         forRowAt indexPath: IndexPath) {
-//            if indexPath.row + 1 == imagesListService.photos.count {
-                imagesListService.fetchPhotosNextPage() { result in
-                    switch result {
-                    case .success(let result):
-                        var value = 0
-                        for item in result {
-                            value += 1
-                            print("\(value).Success result is \(item)")
-                        }
-                        
-                    case .failure(let error):
-                        print("Error is \(error)")
+//            imagesListService.fetchPhotosNextPage() { result in
+//                switch result {
+//                case .success(let result):
+//                    var value = 0
+//                    for item in result {
+//                        value += 1
+//                        print("\(value).Success result is \(item)")
 //                    }
-                }
-            }
+//                    print("We have now \(self.imagesListService.photos.count) photos")
+//                case .failure(let error):
+//                    print("Error is \(error)")
+//                }
+//            }
+//            if indexPath.row + 1 == imagesListService.photos.count {
+//                print("We have now \(imagesListService.photos.count) photos")
+//                imagesListService.fetchPhotosNextPage() {_ in }
+//            }
         }
 }
 
