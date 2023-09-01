@@ -100,7 +100,7 @@ final class ImagesListService {
                     NotificationCenter.default.post(
                         name: ImagesListService.DidChangeNotification,
                         object: self,
-                        userInfo: ["PHOTOS": self.photos]
+                        userInfo: ["URL": self.photos]
                     )
                 case .failure(let error):
                     completion(.failure(error))

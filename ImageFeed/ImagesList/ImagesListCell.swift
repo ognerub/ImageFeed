@@ -15,5 +15,9 @@ final class ImagesListCell: UITableViewCell {
     @IBOutlet weak var cellLikeButton: UIButton!
     @IBOutlet weak var cellImage: UIImageView!
            
-    
+    override override func prepareForReuse() {
+        super.prepareForReuse()
+        // отменяем загрузку чтобы избежать багов
+        fullsizeImageView.kf.cancelDownloadTask()
+    }
 }

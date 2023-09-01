@@ -6,12 +6,15 @@
 //
 
 import UIKit
+import Kingfisher
 
 final class ImagesListViewController: UIViewController {
     
     private let ShowSingleImageSequeIdentifier = "ShowSingleImage"
     private let photosName: [String] = Array(0..<20).map{ "\($0)" }
     private let imagesListService = ImagesListService.shared
+    
+    private var photosURLs: [String] = []
     private var imagesListServiceObserver: NSObjectProtocol?
     
     private lazy var dateFormatter: DateFormatter = {
@@ -33,6 +36,7 @@ final class ImagesListViewController: UIViewController {
         //        tableView.register(ImagesListCell.self, forCellReuseIdentifier: ImagesListCell.reuseIdentifier)
         
         tableView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
+        
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -69,11 +73,28 @@ extension ImagesListViewController: UITableViewDataSource {
 }
 
 extension ImagesListViewController {
+    func updateImagesInCell(url: URL) {
+        
+    }
     /// данный метод конфигурирует стиль кастомных ячеек, в частности присваивается картинка, если такая имеется (если нет, guard else вернет nil), форматируется дата, задается стиль кнопки лайка для четных и нечетных ячеек по indexPath.row)
     func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
-        guard let image = UIImage(named: photosName[indexPath.row]) else {
-            return
+//        guard let image = UIImage(named: photosName[indexPath.row]) else {
+//            return
+//        }
+        guard let image = UIImage(named: "EmptyCell") else { return }
+        
+        imagesListServiceObserver = NotificationCenter.default.addObserver(
+            forName: ImagesListService.DidChangeNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            guard let self = self else { return }
+            self.updateImagesInCell(URL(string: notification: notification)
         }
+        if let url = URL(string: photosURLs[indexPath.row]) {
+            self.updateImagesInCell(url: url)
+        }
+        
         
         cell.cellImage.image = image
         cell.cellDateLabel.text = dateFormatter.string(from: Date())
@@ -90,7 +111,6 @@ extension ImagesListViewController: UITableViewDelegate {
         _ tableView: UITableView,
         didSelectRowAt indexPath: IndexPath) {
             performSegue(withIdentifier: ShowSingleImageSequeIdentifier, sender: indexPath)
-            
         }
     
     /// добавлен новый метод, корректирующий высоту ячейки (строки) в зависимости от высоты изображения
@@ -112,23 +132,24 @@ extension ImagesListViewController: UITableViewDelegate {
         _ tableView: UITableView,
         willDisplay cell: UITableViewCell,
         forRowAt indexPath: IndexPath) {
-//            imagesListService.fetchPhotosNextPage() { result in
-//                switch result {
-//                case .success(let result):
-//                    var value = 0
-//                    for item in result {
-//                        value += 1
-//                        print("\(value).Success result is \(item)")
-//                    }
-//                    print("We have now \(self.imagesListService.photos.count) photos")
-//                case .failure(let error):
-//                    print("Error is \(error)")
-//                }
-//            }
-//            if indexPath.row + 1 == imagesListService.photos.count {
-//                print("We have now \(imagesListService.photos.count) photos")
-//                imagesListService.fetchPhotosNextPage() {_ in }
-//            }
+            imagesListService.fetchPhotosNextPage() { result in
+                switch result {
+                case .success(let result):
+                    var value = 0
+                    for item in result {
+                        value += 1
+                        print("\(value).Success result is \(item.thumbImageURL)")
+                        photosURLs.append(item.thumbImageURL)
+                    }
+                    print("We have now \(self.imagesListService.photos.count) photos")
+                case .failure(let error):
+                    print("Error is \(error)")
+                }
+            }
+            if indexPath.row + 1 == imagesListService.photos.count {
+                print("We have now \(imagesListService.photos.count) photos")
+                imagesListService.fetchPhotosNextPage() {_ in }
+            }
         }
 }
 
