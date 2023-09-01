@@ -113,18 +113,21 @@ extension ImagesListViewController: UITableViewDataSource {
 extension ImagesListViewController {
     /// данный метод конфигурирует стиль кастомных ячеек, в частности присваивается картинка, если такая имеется (если нет, guard else вернет nil), форматируется дата, задается стиль кнопки лайка для четных и нечетных ячеек по indexPath.row)
     func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
-//        guard let image = UIImage(named: photosName[indexPath.row]) else {
-//            return
-//        }
         guard var image = UIImage(named: "EmptyCell") else { return }
-        
-        
-        cell.cellImage.kf.setImage(with: URL(string:photos[indexPath.row].thumbImageURL)) 
-        
-        
+        let data = image.pngData()
         cell.cellImage.image = image
-        cell.cellDateLabel.text = "\(indexPath.row) \(dateFormatter.string(from: Date()))"
+        cell.cellImage.kf.indicatorType = .image(imageData: data!)
+        cell.cellImage.kf.setImage(with: URL(string:photos[indexPath.row].thumbImageURL)) { result in
+            switch result {
+            case .success(let value):
+                self.tableView.reloadRows(at: [indexPath], with: .automatic)
+            case .failure(let error):
+                print("Error to load images at row \(indexPath.row). \n \(error)")
+            }
+        }
         
+        cell.cellDateLabel.text = "\(indexPath.row) \(dateFormatter.string(from: Date()))"
+    
         let isLiked = indexPath.row % 2 == 0
         let likeImage = isLiked ? UIImage(named: "LikeOn") : UIImage(named: "LikeOff")
         cell.cellLikeButton.setImage(likeImage, for: .normal)
@@ -144,15 +147,16 @@ extension ImagesListViewController: UITableViewDelegate {
         _ tableView: UITableView,
         heightForRowAt indexPath: IndexPath) -> CGFloat {
             let imageInsets = UIEdgeInsets(top: 4, left: 16, bottom: 4, right: 16)
-            guard photos.count <= 0 else {
+            if photos[indexPath.row].createdAt == nil {
+                let imageViewWidth = tableView.bounds.width - imageInsets.left - imageInsets.right
+                let imageWidth = photos[indexPath.row].size.width
+                let scale = imageViewWidth / imageWidth
+                let cellHeight = photos[indexPath.row].size.height * scale + imageInsets.top + imageInsets.bottom
+                return cellHeight
+            } else {
                 let cellHeight = 100 + imageInsets.top + imageInsets.bottom
                 return cellHeight
             }
-            let imageViewWidth = tableView.bounds.width - imageInsets.left - imageInsets.right
-            let imageWidth = photos[indexPath.row].size.width
-            let scale = imageViewWidth / imageWidth
-            let cellHeight = photos[indexPath.row].size.height * scale + imageInsets.top + imageInsets.bottom
-            return cellHeight
         }
     
     func tableView(
@@ -163,7 +167,7 @@ extension ImagesListViewController: UITableViewDelegate {
                 imagesListService.fetchPhotosNextPage() { result in
                     switch result {
                     case .success(let result):
-                        print("tableWillDisplay. \(self.imagesListService.photos.count) photos")
+                        print("tableViewWillDisplay. \(self.imagesListService.photos.count) photos")
                     case .failure(let error):
                         print("Error is \(error)")
                     }
