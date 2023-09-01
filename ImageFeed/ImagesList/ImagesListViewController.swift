@@ -12,8 +12,10 @@ final class ImagesListViewController: UIViewController {
     
     private let ShowSingleImageSequeIdentifier = "ShowSingleImage"
     private let imagesListService = ImagesListService.shared
+    private let singleImageViewController = SingleImageViewController.shared
     
     private var imagesListServiceObserver: NSObjectProtocol?
+    
     var photos: [Photo] = []
     
     private lazy var dateFormatter: DateFormatter = {
@@ -62,20 +64,8 @@ final class ImagesListViewController: UIViewController {
         if segue.identifier == ShowSingleImageSequeIdentifier {
             let viewController = segue.destination as! SingleImageViewController
             let indexPath = sender as! IndexPath
-            var fullsizeImage = UIImage(named: "EmptyCell")
-            
-//            KingfisherManager.shared.retrieveImage(with: URL(string:photos[indexPath.row].thumbImageURL)) { result in
-//                switch result {
-//                case .success(let result):
-//                    fullsizeImage = result.image
-//                case .failure(let error):
-//                    print("Error to load fullsize image \(error)")
-//                }
-//            }
-            
 //            _ = viewController.view // crash fixed
-        
-            viewController.image = fullsizeImage
+            viewController.image = self.singleImageViewController.image
         } else {
             super.prepare(for: segue, sender: sender)
         }
@@ -125,6 +115,8 @@ extension ImagesListViewController: UITableViewDataSource {
 extension ImagesListViewController {
     /// данный метод конфигурирует стиль кастомных ячеек, в частности присваивается картинка, если такая имеется (если нет, guard else вернет nil), форматируется дата, задается стиль кнопки лайка для четных и нечетных ячеек по indexPath.row)
     func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
+        
+        /// осуществляем загрузку фото, пока идет загрузка или фото отсутствует вставляем заглушку
         guard let image = UIImage(named: "EmptyCell") else { return }
         let data = image.pngData()
         cell.cellImage.kf.indicatorType = .image(imageData: data!)
@@ -137,14 +129,18 @@ extension ImagesListViewController {
             }
         }
         
-        var createdAtDate: String
-        if photos[indexPath.row].createdAt != nil {
-            createdAtDate = String(describing: dateFormatter.date(from: photos[indexPath.row].createdAt!))
+        /// устанавливаем верную дату для каждой фотографии
+        var date = photos[indexPath.row].createdAt ?? "no date"
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+        if let formattedDate = dateFormatter.date(from: date) {
+            dateFormatter.dateFormat = "dd MMMM yyyy"
+            dateFormatter.locale = Locale(identifier: "ru_Ru")
+            cell.cellDateLabel.text = "\(dateFormatter.string(from: formattedDate))"
         } else {
-            createdAtDate = dateFormatter.string(from: Date())
+            cell.cellDateLabel.text = "no date of photo"
         }
-        cell.cellDateLabel.text = "\(createdAtDate)"
     
+        /// настраиваем лайки для каждой фотографии
         let isLiked = indexPath.row % 2 == 0
         let likeImage = isLiked ? UIImage(named: "LikeOn") : UIImage(named: "LikeOff")
         cell.cellLikeButton.setImage(likeImage, for: .normal)
@@ -156,7 +152,22 @@ extension ImagesListViewController: UITableViewDelegate {
     func tableView(
         _ tableView: UITableView,
         didSelectRowAt indexPath: IndexPath) {
-            performSegue(withIdentifier: ShowSingleImageSequeIdentifier, sender: indexPath)
+            UIBlockingProgressHUD.show()
+            guard let url = URL(string:photos[indexPath.row].largeImageURL) else {
+                print("Guard, no fullsize image url!")
+                return
+            }
+            let resourse = KF.ImageResource(downloadURL: url)
+            KingfisherManager.shared.retrieveImage(with: resourse) { result in
+                switch result {
+                case .success(let result):
+                    self.singleImageViewController.image = result.image
+                    UIBlockingProgressHUD.dismiss()
+                    self.performSegue(withIdentifier: self.ShowSingleImageSequeIdentifier, sender: indexPath)
+                case .failure(let error):
+                    UIBlockingProgressHUD.dismiss()
+                }
+            }
         }
     
     /// добавлен новый метод, корректирующий высоту ячейки (строки) в зависимости от высоты изображения
