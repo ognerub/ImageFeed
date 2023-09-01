@@ -11,7 +11,6 @@ import Kingfisher
 final class ImagesListViewController: UIViewController {
     
     private let ShowSingleImageSequeIdentifier = "ShowSingleImage"
-    private let photosName: [String] = Array(0..<20).map{ "\($0)" }
     private let imagesListService = ImagesListService.shared
     
     private var imagesListServiceObserver: NSObjectProtocol?
@@ -25,7 +24,6 @@ final class ImagesListViewController: UIViewController {
     } ()
     
     @IBOutlet private var tableView: UITableView!
-    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -46,7 +44,6 @@ final class ImagesListViewController: UIViewController {
             self.updateTableViewAnimated()
         }
         
-
         imagesListService.fetchPhotosNextPage() { result in
             switch result {
             case .success(let result):
@@ -57,13 +54,28 @@ final class ImagesListViewController: UIViewController {
         }
     }
     
+    func retrieveImage() {
+        
+    }
+    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == ShowSingleImageSequeIdentifier {
             let viewController = segue.destination as! SingleImageViewController
             let indexPath = sender as! IndexPath
-            let image = UIImage(named: photosName[indexPath.row])
-            //_ = viewController.view // crash fixed
-            viewController.image = image
+            var fullsizeImage = UIImage(named: "EmptyCell")
+            
+//            KingfisherManager.shared.retrieveImage(with: URL(string:photos[indexPath.row].thumbImageURL)) { result in
+//                switch result {
+//                case .success(let result):
+//                    fullsizeImage = result.image
+//                case .failure(let error):
+//                    print("Error to load fullsize image \(error)")
+//                }
+//            }
+            
+//            _ = viewController.view // crash fixed
+        
+            viewController.image = fullsizeImage
         } else {
             super.prepare(for: segue, sender: sender)
         }
@@ -97,14 +109,14 @@ extension ImagesListViewController: UITableViewDataSource {
                     indexPaths.append(IndexPath(row: i, section: 0))
                 }
                 tableView.insertRows(at: indexPaths, with: .automatic)
-//                var prevOldCount = (oldCount - 10) <= 0 ? 0 : (oldCount - 10)
-//                if prevOldCount != 0 {
-//                    var indexPathsToRemove: [IndexPath] = []
-//                    for i in (prevOldCount-10)..<(oldCount-10) {
-//                        indexPathsToRemove.append(IndexPath(row: i, section: 0))
-//                    }
-//                    tableView.deleteRows(at: indexPathsToRemove, with: .automatic)
-//                }
+                //                var prevOldCount = (oldCount - 10) <= 0 ? 0 : (oldCount - 10)
+                //                if prevOldCount != 0 {
+                //                    var indexPathsToRemove: [IndexPath] = []
+                //                    for i in (prevOldCount-10)..<(oldCount-10) {
+                //                        indexPathsToRemove.append(IndexPath(row: i, section: 0))
+                //                    }
+                //                    tableView.deleteRows(at: indexPathsToRemove, with: .automatic)
+                //                }
             } completion: { _ in}
         }
     }
@@ -113,9 +125,8 @@ extension ImagesListViewController: UITableViewDataSource {
 extension ImagesListViewController {
     /// данный метод конфигурирует стиль кастомных ячеек, в частности присваивается картинка, если такая имеется (если нет, guard else вернет nil), форматируется дата, задается стиль кнопки лайка для четных и нечетных ячеек по indexPath.row)
     func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
-        guard var image = UIImage(named: "EmptyCell") else { return }
+        guard let image = UIImage(named: "EmptyCell") else { return }
         let data = image.pngData()
-        cell.cellImage.image = image
         cell.cellImage.kf.indicatorType = .image(imageData: data!)
         cell.cellImage.kf.setImage(with: URL(string:photos[indexPath.row].thumbImageURL)) { result in
             switch result {
@@ -126,7 +137,13 @@ extension ImagesListViewController {
             }
         }
         
-        cell.cellDateLabel.text = "\(indexPath.row) \(dateFormatter.string(from: Date()))"
+        var createdAtDate: String
+        if photos[indexPath.row].createdAt != nil {
+            createdAtDate = String(describing: dateFormatter.date(from: photos[indexPath.row].createdAt!))
+        } else {
+            createdAtDate = dateFormatter.string(from: Date())
+        }
+        cell.cellDateLabel.text = "\(createdAtDate)"
     
         let isLiked = indexPath.row % 2 == 0
         let likeImage = isLiked ? UIImage(named: "LikeOn") : UIImage(named: "LikeOff")
@@ -147,14 +164,14 @@ extension ImagesListViewController: UITableViewDelegate {
         _ tableView: UITableView,
         heightForRowAt indexPath: IndexPath) -> CGFloat {
             let imageInsets = UIEdgeInsets(top: 4, left: 16, bottom: 4, right: 16)
-            if photos[indexPath.row].createdAt == nil {
+            if photos[indexPath.row].size.height > 50 {
                 let imageViewWidth = tableView.bounds.width - imageInsets.left - imageInsets.right
                 let imageWidth = photos[indexPath.row].size.width
                 let scale = imageViewWidth / imageWidth
                 let cellHeight = photos[indexPath.row].size.height * scale + imageInsets.top + imageInsets.bottom
                 return cellHeight
             } else {
-                let cellHeight = 100 + imageInsets.top + imageInsets.bottom
+                let cellHeight = 50 + imageInsets.top + imageInsets.bottom
                 return cellHeight
             }
         }
@@ -167,6 +184,9 @@ extension ImagesListViewController: UITableViewDelegate {
                 imagesListService.fetchPhotosNextPage() { result in
                     switch result {
                     case .success(let result):
+                        for item in result {
+                            print("createdAt \(String(describing: item.createdAt))")
+                        }
                         print("tableViewWillDisplay. \(self.imagesListService.photos.count) photos")
                     case .failure(let error):
                         print("Error is \(error)")

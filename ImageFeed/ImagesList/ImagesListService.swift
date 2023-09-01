@@ -17,15 +17,8 @@ final class ImagesListService {
     private let builder: URLRequestBuilder
     
     private var currentTask: URLSessionTask?
-    private var lastLoadedPage: Int?
+    private var lastLoadedPage: Int = 0
     private (set) var photos: [Photo] = []
-    
-    private lazy var dateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .long
-        formatter.timeStyle = .none
-        return formatter
-    } ()
     
     init (
         urlSession: URLSession = .shared,
@@ -44,13 +37,12 @@ final class ImagesListService {
             print("No task make progress true")
             currentTask?.cancel()
         }
-        
-        guard let request = urlRequestWithBearerToken() else {
+        let nextPage = lastLoadedPage + 1
+        guard let request = urlRequestWithBearerToken(page: nextPage) else {
             assertionFailure("Invalide request in fetchProfile")
             completion(.failure(NetworkError.urlSessionError))
             return
         }
-        let nextPage = lastLoadedPage == nil ? 1 : (lastLoadedPage ?? 0) + 1
         currentTask = urlSession.objectTask(for: request) { [weak self] (result: Result<[PhotoResult],Error>) in
             guard let self = self else { return }
             DispatchQueue.main.async {
@@ -62,7 +54,7 @@ final class ImagesListService {
                         let photo = Photo(
                             id: item.id,
                             size: CGSize(width: item.width, height: item.height),
-                            createdAt: self.dateFormatter.date(from: item.createdAt),
+                            createdAt: item.createdAt,
                             welcomeDescription: item.description,
                             thumbImageURL: item.urls.thumb ?? "NO THUMB",
                             largeImageURL: item.urls.full ?? "NO FULL IMG",
@@ -70,7 +62,7 @@ final class ImagesListService {
                         photos.append(photo)
                     }
                     self.photos.append(contentsOf: photos)
-                    self.lastLoadedPage? += 1
+                    self.lastLoadedPage = self.lastLoadedPage + 1
                     NotificationCenter.default.post(
                         name: ImagesListService.DidChangeNotification,
                         object: self,
@@ -84,15 +76,17 @@ final class ImagesListService {
         }
         currentTask?.resume()
     }
-    
 }
 
 private extension ImagesListService {
     
     /// создаем GET запрос с использованием Bearer токена, планурием получить в ответе JSON
-    func urlRequestWithBearerToken() -> URLRequest? {
-        builder.makeHTTPRequest(
-            path: "/photos/",
+    func urlRequestWithBearerToken(page: Int) -> URLRequest? {
+        let path: String = "/photos?"
+        + "page=\(page)"
+        + "&&per_page=10"
+        return builder.makeHTTPRequest(
+            path: path,
             httpMethod: "GET",
             baseURLString: Constants.defaultAPIURLString)
     }
