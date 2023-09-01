@@ -9,31 +9,6 @@ import Foundation
 
 final class ImagesListService {
     
-    struct PhotoResult: Decodable {
-        let id: String
-        let createdAt: String
-        let width: CGFloat
-        let height: CGFloat
-        let likedByUser: Bool
-        let description: String?
-        let urls: UrlsResult
-    }
-    
-    struct UrlsResult: Decodable {
-        let thumb: String?
-        let full: String?
-    }
-    
-    struct Photo {
-        let id: String
-        let size: CGSize
-        let createdAt: Date?
-        let welcomeDescription: String?
-        let thumbImageURL: String
-        let largeImageURL: String
-        let isLiked: Bool
-    }
-    
     static let DidChangeNotification = Notification.Name(rawValue: "ImagesListServiceProviderDidChange")
     
     static let shared = ImagesListService()
@@ -96,12 +71,12 @@ final class ImagesListService {
                     }
                     self.photos.append(contentsOf: photos)
                     self.lastLoadedPage? += 1
-                    completion(.success(photos))
                     NotificationCenter.default.post(
                         name: ImagesListService.DidChangeNotification,
                         object: self,
-                        userInfo: ["URL": self.photos]
+                        userInfo: ["Photos": photos]
                     )
+                    completion(.success(photos))
                 case .failure(let error):
                     completion(.failure(error))
                 }
