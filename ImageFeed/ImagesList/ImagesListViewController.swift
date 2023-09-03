@@ -46,11 +46,14 @@ final class ImagesListViewController: UIViewController {
             self.updateTableViewAnimated()
         }
         
+        UIBlockingProgressHUD.show()
         imagesListService.fetchPhotosNextPage() { result in
             switch result {
             case .success(let result):
+                UIBlockingProgressHUD.dismiss()
                 print("viewDidLoad. \(self.imagesListService.photos.count) photos")
             case .failure(let error):
+                UIBlockingProgressHUD.dismiss()
                 print("Error is \(error)")
             }
         }
@@ -117,7 +120,7 @@ extension ImagesListViewController {
     func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
         
         /// осуществляем загрузку фото, пока идет загрузка или фото отсутствует вставляем заглушку
-        guard let image = UIImage(named: "EmptyCell") else { return }
+        guard let image = UIImage(named: "Stub") else { return }
         let data = image.pngData()
         cell.cellImage.kf.indicatorType = .image(imageData: data!)
         cell.cellImage.kf.setImage(with: URL(string:photos[indexPath.row].thumbImageURL)) { result in
