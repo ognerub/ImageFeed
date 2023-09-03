@@ -17,6 +17,7 @@ final class ImagesListService {
     private let builder: URLRequestBuilder
     
     private var currentTask: URLSessionTask?
+    private var likeTask: URLSessionTask?
     private var lastLoadedPage: Int = 0
     private (set) var photos: [Photo] = []
     
@@ -30,16 +31,10 @@ final class ImagesListService {
     
     
     func fetchPhotosNextPage(completion: @escaping (Result<[Photo], Error>) -> Void) {
-        if currentTask != nil {
-            print("TaskInProgress guard return from func")
-            return
-        } else {
-            print("No task make progress true")
-            currentTask?.cancel()
-        }
+        if currentTask != nil { return } else { currentTask?.cancel() }
         let nextPage = lastLoadedPage + 1
         guard let request = urlRequestWithBearerToken(page: nextPage) else {
-            assertionFailure("Invalide request in fetchProfile")
+            print("Invalide request in fetchPhotosNextPage")
             completion(.failure(NetworkError.urlSessionError))
             return
         }
@@ -76,10 +71,47 @@ final class ImagesListService {
         }
         currentTask?.resume()
     }
+    
+    func changeLike(photoId: String, isLike: Bool, completion: @escaping (Result<Void, Error>) -> Void) {
+        if likeTask != nil { return } else { likeTask?.cancel() }
+        guard let request = urlRequestForChangeLike(photoId: photoId, isLike: isLike) else {
+            print("Invalide request in changeLike")
+            completion(.failure(NetworkError.urlSessionError))
+            return
+        }
+        likeTask = urlSession.objectTask(for: request) { [weak self] (result: Result<[PhotoResult],Error>) in
+            guard let self = self else { return }
+            DispatchQueue.main.async {
+                self.likeTask = nil
+                switch result {
+                case .success(_):
+                    // поиск индекса элемента
+                    if let index = self.photos.firstIndex(where: {$0.id == photoId}) {
+                        // текуший элемент
+                        let photo = self.photos[index]
+                        // копия элемента с инвертированным значением isLiked
+                        let newPhoto = Photo(
+                            id: photo.id,
+                            size: photo.size,
+                            createdAt: photo.createdAt,
+                            welcomeDescription: photo.welcomeDescription,
+                            thumbImageURL: photo.largeImageURL,
+                            largeImageURL: photo.largeImageURL,
+                            isLiked: !photo.isLiked
+                        )
+                        // замена элемента в массиве
+                        self.photos[index] = newPhoto
+                    }
+                case.failure(let error):
+                    print("Error in LikeTask \(error)")
+                }
+            }
+            self.likeTask?.resume()
+        }
+    }
 }
 
 private extension ImagesListService {
-    
     /// создаем GET запрос с использованием Bearer токена, планурием получить в ответе JSON
     func urlRequestWithBearerToken(page: Int) -> URLRequest? {
         let path: String = "/photos?"
@@ -90,4 +122,13 @@ private extension ImagesListService {
             httpMethod: "GET",
             baseURLString: Constants.defaultAPIURLString)
     }
+    /// создаем  запросы для  лайков
+    func urlRequestForChangeLike(photoId: String, isLike: Bool) -> URLRequest? {
+        let path: String = "/photos/\(photoId)/like"
+        return builder.makeHTTPRequest(
+            path: path,
+            httpMethod: isLike ? "POST" : "DELETE",
+            baseURLString: Constants.defaultAPIURLString)
+    }
+    
 }

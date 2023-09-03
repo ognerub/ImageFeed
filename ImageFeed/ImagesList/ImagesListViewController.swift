@@ -10,7 +10,7 @@ import Kingfisher
 
 final class ImagesListViewController: UIViewController {
     
-    private let ShowSingleImageSequeIdentifier = "ShowSingleImage"
+    private let showSingleImageSequeIdentifier = "ShowSingleImage"
     private let imagesListService = ImagesListService.shared
     private let singleImageViewController = SingleImageViewController.shared
     
@@ -49,29 +49,72 @@ final class ImagesListViewController: UIViewController {
         UIBlockingProgressHUD.show()
         imagesListService.fetchPhotosNextPage() { result in
             switch result {
-            case .success(let result):
+            case .success(_):
                 UIBlockingProgressHUD.dismiss()
-                print("viewDidLoad. \(self.imagesListService.photos.count) photos")
             case .failure(let error):
                 UIBlockingProgressHUD.dismiss()
-                print("Error is \(error)")
+                print("Error from viewDidload \(error)")
             }
         }
     }
     
-    func retrieveImage() {
-        
-    }
-    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == ShowSingleImageSequeIdentifier {
+        if segue.identifier == showSingleImageSequeIdentifier {
             let viewController = segue.destination as! SingleImageViewController
-            let indexPath = sender as! IndexPath
-//            _ = viewController.view // crash fixed
             viewController.image = self.singleImageViewController.image
+//            let indexPath = sender as! IndexPath
+//            _ = viewController.view // crash fix
         } else {
             super.prepare(for: segue, sender: sender)
         }
+    }
+}
+
+// MARK: - Extensions
+extension ImagesListViewController {
+    /// данный метод конфигурирует стиль кастомных ячеек, в частности присваивается картинка, если такая имеется (если нет, guard else вернет nil), форматируется дата, задается стиль кнопки лайка для четных и нечетных ячеек по indexPath.row)
+    func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
+        
+        /// осуществляем загрузку фото, пока идет загрузка или фото отсутствует вставляем заглушку
+        guard let image = UIImage(named: "Stub"),
+              let data = image.pngData() else { return }
+        cell.cellImage.kf.indicatorType = .image(imageData: data)
+        cell.cellImage.kf.setImage(with: URL(string:photos[indexPath.row].thumbImageURL)) { result in
+            switch result {
+            case .success(_):
+                self.tableView.reloadRows(at: [indexPath], with: .automatic)
+            case .failure(let error):
+                print("Error to load images at row \(indexPath.row). \n \(error)")
+            }
+        }
+        
+        /// устанавливаем верную дату для каждой фотографии
+        var date = photos[indexPath.row].createdAt ?? "no date"
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+        if let formattedDate = dateFormatter.date(from: date) {
+            dateFormatter.dateFormat = "dd MMMM yyyy"
+            dateFormatter.locale = Locale(identifier: "ru_Ru")
+            cell.cellDateLabel.text = "\(dateFormatter.string(from: formattedDate))"
+        } else {
+            cell.cellDateLabel.text = "no date of photo"
+        }
+        
+        /// настраиваем лайки для каждой фотографии
+        
+        
+        
+        let isLiked = indexPath.row % 2 == 0
+        let likeImage = isLiked ? UIImage(named: "LikeOn") : UIImage(named: "LikeOff")
+        cell.cellLikeButton.setImage(likeImage, for: .normal)
+    }
+}
+
+//MARK: - ImageListCellDelegate
+extension ImagesListViewController: ImagesListCellDelegate {
+    func imageListCellDidTapLike(_ cell: ImagesListCell) {
+        guard let indexPath = tableView.indexPath(for: cell) else { return }
+        let photo = photos[indexPath.row]
+        
     }
 }
 
@@ -84,6 +127,7 @@ extension ImagesListViewController: UITableViewDataSource {
     /// данный метод опредетяет какую ячейку выводить, если нет кастомной, то отработает quard else и отобразится стандартная ячейка. Также запускается метод из extension для MVC - configCell
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: ImagesListCell.reuseIdentifier, for: indexPath)
+        cell.delegate = self
         guard let imageListCell = cell as? ImagesListCell else {
             return UITableViewCell()
         }
@@ -102,54 +146,12 @@ extension ImagesListViewController: UITableViewDataSource {
                     indexPaths.append(IndexPath(row: i, section: 0))
                 }
                 tableView.insertRows(at: indexPaths, with: .automatic)
-                //                var prevOldCount = (oldCount - 10) <= 0 ? 0 : (oldCount - 10)
-                //                if prevOldCount != 0 {
-                //                    var indexPathsToRemove: [IndexPath] = []
-                //                    for i in (prevOldCount-10)..<(oldCount-10) {
-                //                        indexPathsToRemove.append(IndexPath(row: i, section: 0))
-                //                    }
-                //                    tableView.deleteRows(at: indexPathsToRemove, with: .automatic)
-                //                }
             } completion: { _ in}
         }
     }
 }
 
-extension ImagesListViewController {
-    /// данный метод конфигурирует стиль кастомных ячеек, в частности присваивается картинка, если такая имеется (если нет, guard else вернет nil), форматируется дата, задается стиль кнопки лайка для четных и нечетных ячеек по indexPath.row)
-    func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
-        
-        /// осуществляем загрузку фото, пока идет загрузка или фото отсутствует вставляем заглушку
-        guard let image = UIImage(named: "Stub") else { return }
-        let data = image.pngData()
-        cell.cellImage.kf.indicatorType = .image(imageData: data!)
-        cell.cellImage.kf.setImage(with: URL(string:photos[indexPath.row].thumbImageURL)) { result in
-            switch result {
-            case .success(let value):
-                self.tableView.reloadRows(at: [indexPath], with: .automatic)
-            case .failure(let error):
-                print("Error to load images at row \(indexPath.row). \n \(error)")
-            }
-        }
-        
-        /// устанавливаем верную дату для каждой фотографии
-        var date = photos[indexPath.row].createdAt ?? "no date"
-        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
-        if let formattedDate = dateFormatter.date(from: date) {
-            dateFormatter.dateFormat = "dd MMMM yyyy"
-            dateFormatter.locale = Locale(identifier: "ru_Ru")
-            cell.cellDateLabel.text = "\(dateFormatter.string(from: formattedDate))"
-        } else {
-            cell.cellDateLabel.text = "no date of photo"
-        }
-    
-        /// настраиваем лайки для каждой фотографии
-        let isLiked = indexPath.row % 2 == 0
-        let likeImage = isLiked ? UIImage(named: "LikeOn") : UIImage(named: "LikeOff")
-        cell.cellLikeButton.setImage(likeImage, for: .normal)
-    }
-}
-
+// MARK: - UITableViewDelegate
 extension ImagesListViewController: UITableViewDelegate {
     /// в данном методе будем настраивать реагирование на нажатие пользователем на ячейку (строку)
     func tableView(
@@ -166,9 +168,10 @@ extension ImagesListViewController: UITableViewDelegate {
                 case .success(let result):
                     self.singleImageViewController.image = result.image
                     UIBlockingProgressHUD.dismiss()
-                    self.performSegue(withIdentifier: self.ShowSingleImageSequeIdentifier, sender: indexPath)
+                    self.performSegue(withIdentifier: self.showSingleImageSequeIdentifier, sender: indexPath)
                 case .failure(let error):
                     UIBlockingProgressHUD.dismiss()
+                    print("Error while retrieveImage \(error)")
                 }
             }
         }
@@ -195,17 +198,7 @@ extension ImagesListViewController: UITableViewDelegate {
         willDisplay cell: UITableViewCell,
         forRowAt indexPath: IndexPath) {
             if indexPath.row + 1 == imagesListService.photos.count {
-                imagesListService.fetchPhotosNextPage() { result in
-                    switch result {
-                    case .success(let result):
-                        for item in result {
-                            print("createdAt \(String(describing: item.createdAt))")
-                        }
-                        print("tableViewWillDisplay. \(self.imagesListService.photos.count) photos")
-                    case .failure(let error):
-                        print("Error is \(error)")
-                    }
-                }
+                imagesListService.fetchPhotosNextPage() { _ in}
             }
         }
 }

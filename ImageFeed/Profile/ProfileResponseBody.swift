@@ -8,7 +8,7 @@
 import UIKit
 
 /// струетура, которая будет использоваться для парсинга (decode JSON)
-struct ProfileResult: Decodable {
+struct ProfileResult: Codable {
     let username: String // логин пользователя
     let firstName: String // имя
     let lastName: String? // фамилия
@@ -24,9 +24,9 @@ struct Profile {
 }
 
 /// cтруктуры для картинки профиля
-struct ImageSizes: Decodable {
+struct ImageSizes: Codable {
     var medium: String?
 }
-struct UserResult: Decodable {
+struct UserResult: Codable {
     let profileImage: ImageSizes
 }
