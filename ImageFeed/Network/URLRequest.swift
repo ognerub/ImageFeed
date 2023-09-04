@@ -27,7 +27,7 @@ final class URLRequestBuilder {
             
             var request = URLRequest(url: baseURL)
             request.httpMethod = httpMethod
-            
+            request.timeoutInterval = 15
             if let token = storage.token {
                 request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
             }

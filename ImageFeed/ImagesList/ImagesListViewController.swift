@@ -15,6 +15,7 @@ final class ImagesListViewController: UIViewController {
     private let singleImageViewController = SingleImageViewController.shared
     
     private var imagesListServiceObserver: NSObjectProtocol?
+    private var alertPresenter: AlertPresenterProtocol?
     
     var photos: [Photo] = []
     
@@ -29,14 +30,7 @@ final class ImagesListViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        //        // connection of tableViw with it`s delegate and dataSource (now it`s MVC two in one) in code:
-        //        tableView.delegate = self
-        //        tableView.dataSource = self
-        //        // custom cell registration:
-        //        tableView.register(ImagesListCell.self, forCellReuseIdentifier: ImagesListCell.reuseIdentifier)
-        
         tableView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
-        
         imagesListServiceObserver = NotificationCenter.default.addObserver(
             forName: ImagesListService.DidChangeNotification,
             object: nil,
@@ -45,17 +39,12 @@ final class ImagesListViewController: UIViewController {
             guard let self = self else { return }
             self.updateTableViewAnimated()
         }
-        
-        UIBlockingProgressHUD.show()
-        imagesListService.fetchPhotosNextPage() { result in
-            switch result {
-            case .success(_):
-                UIBlockingProgressHUD.dismiss()
-            case .failure(let error):
-                UIBlockingProgressHUD.dismiss()
-                print("Error from viewDidload \(error)")
-            }
-        }
+        fetchPhotosNextPageSimple()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        alertPresenter = AlertPresenterImpl(viewController: self)
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -70,11 +59,37 @@ final class ImagesListViewController: UIViewController {
     }
 }
 
-// MARK: - Extensions
-extension ImagesListViewController {
+// MARK: - Private extension
+private extension ImagesListViewController {
+    
+    func fetchPhotosNextPageSimple() {
+        UIBlockingProgressHUD.show()
+        imagesListService.fetchPhotosNextPage() { result in
+            switch result {
+            case .success:
+                UIBlockingProgressHUD.dismiss()
+            case .failure:
+                self.showNetWorkErrorForImagesListVC() {
+                    self.fetchPhotosNextPageSimple()
+                }
+                UIBlockingProgressHUD.dismiss()
+            }
+        }
+    }
+    
+    func showNetWorkErrorForImagesListVC(completion: @escaping () -> Void) {
+        DispatchQueue.main.async {
+            let model = AlertModel(
+                title: "Что-то пошло не так(",
+                message: "Загрузка не удалась",
+                buttonText: "OK",
+                completion: completion)
+            self.alertPresenter?.show(with: model)
+        }
+    }
+    
     /// данный метод конфигурирует стиль кастомных ячеек, в частности присваивается картинка, если такая имеется (если нет, guard else вернет nil), форматируется дата, задается стиль кнопки лайка для четных и нечетных ячеек по indexPath.row)
     func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
-        
         /// осуществляем загрузку фото, пока идет загрузка или фото отсутствует вставляем заглушку
         guard let image = UIImage(named: "Stub"),
               let data = image.pngData() else { return }
@@ -111,15 +126,19 @@ extension ImagesListViewController: ImagesListCellDelegate {
     func imageListCellDidTapLike(_ cell: ImagesListCell) {
         guard let indexPath = tableView.indexPath(for: cell) else { return }
         let photo = photos[indexPath.row]
-        imagesListService.changeLike(photoId: photo.id, isLike: photo.isLiked) {_ in}
-        imagesListServiceObserver = NotificationCenter.default.addObserver(
-            forName: ImagesListService.LikeChangeNotification,
-            object: nil,
-            queue: .main
-        ) { [weak self] notification in
-            guard let self = self else { return }
-            print("Notification like")
-            self.tableView.reloadRows(at: [indexPath], with: .automatic)
+        UIBlockingProgressHUD.show()
+        imagesListService.changeLike(photoId: photo.id, isLike: !photo.isLiked) { result in
+            switch result {
+            case .success:
+                self.photos = self.imagesListService.photos
+                let isLiked = self.photos[indexPath.row].isLiked
+                let likeImage = isLiked ? UIImage(named: "LikeOn") : UIImage(named: "LikeOff")
+                cell.cellLikeButton.setImage(likeImage, for: .normal)
+                UIBlockingProgressHUD.dismiss()
+            case .failure:
+                self.showNetWorkErrorForImagesListVC() {()}
+                UIBlockingProgressHUD.dismiss()
+            }
         }
     }
 }
@@ -176,6 +195,7 @@ extension ImagesListViewController: UITableViewDelegate {
                     UIBlockingProgressHUD.dismiss()
                     self.performSegue(withIdentifier: self.showSingleImageSequeIdentifier, sender: indexPath)
                 case .failure(let error):
+                    self.showNetWorkErrorForImagesListVC() {()}
                     UIBlockingProgressHUD.dismiss()
                     print("Error while retrieveImage \(error)")
                 }
@@ -204,7 +224,7 @@ extension ImagesListViewController: UITableViewDelegate {
         willDisplay cell: UITableViewCell,
         forRowAt indexPath: IndexPath) {
             if indexPath.row + 1 == imagesListService.photos.count {
-                imagesListService.fetchPhotosNextPage() { _ in}
+                fetchPhotosNextPageSimple()
             }
         }
 }

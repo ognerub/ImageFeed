@@ -14,6 +14,14 @@ protocol AlertPresenterProtocol: AnyObject {
 final class AlertPresenterImpl {
     private weak var viewController: UIViewController?
     
+    var topVC: UIViewController {
+        var topController: UIViewController = UIApplication.shared.mainKeyWindow!.rootViewController!
+        while (topController.presentedViewController != nil) {
+            topController = topController.presentedViewController!
+        }
+        return topController
+    }
+    
     init(viewController: UIViewController?) {
         self.viewController = viewController
     }
@@ -32,7 +40,21 @@ extension AlertPresenterImpl: AlertPresenterProtocol {
             alertModel.completion()
         }
         alert.addAction(action)
-        viewController?.presentedViewController?.present(alert,
-                                animated: true)
+        topVC.present(alert, animated: true)
+        //viewController?.presentedViewController?.present(alert, animated: true)
+    }
+}
+
+extension UIApplication {
+    var mainKeyWindow: UIWindow? {
+        get {
+            if #available(iOS 13, *) {
+                return connectedScenes
+                    .flatMap { ($0 as? UIWindowScene)?.windows ?? [] }
+                    .first { $0.isKeyWindow }
+            } else {
+                return keyWindow
+            }
+        }
     }
 }

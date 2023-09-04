@@ -11,7 +11,7 @@ final class SingleImageViewController: UIViewController {
     
     static let shared = SingleImageViewController()
     
-    var image = UIImage(named: "EmptyCell")!
+    var image = UIImage(named: "Stub")!
     
     @IBOutlet private weak var scrollView: UIScrollView!
     @IBOutlet private weak var singleImageView: UIImageView!
@@ -70,7 +70,7 @@ extension SingleImageViewController {
         let minZoomScale = scrollView.minimumZoomScale
         let maxZoomScale = scrollView.maximumZoomScale
         view.layoutIfNeeded()
-        var visibleRectSize = scrollView.bounds.size
+        let visibleRectSize = scrollView.bounds.size
         let imageSize = image.size
         let hScale = visibleRectSize.width / imageSize.width
         let vScale = visibleRectSize.height / imageSize.height

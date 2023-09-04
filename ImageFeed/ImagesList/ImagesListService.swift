@@ -33,6 +33,7 @@ final class ImagesListService {
     
     func fetchPhotosNextPage(completion: @escaping (Result<[Photo], Error>) -> Void) {
         if currentTask != nil { return } else { currentTask?.cancel() }
+        print("Start fetch. LastLoadedPage \(lastLoadedPage)")
         let nextPage = lastLoadedPage + 1
         guard let request = urlRequestWithBearerToken(page: nextPage) else {
             print("Invalide request in fetchPhotosNextPage")
@@ -58,7 +59,10 @@ final class ImagesListService {
                         photos.append(photo)
                     }
                     self.photos.append(contentsOf: photos)
-                    self.lastLoadedPage = self.lastLoadedPage + 1
+                    var stopRaceValue = self.lastLoadedPage
+                    stopRaceValue += 1
+                    self.lastLoadedPage = stopRaceValue
+                    print("Success compl. LastLoadedPage \(self.lastLoadedPage)")
                     NotificationCenter.default.post(
                         name: ImagesListService.DidChangeNotification,
                         object: self,
@@ -102,19 +106,14 @@ final class ImagesListService {
                         )
                         // замена элемента в массиве
                         self.photos[index] = newPhoto
-                        print("Success change Like")
-                        NotificationCenter.default.post(
-                            name: ImagesListService.LikeChangeNotification,
-                            object: self,
-                            userInfo: ["Like": newPhoto]
-                        )
+                        completion(.success(()))
                     }
                 case.failure(let error):
-                    print("Error in LikeTask \(error)")
+                    completion(.failure(error))
                 }
             }
         }
-            self.likeTask?.resume()
+        self.likeTask?.resume()
     }
 }
 
@@ -124,6 +123,8 @@ private extension ImagesListService {
         let path: String = "/photos?"
         + "page=\(page)"
         + "&&per_page=10"
+        + "&&order_by=relevant"
+        + "&&collections=11649432"
         return builder.makeHTTPRequest(
             path: path,
             httpMethod: "GET",
@@ -132,7 +133,7 @@ private extension ImagesListService {
     /// создаем  запросы для  лайков
     func urlRequestForChangeLike(photoId: String, isLike: Bool) -> URLRequest? {
         let path: String = "/photos/\(photoId)/like"
-        let httpMethod = isLike ? "DELETE" : "POST"
+        let httpMethod = isLike ? "POST" : "DELETE"
         return builder.makeHTTPRequest(
             path: path,
             httpMethod: httpMethod,
