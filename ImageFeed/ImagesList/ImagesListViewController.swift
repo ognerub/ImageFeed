@@ -89,7 +89,7 @@ extension ImagesListViewController {
         }
         
         /// устанавливаем верную дату для каждой фотографии
-        var date = photos[indexPath.row].createdAt ?? "no date"
+        let date = photos[indexPath.row].createdAt ?? "no date"
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
         if let formattedDate = dateFormatter.date(from: date) {
             dateFormatter.dateFormat = "dd MMMM yyyy"
@@ -100,10 +100,7 @@ extension ImagesListViewController {
         }
         
         /// настраиваем лайки для каждой фотографии
-        
-        
-        
-        let isLiked = indexPath.row % 2 == 0
+        let isLiked = photos[indexPath.row].isLiked
         let likeImage = isLiked ? UIImage(named: "LikeOn") : UIImage(named: "LikeOff")
         cell.cellLikeButton.setImage(likeImage, for: .normal)
     }
@@ -114,7 +111,16 @@ extension ImagesListViewController: ImagesListCellDelegate {
     func imageListCellDidTapLike(_ cell: ImagesListCell) {
         guard let indexPath = tableView.indexPath(for: cell) else { return }
         let photo = photos[indexPath.row]
-        
+        imagesListService.changeLike(photoId: photo.id, isLike: photo.isLiked) {_ in}
+        imagesListServiceObserver = NotificationCenter.default.addObserver(
+            forName: ImagesListService.LikeChangeNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            guard let self = self else { return }
+            print("Notification like")
+            self.tableView.reloadRows(at: [indexPath], with: .automatic)
+        }
     }
 }
 
@@ -127,10 +133,10 @@ extension ImagesListViewController: UITableViewDataSource {
     /// данный метод опредетяет какую ячейку выводить, если нет кастомной, то отработает quard else и отобразится стандартная ячейка. Также запускается метод из extension для MVC - configCell
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: ImagesListCell.reuseIdentifier, for: indexPath)
-        cell.delegate = self
         guard let imageListCell = cell as? ImagesListCell else {
             return UITableViewCell()
         }
+        imageListCell.delegate = self
         configCell(for: imageListCell, with: indexPath)
         return imageListCell
     }

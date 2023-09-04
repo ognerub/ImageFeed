@@ -22,6 +22,15 @@ struct UrlsResult: Codable {
     let full: String?
 }
 
+struct LikeResponse: Codable {
+    let photo: LikeResult
+}
+
+struct LikeResult: Codable {
+    let id: String
+    let likedByUser: Bool
+}
+
 struct Photo {
     let id: String
     let size: CGSize

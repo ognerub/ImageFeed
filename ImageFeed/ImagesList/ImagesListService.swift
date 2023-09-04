@@ -10,6 +10,7 @@ import Foundation
 final class ImagesListService {
     
     static let DidChangeNotification = Notification.Name(rawValue: "ImagesListServiceProviderDidChange")
+    static let LikeChangeNotification = Notification.Name(rawValue: "ImagesListServiceLikeDidChange")
     
     static let shared = ImagesListService()
     
@@ -79,7 +80,7 @@ final class ImagesListService {
             completion(.failure(NetworkError.urlSessionError))
             return
         }
-        likeTask = urlSession.objectTask(for: request) { [weak self] (result: Result<[PhotoResult],Error>) in
+        likeTask = urlSession.objectTask(for: request) { [weak self] (result: Result<LikeResponse,Error>) in
             guard let self = self else { return }
             DispatchQueue.main.async {
                 self.likeTask = nil
@@ -101,13 +102,19 @@ final class ImagesListService {
                         )
                         // замена элемента в массиве
                         self.photos[index] = newPhoto
+                        print("Success change Like")
+                        NotificationCenter.default.post(
+                            name: ImagesListService.LikeChangeNotification,
+                            object: self,
+                            userInfo: ["Like": newPhoto]
+                        )
                     }
                 case.failure(let error):
                     print("Error in LikeTask \(error)")
                 }
             }
-            self.likeTask?.resume()
         }
+            self.likeTask?.resume()
     }
 }
 
@@ -125,9 +132,10 @@ private extension ImagesListService {
     /// создаем  запросы для  лайков
     func urlRequestForChangeLike(photoId: String, isLike: Bool) -> URLRequest? {
         let path: String = "/photos/\(photoId)/like"
+        let httpMethod = isLike ? "DELETE" : "POST"
         return builder.makeHTTPRequest(
             path: path,
-            httpMethod: isLike ? "POST" : "DELETE",
+            httpMethod: httpMethod,
             baseURLString: Constants.defaultAPIURLString)
     }
     
