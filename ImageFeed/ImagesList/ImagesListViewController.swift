@@ -59,6 +59,42 @@ final class ImagesListViewController: UIViewController {
     }
 }
 
+// MARK: - UITableViewDelegate
+extension ImagesListViewController: UITableViewDelegate {
+    /// в данном методе будем настраивать реагирование на нажатие пользователем на ячейку (строку)
+    func tableView(
+        _ tableView: UITableView,
+        didSelectRowAt indexPath: IndexPath) {
+            loadFullscreenImage(indexPath: indexPath)
+        }
+    
+    /// добавлен новый метод, корректирующий высоту ячейки (строки) в зависимости от высоты изображения
+    func tableView(
+        _ tableView: UITableView,
+        heightForRowAt indexPath: IndexPath) -> CGFloat {
+            let imageInsets = UIEdgeInsets(top: 4, left: 16, bottom: 4, right: 16)
+            if photos[indexPath.row].size.height > 50 {
+                let imageViewWidth = tableView.bounds.width - imageInsets.left - imageInsets.right
+                let imageWidth = photos[indexPath.row].size.width
+                let scale = imageViewWidth / imageWidth
+                let cellHeight = photos[indexPath.row].size.height * scale + imageInsets.top + imageInsets.bottom
+                return cellHeight
+            } else {
+                let cellHeight = 50 + imageInsets.top + imageInsets.bottom
+                return cellHeight
+            }
+        }
+    
+    func tableView(
+        _ tableView: UITableView,
+        willDisplay cell: UITableViewCell,
+        forRowAt indexPath: IndexPath) {
+            if indexPath.row + 1 == imagesListService.photos.count {
+                fetchPhotosNextPageSimple()
+            }
+        }
+}
+
 // MARK: - Private extension
 private extension ImagesListViewController {
     
@@ -77,14 +113,37 @@ private extension ImagesListViewController {
         }
     }
     
+    func loadFullscreenImage(indexPath: IndexPath) {
+        UIBlockingProgressHUD.show()
+        guard let url = URL(string:photos[indexPath.row].largeImageURL) else {
+            print("Guard, no fullsize image url!")
+            return
+        }
+        let resourse = KF.ImageResource(downloadURL: url)
+        KingfisherManager.shared.retrieveImage(with: resourse) { result in
+            switch result {
+            case .success(let result):
+                self.singleImageViewController.image = result.image
+                UIBlockingProgressHUD.dismiss()
+                self.performSegue(withIdentifier: self.showSingleImageSequeIdentifier, sender: indexPath)
+            case .failure(let error):
+                self.showNetWorkErrorForImagesListVC() { self.loadFullscreenImage(indexPath: indexPath) }
+                UIBlockingProgressHUD.dismiss()
+                print("Error while retrieveImage \(error)")
+            }
+        }
+    }
+    
     func showNetWorkErrorForImagesListVC(completion: @escaping () -> Void) {
         DispatchQueue.main.async {
-            let model = AlertModel(
+            let model = AlertModel2(
                 title: "Что-то пошло не так(",
-                message: "Загрузка не удалась",
-                buttonText: "OK",
-                completion: completion)
-            self.alertPresenter?.show(with: model)
+                message: "Попробовать еще раз?",
+                buttonText1: "Повторить",
+                buttonText2: "Не надо",
+                completion1: completion,
+                completion2: {})
+            self.alertPresenter?.show2(with: model)
         }
     }
     
@@ -174,58 +233,5 @@ extension ImagesListViewController: UITableViewDataSource {
             } completion: { _ in}
         }
     }
-}
-
-// MARK: - UITableViewDelegate
-extension ImagesListViewController: UITableViewDelegate {
-    /// в данном методе будем настраивать реагирование на нажатие пользователем на ячейку (строку)
-    func tableView(
-        _ tableView: UITableView,
-        didSelectRowAt indexPath: IndexPath) {
-            UIBlockingProgressHUD.show()
-            guard let url = URL(string:photos[indexPath.row].largeImageURL) else {
-                print("Guard, no fullsize image url!")
-                return
-            }
-            let resourse = KF.ImageResource(downloadURL: url)
-            KingfisherManager.shared.retrieveImage(with: resourse) { result in
-                switch result {
-                case .success(let result):
-                    self.singleImageViewController.image = result.image
-                    UIBlockingProgressHUD.dismiss()
-                    self.performSegue(withIdentifier: self.showSingleImageSequeIdentifier, sender: indexPath)
-                case .failure(let error):
-                    self.showNetWorkErrorForImagesListVC() {()}
-                    UIBlockingProgressHUD.dismiss()
-                    print("Error while retrieveImage \(error)")
-                }
-            }
-        }
-    
-    /// добавлен новый метод, корректирующий высоту ячейки (строки) в зависимости от высоты изображения
-    func tableView(
-        _ tableView: UITableView,
-        heightForRowAt indexPath: IndexPath) -> CGFloat {
-            let imageInsets = UIEdgeInsets(top: 4, left: 16, bottom: 4, right: 16)
-            if photos[indexPath.row].size.height > 50 {
-                let imageViewWidth = tableView.bounds.width - imageInsets.left - imageInsets.right
-                let imageWidth = photos[indexPath.row].size.width
-                let scale = imageViewWidth / imageWidth
-                let cellHeight = photos[indexPath.row].size.height * scale + imageInsets.top + imageInsets.bottom
-                return cellHeight
-            } else {
-                let cellHeight = 50 + imageInsets.top + imageInsets.bottom
-                return cellHeight
-            }
-        }
-    
-    func tableView(
-        _ tableView: UITableView,
-        willDisplay cell: UITableViewCell,
-        forRowAt indexPath: IndexPath) {
-            if indexPath.row + 1 == imagesListService.photos.count {
-                fetchPhotosNextPageSimple()
-            }
-        }
 }
 

@@ -33,7 +33,6 @@ final class ImagesListService {
     
     func fetchPhotosNextPage(completion: @escaping (Result<[Photo], Error>) -> Void) {
         if currentTask != nil { return } else { currentTask?.cancel() }
-        print("Start fetch. LastLoadedPage \(lastLoadedPage)")
         let nextPage = lastLoadedPage + 1
         guard let request = urlRequestWithBearerToken(page: nextPage) else {
             print("Invalide request in fetchPhotosNextPage")
@@ -62,7 +61,6 @@ final class ImagesListService {
                     var stopRaceValue = self.lastLoadedPage
                     stopRaceValue += 1
                     self.lastLoadedPage = stopRaceValue
-                    print("Success compl. LastLoadedPage \(self.lastLoadedPage)")
                     NotificationCenter.default.post(
                         name: ImagesListService.DidChangeNotification,
                         object: self,
