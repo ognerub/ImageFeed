@@ -14,17 +14,23 @@ protocol WebViewViewControllerDelegate: AnyObject {
 }
 
 final class WebViewViewController: UIViewController {
-    @IBOutlet private var webView: WKWebView!
     
-    @IBOutlet private var progressView: UIProgressView!
+    static let shared = WebViewViewController()
     
-    weak var delegate: WebViewViewControllerDelegate?
+    private let splashViewController = SplashViewController.shared
     
     /// переменная для нового API
     private var estimatedProgressObservation: NSKeyValueObservation?
+    private var alertPresenter: AlertPresenterProtocol?
+
+    weak var delegate: WebViewViewControllerDelegate?
+    
+    @IBOutlet private var webView: WKWebView!
+    @IBOutlet private var progressView: UIProgressView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        alertPresenter = AlertPresenterImpl(viewController: self)
         webView.navigationDelegate = self
         var urlComponents = URLComponents(string: Constants.unsplashAuthorizeURLString)!
         urlComponents.queryItems = [
@@ -51,6 +57,19 @@ final class WebViewViewController: UIViewController {
         progressView.isHidden = fabs(webView.estimatedProgress - 1.0) <= 0.0001
     }
     
+    func cleanWebViewAfterUse() {
+        HTTPCookieStorage.shared.removeCookies(since: Date.distantPast)
+        WKWebsiteDataStore.default().fetchDataRecords(
+            ofTypes: WKWebsiteDataStore.allWebsiteDataTypes()) { records in
+                records.forEach { record in
+                    WKWebsiteDataStore.default().removeData(
+                        ofTypes: record.dataTypes,
+                        for: [record],
+                        completionHandler: {})
+                }
+            }
+    }
+    
     @IBAction func didTapNavBackButton(_ sender: Any) {
         delegate?.webViewViewControllerDidCancel(self)
     }
@@ -75,13 +94,27 @@ extension WebViewViewController: WKNavigationDelegate {
         if
             let url = navigationAction.request.url,
             let urlComponents = URLComponents(string: url.absoluteString),
-            urlComponents.path == "/oauth/authorize/native",
+            urlComponents.path == "/oauth/authorize/native" || urlComponents.path == "/oauth/authorize" || urlComponents.path == "/oauth/login",
             let items = urlComponents.queryItems,
             let codeItem = items.first(where: { $0.name == "code" })
         {
             return codeItem.value
         } else {
+//            showNetWorkErrorForWebViewVC {
+//                self.delegate?.webViewViewControllerDidCancel(self)
+//            }
             return nil
+        }
+    }
+    
+    func showNetWorkErrorForWebViewVC(completion: @escaping () -> Void) {
+        DispatchQueue.main.async {
+            let model = AlertModel(
+                title: "Что-то пошло не так(",
+                message: "Загрузка не удалась",
+                buttonText: "OK",
+                completion: completion)
+            self.alertPresenter?.show(with: model)
         }
     }
 }

@@ -17,6 +17,9 @@ final class ProfileViewController: UIViewController {
     private let profileImageService = ProfileImageService.shared
     private let storage = OAuth2TokenStorage.shared
     private let splashViewController = SplashViewController.shared
+    private let webViewViewController = WebViewViewController.shared
+    
+    private var alertPresenter: AlertPresenterProtocol?
     
     var personImageView: UIImageView = {
         let personImage = UIImage(named: "Avatar") ?? UIImage(systemName: "person.crop.circle.fill")!
@@ -63,6 +66,7 @@ final class ProfileViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        alertPresenter = AlertPresenterImpl(viewController: self)
         view.backgroundColor = UIColor(named: "YP Black")
         addSubViews()
         configureConstraints()
@@ -159,7 +163,23 @@ final class ProfileViewController: UIViewController {
     
     @objc
     private func didTapButton() {
-        storage.nilTokenInUserDefaults()
-        switchToAuthViewController()
+        showAlertBeforExit()
+    }
+    
+    func showAlertBeforExit() {
+        DispatchQueue.main.async {
+            let model2 = AlertModel2(
+                title: "Пока, пока!",
+                message: "Уверены что хотите выйти?",
+                buttonText1: "Да",
+                buttonText2: "Нет",
+                completion1: {
+                    self.storage.nilTokenInUserDefaults()
+                    self.webViewViewController.cleanWebViewAfterUse()
+                    self.switchToAuthViewController()
+                },
+                completion2: { })
+            self.alertPresenter?.show2(with: model2)
+        }
     }
 }
