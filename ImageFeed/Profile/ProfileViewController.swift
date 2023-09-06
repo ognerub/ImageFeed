@@ -10,8 +10,6 @@ import Kingfisher
 
 final class ProfileViewController: UIViewController {
     
-    private let mainUIStoryboard = "Main"
-    
     private let profileService = ProfileService.shared
     private let profileImageService = ProfileImageService.shared
     private let storage = OAuth2TokenStorage.shared
@@ -19,6 +17,7 @@ final class ProfileViewController: UIViewController {
     private let webViewViewController = WebViewViewController.shared
     
     private var alertPresenter: AlertPresenterProtocol?
+    private var profileImageServiceObserver: NSObjectProtocol?
     
     var personImageView: UIImageView = {
         let personImage = UIImage(named: "Avatar") ?? UIImage(systemName: "person.crop.circle.fill")!
@@ -60,8 +59,6 @@ final class ProfileViewController: UIViewController {
         exitButton.translatesAutoresizingMaskIntoConstraints = false
         return exitButton
     }()
-    
-    private var profileImageServiceObserver: NSObjectProtocol?
     
     override func viewDidLoad() {
         super.viewDidLoad()

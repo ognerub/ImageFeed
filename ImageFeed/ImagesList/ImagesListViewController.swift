@@ -50,9 +50,9 @@ final class ImagesListViewController: UIViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == showSingleImageSequeIdentifier {
             let viewController = segue.destination as! SingleImageViewController
-            viewController.image = self.singleImageViewController.image
-//            let indexPath = sender as! IndexPath
-//            _ = viewController.view // crash fix
+            //            viewController.image = self.singleImageViewController.image
+            //            let indexPath = sender as! IndexPath
+            //            _ = viewController.view // crash fix
         } else {
             super.prepare(for: segue, sender: sender)
         }
@@ -65,7 +65,9 @@ extension ImagesListViewController: UITableViewDelegate {
     func tableView(
         _ tableView: UITableView,
         didSelectRowAt indexPath: IndexPath) {
-            loadFullscreenImage(indexPath: indexPath)
+            singleImageViewController.fullscreenImageURL = URL(string: photos[indexPath.row].largeImageURL)
+            singleImageViewController.loadFullscreenImage()
+            self.performSegue(withIdentifier: self.showSingleImageSequeIdentifier, sender: indexPath)
         }
     
     /// добавлен новый метод, корректирующий высоту ячейки (строки) в зависимости от высоты изображения
@@ -109,27 +111,6 @@ private extension ImagesListViewController {
                     self.fetchPhotosNextPageSimple()
                 }
                 UIBlockingProgressHUD.dismiss()
-            }
-        }
-    }
-    
-    func loadFullscreenImage(indexPath: IndexPath) {
-        UIBlockingProgressHUD.show()
-        guard let url = URL(string:photos[indexPath.row].largeImageURL) else {
-            print("Guard, no fullsize image url!")
-            return
-        }
-        let resourse = KF.ImageResource(downloadURL: url)
-        KingfisherManager.shared.retrieveImage(with: resourse) { result in
-            switch result {
-            case .success(let result):
-                self.singleImageViewController.image = result.image
-                UIBlockingProgressHUD.dismiss()
-                self.performSegue(withIdentifier: self.showSingleImageSequeIdentifier, sender: indexPath)
-            case .failure(let error):
-                self.showNetWorkErrorForImagesListVC() { self.loadFullscreenImage(indexPath: indexPath) }
-                UIBlockingProgressHUD.dismiss()
-                print("Error while retrieveImage \(error)")
             }
         }
     }

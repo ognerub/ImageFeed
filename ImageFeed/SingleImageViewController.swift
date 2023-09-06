@@ -6,12 +6,18 @@
 //
 
 import UIKit
+import Kingfisher
 
 final class SingleImageViewController: UIViewController {    
     
     static let shared = SingleImageViewController()
     
+    static let DidChangeNotification = Notification.Name(rawValue: "SingleImageProviderDidChange")
+    
+    private var singleImageServiceObserver: NSObjectProtocol?
+    
     var image = UIImage(named: "Stub")!
+    var fullscreenImageURL: URL?
     
     @IBOutlet private weak var scrollView: UIScrollView!
     @IBOutlet private weak var singleImageView: UIImageView!
@@ -20,14 +26,58 @@ final class SingleImageViewController: UIViewController {
         super.viewDidLoad()
         scrollView.minimumZoomScale = 0.1
         scrollView.maximumZoomScale = 1.25
+        updateFullscreenImage()
     }
     
-    /// в этом методе выставляем позицию картинки после расположения всех subview (для способа 2)
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        singleImageServiceObserver = NotificationCenter.default.addObserver(
+            forName: SingleImageViewController.DidChangeNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            guard let self = self else { return }
+            self.updateFullscreenImageObjc(notification: notification)
+        }
+    }
+    
+    @objc
+    private func updateFullscreenImageObjc(notification: Notification) {
+        guard
+            isViewLoaded,
+            let userInfo = notification.userInfo,
+            let fullscreenImage = userInfo["FullscreenImage"] as? UIImage
+        else { return }
+        image = fullscreenImage
+        updateFullscreenImage()
+    }
+    
+    func updateFullscreenImage() {
         singleImageView.image = image
         rescaleAndCenterImageInScrollView(image: image)
-        //rescaleAndCenterImageInScrollViewV2()
+    }
+    
+    func loadFullscreenImage() {
+        UIBlockingProgressHUD.show()
+        guard let fullscreenImageURL = fullscreenImageURL else {
+            print("FullscreenImage is empty")
+            return
+        }
+        let resourse = KF.ImageResource(downloadURL: fullscreenImageURL)
+        KingfisherManager.shared.retrieveImage(with: resourse) { result in
+            UIBlockingProgressHUD.dismiss()
+            switch result {
+            case .success(let result):
+                NotificationCenter.default.post(
+                    name: SingleImageViewController.DidChangeNotification,
+                    object: self,
+                    userInfo: ["FullscreenImage": result.image]
+                )
+            case .failure(let error):
+                //self.showNetWorkErrorForImagesListVC() { self.loadFullscreenImage(indexPath: indexPath) }
+                print("Error while retrieveImage \(error)")
+            }
+        }
     }
     
     @IBAction private func didTapShareButton(_ sender: UIButton) {
