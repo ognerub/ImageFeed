@@ -10,7 +10,6 @@ import Kingfisher
 
 final class ProfileViewController: UIViewController {
     
-    private let authViewControllerIdentifier = "AuthViewController"
     private let mainUIStoryboard = "Main"
     
     private let profileService = ProfileService.shared
@@ -154,11 +153,9 @@ final class ProfileViewController: UIViewController {
         ])
     }
     
-    private func switchToAuthViewController() {
-        guard let window = UIApplication.shared.windows.first else { fatalError("Invalid Configuration of switchToAuthViewController") }
-        let authViewController = UIStoryboard(name: mainUIStoryboard, bundle: .main)
-            .instantiateViewController(withIdentifier: authViewControllerIdentifier)
-        window.rootViewController = authViewController
+    private func switchToSplashViewController() {
+        guard let window = UIApplication.shared.windows.first else { fatalError("Invalid Configuration of switchToSplashViewController") }
+        window.rootViewController = SplashViewController()
     }
     
     @objc
@@ -176,7 +173,7 @@ final class ProfileViewController: UIViewController {
                 completion1: {
                     self.storage.nilTokenInUserDefaults()
                     self.webViewViewController.cleanWebViewAfterUse()
-                    self.switchToAuthViewController()
+                    self.switchToSplashViewController()
                 },
                 completion2: { })
             self.alertPresenter?.show2(with: model2)

@@ -136,14 +136,14 @@ private extension ImagesListViewController {
     
     func showNetWorkErrorForImagesListVC(completion: @escaping () -> Void) {
         DispatchQueue.main.async {
-            let model = AlertModel2(
+            let model2 = AlertModel2(
                 title: "Что-то пошло не так(",
                 message: "Попробовать еще раз?",
                 buttonText1: "Повторить",
                 buttonText2: "Не надо",
                 completion1: completion,
                 completion2: {})
-            self.alertPresenter?.show2(with: model)
+            self.alertPresenter?.show2(with: model2)
         }
     }
     
@@ -195,7 +195,9 @@ extension ImagesListViewController: ImagesListCellDelegate {
                 cell.cellLikeButton.setImage(likeImage, for: .normal)
                 UIBlockingProgressHUD.dismiss()
             case .failure:
-                self.showNetWorkErrorForImagesListVC() {()}
+                self.showNetWorkErrorForImagesListVC() {
+                    self.imageListCellDidTapLike(cell)
+                }
                 UIBlockingProgressHUD.dismiss()
             }
         }
