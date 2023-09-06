@@ -12,11 +12,8 @@ final class SingleImageViewController: UIViewController {
     
     static let shared = SingleImageViewController()
     
-    static let DidChangeNotification = Notification.Name(rawValue: "SingleImageProviderDidChange")
+    private var alertPresenter: AlertPresenterProtocol?
     
-    private var singleImageServiceObserver: NSObjectProtocol?
-    
-    var image = UIImage(named: "Stub")!
     var fullscreenImageURL: URL?
     
     @IBOutlet private weak var scrollView: UIScrollView!
@@ -26,62 +23,17 @@ final class SingleImageViewController: UIViewController {
         super.viewDidLoad()
         scrollView.minimumZoomScale = 0.1
         scrollView.maximumZoomScale = 1.25
-        updateFullscreenImage()
+        updateFullscreenImage(image: UIImage(named: "Stub")!)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        singleImageServiceObserver = NotificationCenter.default.addObserver(
-            forName: SingleImageViewController.DidChangeNotification,
-            object: nil,
-            queue: .main
-        ) { [weak self] notification in
-            guard let self = self else { return }
-            self.updateFullscreenImageObjc(notification: notification)
-        }
-    }
-    
-    @objc
-    private func updateFullscreenImageObjc(notification: Notification) {
-        guard
-            isViewLoaded,
-            let userInfo = notification.userInfo,
-            let fullscreenImage = userInfo["FullscreenImage"] as? UIImage
-        else { return }
-        image = fullscreenImage
-        updateFullscreenImage()
-    }
-    
-    func updateFullscreenImage() {
-        singleImageView.image = image
-        rescaleAndCenterImageInScrollView(image: image)
-    }
-    
-    func loadFullscreenImage() {
-        UIBlockingProgressHUD.show()
-        guard let fullscreenImageURL = fullscreenImageURL else {
-            print("FullscreenImage is empty")
-            return
-        }
-        let resourse = KF.ImageResource(downloadURL: fullscreenImageURL)
-        KingfisherManager.shared.retrieveImage(with: resourse) { result in
-            UIBlockingProgressHUD.dismiss()
-            switch result {
-            case .success(let result):
-                NotificationCenter.default.post(
-                    name: SingleImageViewController.DidChangeNotification,
-                    object: self,
-                    userInfo: ["FullscreenImage": result.image]
-                )
-            case .failure(let error):
-                //self.showNetWorkErrorForImagesListVC() { self.loadFullscreenImage(indexPath: indexPath) }
-                print("Error while retrieveImage \(error)")
-            }
-        }
+        alertPresenter = AlertPresenterImpl(viewController: self)
+        loadFullscreenImage()
     }
     
     @IBAction private func didTapShareButton(_ sender: UIButton) {
-        let item = [image]
+        let item = [singleImageView.image]
         let ac = UIActivityViewController(activityItems: item as [Any], applicationActivities: nil)
         present(ac, animated: true)
     }
@@ -101,21 +53,50 @@ extension SingleImageViewController: UIScrollViewDelegate {
     func scrollViewDidEndZooming(_ scrollView: UIScrollView, with view: UIView?, atScale scale: CGFloat) {
         UIView.animate(withDuration: 0.5) {
             //self.rescaleAndCenterImageInScrollViewV2()
-            self.rescaleAndCenterImageInScrollView(image: self.image)
+            self.rescaleAndCenterImageInScrollView(image: self.singleImageView.image!)
         }
     }
 }
 
-extension SingleImageViewController {
+// MARK: - Private functions
+private extension SingleImageViewController {
     
-//    /// способ 2 позиционирования картинки (из вебинара с Дмитрием Исаевым)
-//    private func rescaleAndCenterImageInScrollViewV2() {
-//        let halfWidth = (scrollView.bounds.size.width - singleImageView.frame.size.width) / 2
-//        let halfHeight = (scrollView.bounds.size.height - singleImageView.frame.size.height) / 2
-//        scrollView.contentInset = .init(top: halfHeight, left: halfWidth, bottom: 0, right: 0)
-//    }
+    func updateFullscreenImage(image: UIImage) {
+        singleImageView.image = image
+        rescaleAndCenterImageInScrollView(image: image)
+    }
     
-    /// способ 1 позиционирования картирки из учебника
+    func loadFullscreenImage() {
+        UIBlockingProgressHUD.show()
+        guard let fullscreenImageURL = fullscreenImageURL else { return }
+        let resourse = KF.ImageResource(downloadURL: fullscreenImageURL)
+        KingfisherManager.shared.retrieveImage(with: resourse) { result in
+            UIBlockingProgressHUD.dismiss()
+            switch result {
+            case .success(let result):
+                self.updateFullscreenImage(image: result.image)
+            case .failure(let error):
+                self.showNetWorkErrorForSingleImageVC {
+                    self.loadFullscreenImage()
+                }
+                print("Error while retrieveImage \(error)")
+            }
+        }
+    }
+    
+    func showNetWorkErrorForSingleImageVC(completion: @escaping () -> Void) {
+        DispatchQueue.main.async {
+            let model2 = AlertModel2(
+                title: "Что-то пошло не так(",
+                message: "Попробовать еще раз?",
+                buttonText1: "Повторить",
+                buttonText2: "Не надо",
+                completion1: completion,
+                completion2: {})
+            self.alertPresenter?.show2(with: model2)
+        }
+    }
+    
     private func rescaleAndCenterImageInScrollView(image: UIImage) {
         let minZoomScale = scrollView.minimumZoomScale
         let maxZoomScale = scrollView.maximumZoomScale

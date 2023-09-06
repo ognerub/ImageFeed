@@ -50,8 +50,8 @@ final class ImagesListViewController: UIViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == showSingleImageSequeIdentifier {
             let viewController = segue.destination as! SingleImageViewController
-            //            viewController.image = self.singleImageViewController.image
-            //            let indexPath = sender as! IndexPath
+            let indexPath = sender as! IndexPath
+            viewController.fullscreenImageURL = URL(string: photos[indexPath.row].largeImageURL)
             //            _ = viewController.view // crash fix
         } else {
             super.prepare(for: segue, sender: sender)
@@ -65,8 +65,6 @@ extension ImagesListViewController: UITableViewDelegate {
     func tableView(
         _ tableView: UITableView,
         didSelectRowAt indexPath: IndexPath) {
-            singleImageViewController.fullscreenImageURL = URL(string: photos[indexPath.row].largeImageURL)
-            singleImageViewController.loadFullscreenImage()
             self.performSegue(withIdentifier: self.showSingleImageSequeIdentifier, sender: indexPath)
         }
     
