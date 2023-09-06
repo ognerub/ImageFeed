@@ -23,7 +23,6 @@ final class SingleImageViewController: UIViewController {
         super.viewDidLoad()
         scrollView.minimumZoomScale = 0.1
         scrollView.maximumZoomScale = 1.25
-        updateFullscreenImage(image: UIImage(named: "Stub")!)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -33,8 +32,9 @@ final class SingleImageViewController: UIViewController {
     }
     
     @IBAction private func didTapShareButton(_ sender: UIButton) {
-        let item = [singleImageView.image]
-        let ac = UIActivityViewController(activityItems: item as [Any], applicationActivities: nil)
+        let image: UIImage = singleImageView.image ?? UIImage(named: "Stub")!
+        let item: [Any] = [image]
+        let ac = UIActivityViewController(activityItems: item, applicationActivities: nil)
         present(ac, animated: true)
     }
     
