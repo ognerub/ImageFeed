@@ -39,8 +39,8 @@ final class SplashViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         if storage.token != nil {
-            //fetchProfileSimple()
-            //fetchProfileImageSimple()
+            fetchProfileSimple()
+            fetchProfileImageSimple()
             switchToTabBarController()
         } else {
             showAuthViewController()
@@ -136,8 +136,10 @@ private extension SplashViewController {
             let model = AlertModel(
                 title: "Что-то пошло не так(",
                 message: "Не удалось войти в систему",
-                buttonText: "OK",
-                completion: { })
+                firstButton: "OK",
+                secondButton: nil,
+                firstCompletion: {},
+                secondCompletion: {})
             self.alertPresenter?.show(with: model)
         }
     }

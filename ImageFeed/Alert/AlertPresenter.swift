@@ -9,7 +9,6 @@ import UIKit
 
 protocol AlertPresenterProtocol: AnyObject {
     func show(with alertModel: AlertModel)
-    func show2(with alertModel: AlertModel2)
 }
 
 final class AlertPresenterImpl {
@@ -35,35 +34,21 @@ extension AlertPresenterImpl: AlertPresenterProtocol {
             title: alertModel.title,
             message: alertModel.message,
             preferredStyle: .alert)
-        let action = UIAlertAction(
-            title: alertModel.buttonText,
+        let firstAction = UIAlertAction(
+            title: alertModel.firstButton,
             style: .default) { _ in
-            alertModel.completion()
+            alertModel.firstCompletion()
         }
-        alert.addAction(action)
+        alert.addAction(firstAction)
+        if alertModel.secondButton != nil {
+            let secondAction = UIAlertAction(
+                title: alertModel.secondButton,
+                style: .default) { _ in
+                    alertModel.secondCompletion()
+                }
+            alert.addAction(secondAction)
+        }
         topVC.present(alert, animated: true)
-        //viewController?.presentedViewController?.present(alert, animated: true)
-    }
-    
-    func show2(with alertModel: AlertModel2) {
-        let alert = UIAlertController(
-            title: alertModel.title,
-            message: alertModel.message,
-            preferredStyle: .alert)
-        let action1 = UIAlertAction(
-            title: alertModel.buttonText1,
-            style: .default) { _ in
-            alertModel.completion1()
-        }
-        let action2 = UIAlertAction(
-            title: alertModel.buttonText2,
-            style: .default) { _ in
-            alertModel.completion2()
-        }
-        alert.addAction(action1)
-        alert.addAction(action2)
-        topVC.present(alert, animated: true)
-        //viewController?.presentedViewController?.present(alert, animated: true)
     }
 }
 

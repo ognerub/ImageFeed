@@ -49,7 +49,7 @@ final class ImagesListService {
                         let photo = Photo(
                             id: item.id,
                             size: CGSize(width: item.width, height: item.height),
-                            createdAt: item.createdAt,
+                            createdAt: item.createdAt?.dateTimeString,
                             welcomeDescription: item.description,
                             thumbImageURL: item.urls.thumb ?? "NO THUMB",
                             largeImageURL: item.urls.full ?? "NO FULL IMG",

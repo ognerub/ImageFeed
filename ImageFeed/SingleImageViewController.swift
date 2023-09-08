@@ -86,14 +86,14 @@ private extension SingleImageViewController {
     
     func showNetWorkErrorForSingleImageVC(completion: @escaping () -> Void) {
         DispatchQueue.main.async {
-            let model2 = AlertModel2(
+            let model = AlertModel(
                 title: "Что-то пошло не так(",
                 message: "Попробовать еще раз?",
-                buttonText1: "Повторить",
-                buttonText2: "Не надо",
-                completion1: completion,
-                completion2: {})
-            self.alertPresenter?.show2(with: model2)
+                firstButton: "Повторить",
+                secondButton: "Не надо",
+                firstCompletion: completion,
+                secondCompletion: {})
+            self.alertPresenter?.show(with: model)
         }
     }
     

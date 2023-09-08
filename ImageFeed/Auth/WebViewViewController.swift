@@ -100,9 +100,6 @@ extension WebViewViewController: WKNavigationDelegate {
         {
             return codeItem.value
         } else {
-//            showNetWorkErrorForWebViewVC {
-//                self.delegate?.webViewViewControllerDidCancel(self)
-//            }
             return nil
         }
     }
@@ -112,8 +109,10 @@ extension WebViewViewController: WKNavigationDelegate {
             let model = AlertModel(
                 title: "Что-то пошло не так(",
                 message: "Загрузка не удалась",
-                buttonText: "OK",
-                completion: completion)
+                firstButton: "OK",
+                secondButton: nil,
+                firstCompletion: completion,
+                secondCompletion: {})
             self.alertPresenter?.show(with: model)
         }
     }

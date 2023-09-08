@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		84041D582A78414A0085D28A /* WebViewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84041D572A78414A0085D28A /* WebViewViewController.swift */; };
+		8407D2B32AAB8A3F00EE49BA /* DateFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8407D2B22AAB8A3F00EE49BA /* DateFormatter.swift */; };
 		840BBAA32A9934AB003A9272 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 840BBAA22A9934AB003A9272 /* Kingfisher */; };
 		84249D0C2A9A6C0300A90322 /* SwiftKeychainWrapper in Frameworks */ = {isa = PBXBuildFile; productRef = 84249D0B2A9A6C0300A90322 /* SwiftKeychainWrapper */; };
 		84249D0E2A9A869200A90322 /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84249D0D2A9A869200A90322 /* TabBarController.swift */; };
@@ -42,6 +43,7 @@
 
 /* Begin PBXFileReference section */
 		84041D572A78414A0085D28A /* WebViewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewViewController.swift; sourceTree = "<group>"; };
+		8407D2B22AAB8A3F00EE49BA /* DateFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateFormatter.swift; sourceTree = "<group>"; };
 		84249D0D2A9A869200A90322 /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
 		8429895A2A8E26BA002D3C97 /* ProfileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileService.swift; sourceTree = "<group>"; };
 		842BC8F42A66FB2600B09935 /* SingleImageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleImageViewController.swift; sourceTree = "<group>"; };
@@ -171,6 +173,7 @@
 				8496ECCA2A6A6EAE003B7B5D /* Profile */,
 				8431A3522A5754640056E618 /* ImagesList */,
 				842BC8F42A66FB2600B09935 /* SingleImageViewController.swift */,
+				8407D2B22AAB8A3F00EE49BA /* DateFormatter.swift */,
 				84FB04382A507D170084F445 /* Main.storyboard */,
 				84FB043D2A507D1B0084F445 /* LaunchScreen.storyboard */,
 				8431A3532A58A80C0056E618 /* Assets.xcassets */,
@@ -262,6 +265,7 @@
 			files = (
 				84DB4E862A7ED5A800B8E3A3 /* OAuth2TokenStorage.swift in Sources */,
 				8456E5612A9366BC00940549 /* AlertPresenter.swift in Sources */,
+				8407D2B32AAB8A3F00EE49BA /* DateFormatter.swift in Sources */,
 				84B4C6012A839A4F003901B1 /* URLRequest.swift in Sources */,
 				84B4C6032A839A75003901B1 /* URLSession.swift in Sources */,
 				84FB04372A507D170084F445 /* ImagesListViewController.swift in Sources */,

@@ -162,18 +162,18 @@ final class ProfileViewController: UIViewController {
     
     func showAlertBeforExit() {
         DispatchQueue.main.async {
-            let model2 = AlertModel2(
+            let model = AlertModel(
                 title: "Пока, пока!",
                 message: "Уверены что хотите выйти?",
-                buttonText1: "Да",
-                buttonText2: "Нет",
-                completion1: {
+                firstButton: "Да",
+                secondButton: "Нет",
+                firstCompletion: {
                     self.storage.nilTokenInUserDefaults()
                     self.webViewViewController.cleanWebViewAfterUse()
                     self.switchToSplashViewController()
                 },
-                completion2: { })
-            self.alertPresenter?.show2(with: model2)
+                secondCompletion: { })
+            self.alertPresenter?.show(with: model)
         }
     }
 }

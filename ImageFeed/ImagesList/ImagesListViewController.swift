@@ -19,13 +19,6 @@ final class ImagesListViewController: UIViewController {
     
     var photos: [Photo] = []
     
-    private lazy var dateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .long
-        formatter.timeStyle = .none
-        return formatter
-    } ()
-    
     @IBOutlet private var tableView: UITableView!
     
     override func viewDidLoad() {
@@ -115,14 +108,14 @@ private extension ImagesListViewController {
     
     func showNetWorkErrorForImagesListVC(completion: @escaping () -> Void) {
         DispatchQueue.main.async {
-            let model2 = AlertModel2(
+            let model = AlertModel(
                 title: "Что-то пошло не так(",
                 message: "Попробовать еще раз?",
-                buttonText1: "Повторить",
-                buttonText2: "Не надо",
-                completion1: completion,
-                completion2: {})
-            self.alertPresenter?.show2(with: model2)
+                firstButton: "Повторить",
+                secondButton: "Не надо",
+                firstCompletion: completion,
+                secondCompletion: {})
+            self.alertPresenter?.show(with: model)
         }
     }
     
@@ -141,16 +134,7 @@ private extension ImagesListViewController {
             }
         }
         
-        /// устанавливаем верную дату для каждой фотографии
-        let date = photos[indexPath.row].createdAt ?? "no date"
-        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
-        if let formattedDate = dateFormatter.date(from: date) {
-            dateFormatter.dateFormat = "dd MMMM yyyy"
-            dateFormatter.locale = Locale(identifier: "ru_Ru")
-            cell.cellDateLabel.text = "\(dateFormatter.string(from: formattedDate))"
-        } else {
-            cell.cellDateLabel.text = ""
-        }
+        cell.cellDateLabel.text = photos[indexPath.row].createdAt?.dateTimeString ?? ""
         
         /// настраиваем лайки для каждой фотографии
         let isLiked = photos[indexPath.row].isLiked
