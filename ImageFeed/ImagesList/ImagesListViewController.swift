@@ -52,7 +52,7 @@ final class ImagesListViewController: UIViewController {
             let viewController = segue.destination as! SingleImageViewController
             let indexPath = sender as! IndexPath
             viewController.fullscreenImageURL = URL(string: photos[indexPath.row].largeImageURL)
-            //            _ = viewController.view // crash fix
+//            _ = viewController.view // crash fix
         } else {
             super.prepare(for: segue, sender: sender)
         }
@@ -149,7 +149,7 @@ private extension ImagesListViewController {
             dateFormatter.locale = Locale(identifier: "ru_Ru")
             cell.cellDateLabel.text = "\(dateFormatter.string(from: formattedDate))"
         } else {
-            cell.cellDateLabel.text = "no date of photo"
+            cell.cellDateLabel.text = ""
         }
         
         /// настраиваем лайки для каждой фотографии
