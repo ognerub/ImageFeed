@@ -46,12 +46,10 @@ final class ImagesListService {
                 case .success(let result):
                     var photos: [Photo] = []
                     for item in result {
-                        let date = item.createdAt?.formatISODateString(dateFormat: item.createdAt ?? "")
                         let photo = Photo(
                             id: item.id,
                             size: CGSize(width: item.width, height: item.height),
-                            createdAt: date,
-                            //createdAt: item.createdAt?.dateTimeString,
+                            createdAt: item.createdAt?.formatISODateString(dateFormat: item.createdAt ?? ""),
                             welcomeDescription: item.description,
                             thumbImageURL: item.urls.thumb ?? "NO THUMB",
                             largeImageURL: item.urls.full ?? "NO FULL IMG",
