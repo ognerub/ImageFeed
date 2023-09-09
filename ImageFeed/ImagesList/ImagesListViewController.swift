@@ -134,7 +134,7 @@ private extension ImagesListViewController {
             }
         }
         
-        cell.cellDateLabel.text = photos[indexPath.row].createdAt?.dateTimeString ?? ""
+        cell.cellDateLabel.text = photos[indexPath.row].createdAt ?? ""
         
         /// настраиваем лайки для каждой фотографии
         let isLiked = photos[indexPath.row].isLiked

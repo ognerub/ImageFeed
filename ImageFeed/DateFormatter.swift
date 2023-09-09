@@ -7,21 +7,16 @@
 
 import Foundation
 
-var dateFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.dateStyle = .long
-    formatter.timeStyle = .none
-    return formatter
-}()
-
-extension Date {
-    var dateTimeString: String { dateFormatter.string(from: self)}
-}
-
 extension String {
-    var dateTimeString: Date? {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
-        return dateFormatter.date(from: self)
+    public func formatISODateString(dateFormat: String) -> String {
+        var formatDate = self
+        let isoDateFormatter = ISO8601DateFormatter()
+        if let date = isoDateFormatter.date(from: self) {
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateStyle = .long
+            dateFormatter.timeStyle = .none
+            formatDate = dateFormatter.string(from: date)
+        }
+        return formatDate
     }
 }
