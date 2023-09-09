@@ -8,7 +8,7 @@
 import Foundation
 
 extension String {
-    public func formatISODateString(dateFormat: String) -> String {
+    public func formatISODateString(dateFormat: String?) -> String? {
         var formatDate = self
         let isoDateFormatter = ISO8601DateFormatter()
         if let date = isoDateFormatter.date(from: self) {
