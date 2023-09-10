@@ -6,35 +6,35 @@
 //
 
 import UIKit
+import Kingfisher
 
 final class SingleImageViewController: UIViewController {    
-    var image: UIImage! {
-        didSet {
-            guard isViewLoaded else {return}
-            singleImageView.image = image
-            rescaleAndCenterImageInScrollView(image: image)
-        }
-    }
+    
+    static let shared = SingleImageViewController()
+    
+    private var alertPresenter: AlertPresenterProtocol?
+    
+    var fullscreenImageURL: URL?
     
     @IBOutlet private weak var scrollView: UIScrollView!
     @IBOutlet private weak var singleImageView: UIImageView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        singleImageView.image = image
         scrollView.minimumZoomScale = 0.1
         scrollView.maximumZoomScale = 1.25
     }
     
-    /// в этом методе выставляем позицию картинки после расположения всех subview (для способа 2)
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        rescaleAndCenterImageInScrollView(image: image)
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        alertPresenter = AlertPresenterImpl(viewController: self)
+        loadFullscreenImage()
     }
     
     @IBAction private func didTapShareButton(_ sender: UIButton) {
-        let item = [image]
-        let ac = UIActivityViewController(activityItems: item as [Any], applicationActivities: nil)
+        let image: UIImage = singleImageView.image ?? UIImage(named: "Stub")!
+        let item: [Any] = [image]
+        let ac = UIActivityViewController(activityItems: item, applicationActivities: nil)
         present(ac, animated: true)
     }
     
@@ -52,12 +52,51 @@ extension SingleImageViewController: UIScrollViewDelegate {
     /// метод, который вызывается после завершения зума пользователем (для способа 2)
     func scrollViewDidEndZooming(_ scrollView: UIScrollView, with view: UIView?, atScale scale: CGFloat) {
         UIView.animate(withDuration: 0.5) {
-            self.rescaleAndCenterImageInScrollView(image: self.image)
+            //self.rescaleAndCenterImageInScrollViewV2()
+            self.rescaleAndCenterImageInScrollView(image: self.singleImageView.image!)
         }
     }
 }
 
-extension SingleImageViewController {
+// MARK: - Private functions
+private extension SingleImageViewController {
+    
+    func updateFullscreenImage(image: UIImage) {
+        singleImageView.image = image
+        rescaleAndCenterImageInScrollView(image: image)
+    }
+    
+    func loadFullscreenImage() {
+        UIBlockingProgressHUD.show()
+        guard let fullscreenImageURL = fullscreenImageURL else { return }
+        let resourse = KF.ImageResource(downloadURL: fullscreenImageURL)
+        KingfisherManager.shared.retrieveImage(with: resourse) { result in
+            UIBlockingProgressHUD.dismiss()
+            switch result {
+            case .success(let result):
+                self.updateFullscreenImage(image: result.image)
+            case .failure(let error):
+                self.showNetWorkErrorForSingleImageVC {
+                    self.loadFullscreenImage()
+                }
+                print("Error while retrieveImage \(error)")
+            }
+        }
+    }
+    
+    func showNetWorkErrorForSingleImageVC(completion: @escaping () -> Void) {
+        DispatchQueue.main.async {
+            let model = AlertModel(
+                title: "Что-то пошло не так(",
+                message: "Попробовать еще раз?",
+                firstButton: "Повторить",
+                secondButton: "Не надо",
+                firstCompletion: completion,
+                secondCompletion: {})
+            self.alertPresenter?.show(with: model)
+        }
+    }
+    
     private func rescaleAndCenterImageInScrollView(image: UIImage) {
         let minZoomScale = scrollView.minimumZoomScale
         let maxZoomScale = scrollView.maximumZoomScale
@@ -71,7 +110,7 @@ extension SingleImageViewController {
         scrollView.layoutIfNeeded()
         let newContentSize = scrollView.contentSize
         let x = (newContentSize.width - visibleRectSize.width) / 2
-        let y = (newContentSize.width - visibleRectSize.height) / 2
+        let y = (newContentSize.height - visibleRectSize.height) / 2
         scrollView.setContentOffset(CGPoint(x: x, y: y), animated: false)
     }
 }

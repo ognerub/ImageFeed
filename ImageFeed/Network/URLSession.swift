@@ -10,7 +10,7 @@ import Foundation
 extension URLSession {
     
     /// Сетевой запрос на дженериках (сессия с декодированием)
-    func objectTask<T: Decodable>(
+    func objectTask<T: Codable>(
         for request: URLRequest,
         completion: @escaping (Result<T, Error>) -> Void
     ) -> URLSessionTask {

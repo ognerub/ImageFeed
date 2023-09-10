@@ -89,8 +89,8 @@ extension SplashViewController: AuthViewControllerDelegate {
     }
 }
 
-// MARK: - Fetch functions
-extension SplashViewController {
+// MARK: - Private extension
+private extension SplashViewController {
     func fetchOAuthToken(_ code: String) {
         oAuth2Service.fetchOAuthToken(code) { [weak self] result in
             guard let self = self else { return }
@@ -117,7 +117,7 @@ extension SplashViewController {
         }
     }
     
-    private func fetchProfileImageSimple() {
+    func fetchProfileImageSimple() {
         profileImageService.fetchProfileImageURL(username: profileService.profile?.username ?? "username") { [weak self] result in
             guard let self = self else {return }
             switch result {
@@ -130,17 +130,16 @@ extension SplashViewController {
             }
         }
     }
-}
 
-// MARK: ShowNetWorkError
-extension SplashViewController {
-    private func showNetWorkErrorForSpashVC() {
+    func showNetWorkErrorForSpashVC() {
         DispatchQueue.main.async {
             let model = AlertModel(
                 title: "Что-то пошло не так(",
                 message: "Не удалось войти в систему",
-                buttonText: "OK",
-                completion: { })
+                firstButton: "OK",
+                secondButton: nil,
+                firstCompletion: {},
+                secondCompletion: {})
             self.alertPresenter?.show(with: model)
         }
     }

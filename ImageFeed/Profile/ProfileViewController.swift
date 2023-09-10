@@ -10,13 +10,14 @@ import Kingfisher
 
 final class ProfileViewController: UIViewController {
     
-    private let authViewControllerIdentifier = "AuthViewController"
-    private let mainUIStoryboard = "Main"
-    
     private let profileService = ProfileService.shared
     private let profileImageService = ProfileImageService.shared
     private let storage = OAuth2TokenStorage.shared
     private let splashViewController = SplashViewController.shared
+    private let webViewViewController = WebViewViewController.shared
+    
+    private var alertPresenter: AlertPresenterProtocol?
+    private var profileImageServiceObserver: NSObjectProtocol?
     
     var personImageView: UIImageView = {
         let personImage = UIImage(named: "Avatar") ?? UIImage(systemName: "person.crop.circle.fill")!
@@ -59,10 +60,9 @@ final class ProfileViewController: UIViewController {
         return exitButton
     }()
     
-    private var profileImageServiceObserver: NSObjectProtocol?
-    
     override func viewDidLoad() {
         super.viewDidLoad()
+        alertPresenter = AlertPresenterImpl(viewController: self)
         view.backgroundColor = UIColor(named: "YP Black")
         addSubViews()
         configureConstraints()
@@ -150,16 +150,30 @@ final class ProfileViewController: UIViewController {
         ])
     }
     
-    private func switchToAuthViewController() {
-        guard let window = UIApplication.shared.windows.first else { fatalError("Invalid Configuration of switchToAuthViewController") }
-        let authViewController = UIStoryboard(name: mainUIStoryboard, bundle: .main)
-            .instantiateViewController(withIdentifier: authViewControllerIdentifier)
-        window.rootViewController = authViewController
+    private func switchToSplashViewController() {
+        guard let window = UIApplication.shared.windows.first else { fatalError("Invalid Configuration of switchToSplashViewController") }
+        window.rootViewController = SplashViewController()
     }
     
     @objc
     private func didTapButton() {
-        storage.nilTokenInUserDefaults()
-        switchToAuthViewController()
+        showAlertBeforExit()
+    }
+    
+    func showAlertBeforExit() {
+        DispatchQueue.main.async {
+            let model = AlertModel(
+                title: "Пока, пока!",
+                message: "Уверены что хотите выйти?",
+                firstButton: "Да",
+                secondButton: "Нет",
+                firstCompletion: {
+                    self.storage.nilTokenInUserDefaults()
+                    self.webViewViewController.cleanWebViewAfterUse()
+                    self.switchToSplashViewController()
+                },
+                secondCompletion: { })
+            self.alertPresenter?.show(with: model)
+        }
     }
 }

@@ -16,16 +16,13 @@ final class ProfileImageService {
     private (set) var avatarURL: URL?
     
     private let urlSession: URLSession
-    private let storage: OAuth2TokenStorage
     private let builder: URLRequestBuilder
     
     init (
         urlSession: URLSession = .shared,
-        storage: OAuth2TokenStorage = .shared,
         builder: URLRequestBuilder = .shared
     ) {
         self.urlSession = urlSession
-        self.storage = storage
         self.builder = builder
     }
     

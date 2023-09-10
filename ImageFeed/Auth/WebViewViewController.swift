@@ -14,17 +14,23 @@ protocol WebViewViewControllerDelegate: AnyObject {
 }
 
 final class WebViewViewController: UIViewController {
-    @IBOutlet private var webView: WKWebView!
     
-    @IBOutlet private var progressView: UIProgressView!
+    static let shared = WebViewViewController()
     
-    weak var delegate: WebViewViewControllerDelegate?
+    private let splashViewController = SplashViewController.shared
     
     /// переменная для нового API
     private var estimatedProgressObservation: NSKeyValueObservation?
+    private var alertPresenter: AlertPresenterProtocol?
+
+    weak var delegate: WebViewViewControllerDelegate?
+    
+    @IBOutlet private var webView: WKWebView!
+    @IBOutlet private var progressView: UIProgressView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        alertPresenter = AlertPresenterImpl(viewController: self)
         webView.navigationDelegate = self
         var urlComponents = URLComponents(string: Constants.unsplashAuthorizeURLString)!
         urlComponents.queryItems = [
@@ -49,6 +55,19 @@ final class WebViewViewController: UIViewController {
     private func updateProgress() {
         progressView.progress = Float(webView.estimatedProgress)
         progressView.isHidden = fabs(webView.estimatedProgress - 1.0) <= 0.0001
+    }
+    
+    func cleanWebViewAfterUse() {
+        HTTPCookieStorage.shared.removeCookies(since: Date.distantPast)
+        WKWebsiteDataStore.default().fetchDataRecords(
+            ofTypes: WKWebsiteDataStore.allWebsiteDataTypes()) { records in
+                records.forEach { record in
+                    WKWebsiteDataStore.default().removeData(
+                        ofTypes: record.dataTypes,
+                        for: [record],
+                        completionHandler: {})
+                }
+            }
     }
     
     @IBAction func didTapNavBackButton(_ sender: Any) {
@@ -82,6 +101,19 @@ extension WebViewViewController: WKNavigationDelegate {
             return codeItem.value
         } else {
             return nil
+        }
+    }
+    
+    func showNetWorkErrorForWebViewVC(completion: @escaping () -> Void) {
+        DispatchQueue.main.async {
+            let model = AlertModel(
+                title: "Что-то пошло не так(",
+                message: "Загрузка не удалась",
+                firstButton: "OK",
+                secondButton: nil,
+                firstCompletion: completion,
+                secondCompletion: {})
+            self.alertPresenter?.show(with: model)
         }
     }
 }
