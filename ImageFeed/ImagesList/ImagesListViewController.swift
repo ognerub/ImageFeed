@@ -122,15 +122,17 @@ private extension ImagesListViewController {
     /// данный метод конфигурирует стиль кастомных ячеек, в частности присваивается картинка, если такая имеется (если нет, guard else вернет nil), форматируется дата, задается стиль кнопки лайка для четных и нечетных ячеек по indexPath.row)
     func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
         /// осуществляем загрузку фото, пока идет загрузка или фото отсутствует вставляем заглушку
-        guard let image = UIImage(named: "Stub"),
-              let data = image.pngData() else { return }
-        cell.cellImage.kf.indicatorType = .image(imageData: data)
+        guard let image = UIImage(named: "Stub") else { return }
+        cell.cellImage.kf.indicatorType = .custom(indicator: UIBlockingProgressHUD.MyIndicator())
         cell.cellImage.kf.setImage(with: URL(string:photos[indexPath.row].thumbImageURL)) { result in
             switch result {
             case .success(_):
+                cell.cellImage.contentMode = UIView.ContentMode.scaleAspectFit
                 self.tableView.reloadRows(at: [indexPath], with: .automatic)
-            case .failure(let error):
-                print("Error to load images at row \(indexPath.row). \n \(error)")
+            case .failure(_):
+                cell.cellImage.contentMode = UIView.ContentMode.center
+                cell.cellImage.backgroundColor = UIColor(named: "YP Grey")
+                cell.cellImage.image = image
             }
         }
         

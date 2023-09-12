@@ -31,7 +31,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="393" height="252"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Stub" translatesAutoresizingMaskIntoConstraints="NO" id="88g-Xj-hRB" userLabel="Cell Image">
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="88g-Xj-hRB" userLabel="Cell Image">
                                                     <rect key="frame" x="16" y="4" width="361" height="244"/>
                                                     <userDefinedRuntimeAttributes>
                                                         <userDefinedRuntimeAttribute type="boolean" keyPath="layer.maskToBounds" value="YES"/>
@@ -129,16 +129,17 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jlJ-9r-M57">
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" placeholderIntrinsicWidth="393" placeholderIntrinsicHeight="852" translatesAutoresizingMaskIntoConstraints="NO" id="jlJ-9r-M57">
                                 <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                                 <subviews>
-                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" placeholderIntrinsicWidth="414" placeholderIntrinsicHeight="414" translatesAutoresizingMaskIntoConstraints="NO" id="THY-Nk-6W6" userLabel="Image View">
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" placeholderIntrinsicWidth="414" placeholderIntrinsicHeight="414" translatesAutoresizingMaskIntoConstraints="NO" id="THY-Nk-6W6" userLabel="Image View">
                                         <rect key="frame" x="0.0" y="0.0" width="414" height="414"/>
+                                        <color key="backgroundColor" name="YP Red"/>
                                     </imageView>
                                 </subviews>
                                 <constraints>
+                                    <constraint firstAttribute="bottom" secondItem="THY-Nk-6W6" secondAttribute="bottom" id="NzW-Eu-s35"/>
                                     <constraint firstItem="THY-Nk-6W6" firstAttribute="leading" secondItem="jlJ-9r-M57" secondAttribute="leading" id="rUc-0R-PlJ"/>
-                                    <constraint firstAttribute="bottom" secondItem="THY-Nk-6W6" secondAttribute="bottom" id="wnU-8x-y6J"/>
                                     <constraint firstAttribute="trailing" secondItem="THY-Nk-6W6" secondAttribute="trailing" id="wsX-n9-yhN"/>
                                     <constraint firstItem="THY-Nk-6W6" firstAttribute="top" secondItem="jlJ-9r-M57" secondAttribute="top" id="zvh-5q-nHI"/>
                                 </constraints>
@@ -193,10 +194,10 @@
                             <constraint firstItem="dRl-O5-WPH" firstAttribute="centerX" secondItem="TYJ-I5-Hj9" secondAttribute="centerX" id="79w-P7-hKj"/>
                             <constraint firstItem="jlJ-9r-M57" firstAttribute="top" secondItem="TYJ-I5-Hj9" secondAttribute="top" id="85B-Kb-JMM"/>
                             <constraint firstAttribute="bottom" secondItem="dRl-O5-WPH" secondAttribute="bottom" constant="51" id="Lpm-DN-CRL"/>
-                            <constraint firstItem="djn-nm-vxL" firstAttribute="trailing" secondItem="jlJ-9r-M57" secondAttribute="trailing" id="MUH-iV-Faw"/>
+                            <constraint firstAttribute="trailing" secondItem="jlJ-9r-M57" secondAttribute="trailing" id="MUH-iV-Faw"/>
                             <constraint firstAttribute="bottom" secondItem="jlJ-9r-M57" secondAttribute="bottom" id="Zow-FK-drJ"/>
                             <constraint firstItem="Rtl-e5-nU0" firstAttribute="leading" secondItem="djn-nm-vxL" secondAttribute="leading" constant="8" id="cGt-pe-FSV"/>
-                            <constraint firstItem="djn-nm-vxL" firstAttribute="leading" secondItem="jlJ-9r-M57" secondAttribute="leading" id="rD2-y5-F9A"/>
+                            <constraint firstAttribute="leading" secondItem="jlJ-9r-M57" secondAttribute="leading" id="rD2-y5-F9A"/>
                             <constraint firstItem="Rtl-e5-nU0" firstAttribute="top" secondItem="djn-nm-vxL" secondAttribute="top" constant="8" id="tZN-Zi-mLY"/>
                         </constraints>
                     </view>
@@ -208,7 +209,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="9Xj-TM-a8D" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2802.2900763358775" y="-35.211267605633807"/>
+            <point key="canvasLocation" x="2800.7633587786258" y="-35.211267605633807"/>
         </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="wjq-0I-Gry">
@@ -343,10 +344,12 @@
         <image name="BackArrowBlack" width="24" height="24"/>
         <image name="LikeOn" width="42" height="42"/>
         <image name="Sharing" width="51" height="50"/>
-        <image name="Stub" width="343" height="252"/>
         <image name="tab_editorial_active" width="75" height="49"/>
         <namedColor name="YP Black">
             <color red="0.10199999809265137" green="0.10599999874830246" blue="0.13300000131130219" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="YP Red">
+            <color red="0.96100002527236938" green="0.41999998688697815" blue="0.42399999499320984" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="YP White">
             <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

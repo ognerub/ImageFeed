@@ -28,7 +28,7 @@ final class SingleImageViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         alertPresenter = AlertPresenterImpl(viewController: self)
-        loadFullscreenImage()
+        loadFullscreenImage(imageView: singleImageView)
     }
     
     @IBAction private func didTapShareButton(_ sender: UIButton) {
@@ -60,24 +60,33 @@ extension SingleImageViewController: UIScrollViewDelegate {
 
 // MARK: - Private functions
 private extension SingleImageViewController {
-    
-    func updateFullscreenImage(image: UIImage) {
-        singleImageView.image = image
-        rescaleAndCenterImageInScrollView(image: image)
-    }
-    
-    func loadFullscreenImage() {
+    func loadFullscreenImage(imageView: UIImageView) {
         UIBlockingProgressHUD.show()
+        
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.widthAnchor.constraint(equalTo: scrollView.widthAnchor).isActive = true
+        imageView.heightAnchor.constraint(equalTo: scrollView.heightAnchor).isActive = true
+        imageView.topAnchor.constraint(equalTo: scrollView.centerYAnchor).isActive = true
+        imageView.leftAnchor.constraint(equalTo: scrollView.centerXAnchor).isActive = true
+        scrollView.layoutIfNeeded()
+        
         guard let fullscreenImageURL = fullscreenImageURL else { return }
-        let resourse = KF.ImageResource(downloadURL: fullscreenImageURL)
-        KingfisherManager.shared.retrieveImage(with: resourse) { result in
+        imageView.kf.setImage(with: fullscreenImageURL, placeholder: UIBlockingProgressHUD.MyIndicator().image) { result in
             UIBlockingProgressHUD.dismiss()
             switch result {
             case .success(let result):
-                self.updateFullscreenImage(image: result.image)
+
+                imageView.constraints.first(where: {$0.firstAnchor == imageView.widthAnchor})?.isActive = false
+                imageView.constraints.first(where: {$0.firstAnchor == imageView.heightAnchor})?.isActive = false
+                imageView.constraints.first(where: {$0.firstAnchor == imageView.leadingAnchor})?.isActive = false
+                imageView.constraints.first(where: {$0.firstAnchor == imageView.topAnchor})?.isActive = false
+                imageView.translatesAutoresizingMaskIntoConstraints = true
+                self.scrollView.layoutIfNeeded()
+                
+                self.rescaleAndCenterImageInScrollView(image: result.image)
             case .failure(let error):
                 self.showNetWorkErrorForSingleImageVC {
-                    self.loadFullscreenImage()
+                    self.loadFullscreenImage(imageView: imageView)
                 }
                 print("Error while retrieveImage \(error)")
             }
