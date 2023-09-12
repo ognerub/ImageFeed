@@ -61,29 +61,13 @@ extension SingleImageViewController: UIScrollViewDelegate {
 // MARK: - Private functions
 private extension SingleImageViewController {
     
-    func moveConstraintsToCenter(imageView: UIImageView) {
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.topAnchor.constraint(equalTo: view.centerYAnchor, constant: -UIBlockingProgressHUD.MyIndicator().image.size.height/2).isActive = true
-        imageView.leadingAnchor.constraint(equalTo: view.centerXAnchor, constant: -UIBlockingProgressHUD.MyIndicator().image.size.width/2).isActive = true
-        imageView.layoutIfNeeded()
-    }
-    
-    func moveConstraintsToZero(imageView: UIImageView) {
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-        imageView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        imageView.layoutIfNeeded()
-    }
-    
     func loadFullscreenImage(imageView: UIImageView) {
         UIBlockingProgressHUD.show()
-        moveConstraintsToCenter(imageView: imageView)
         guard let fullscreenImageURL = fullscreenImageURL else { return }
-        imageView.kf.setImage(with: fullscreenImageURL, placeholder: UIBlockingProgressHUD.MyIndicator().image) { result in
+        imageView.kf.setImage(with: fullscreenImageURL) { result in
             UIBlockingProgressHUD.dismiss()
             switch result {
             case .success(let result):
-                self.moveConstraintsToZero(imageView: imageView)
                 self.rescaleAndCenterImageInScrollView(image: result.image)
             case .failure(let error):
                 self.showNetWorkErrorForSingleImageVC {
