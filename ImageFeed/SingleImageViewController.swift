@@ -32,7 +32,7 @@ final class SingleImageViewController: UIViewController {
     }
     
     @IBAction private func didTapShareButton(_ sender: UIButton) {
-        let image: UIImage = singleImageView.image ?? UIImage(named: "Stub")!
+        let image: UIImage = singleImageView.image ?? UIBlockingProgressHUD.MyIndicator().image
         let item: [Any] = [image]
         let ac = UIActivityViewController(activityItems: item, applicationActivities: nil)
         present(ac, animated: true)
@@ -60,29 +60,30 @@ extension SingleImageViewController: UIScrollViewDelegate {
 
 // MARK: - Private functions
 private extension SingleImageViewController {
+    
+    func moveConstraintsToCenter(imageView: UIImageView) {
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.topAnchor.constraint(equalTo: view.centerYAnchor, constant: -UIBlockingProgressHUD.MyIndicator().image.size.height/2).isActive = true
+        imageView.leadingAnchor.constraint(equalTo: view.centerXAnchor, constant: -UIBlockingProgressHUD.MyIndicator().image.size.width/2).isActive = true
+        imageView.layoutIfNeeded()
+    }
+    
+    func moveConstraintsToZero(imageView: UIImageView) {
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        imageView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        imageView.layoutIfNeeded()
+    }
+    
     func loadFullscreenImage(imageView: UIImageView) {
         UIBlockingProgressHUD.show()
-        
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.widthAnchor.constraint(equalTo: scrollView.widthAnchor).isActive = true
-        imageView.heightAnchor.constraint(equalTo: scrollView.heightAnchor).isActive = true
-        imageView.topAnchor.constraint(equalTo: scrollView.centerYAnchor).isActive = true
-        imageView.leftAnchor.constraint(equalTo: scrollView.centerXAnchor).isActive = true
-        scrollView.layoutIfNeeded()
-        
+        moveConstraintsToCenter(imageView: imageView)
         guard let fullscreenImageURL = fullscreenImageURL else { return }
         imageView.kf.setImage(with: fullscreenImageURL, placeholder: UIBlockingProgressHUD.MyIndicator().image) { result in
             UIBlockingProgressHUD.dismiss()
             switch result {
             case .success(let result):
-
-                imageView.constraints.first(where: {$0.firstAnchor == imageView.widthAnchor})?.isActive = false
-                imageView.constraints.first(where: {$0.firstAnchor == imageView.heightAnchor})?.isActive = false
-                imageView.constraints.first(where: {$0.firstAnchor == imageView.leadingAnchor})?.isActive = false
-                imageView.constraints.first(where: {$0.firstAnchor == imageView.topAnchor})?.isActive = false
-                imageView.translatesAutoresizingMaskIntoConstraints = true
-                self.scrollView.layoutIfNeeded()
-                
+                self.moveConstraintsToZero(imageView: imageView)
                 self.rescaleAndCenterImageInScrollView(image: result.image)
             case .failure(let error):
                 self.showNetWorkErrorForSingleImageVC {
