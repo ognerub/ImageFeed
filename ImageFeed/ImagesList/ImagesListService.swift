@@ -125,7 +125,7 @@ private extension ImagesListService {
         return builder.makeHTTPRequest(
             path: path,
             httpMethod: "GET",
-            baseURLString: Constants.defaultAPIURLString)
+            baseURLString: AuthConfiguration.standart.defaultBaseURLString)
     }
     /// создаем  запросы для  лайков
     func urlRequestForChangeLike(photoId: String, isLike: Bool) -> URLRequest? {
@@ -134,7 +134,7 @@ private extension ImagesListService {
         return builder.makeHTTPRequest(
             path: path,
             httpMethod: httpMethod,
-            baseURLString: Constants.defaultAPIURLString)
+            baseURLString: AuthConfiguration.standart.defaultBaseURLString)
     }
     
 }
