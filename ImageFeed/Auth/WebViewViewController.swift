@@ -21,6 +21,17 @@ protocol WebViewViewControllerDelegate: AnyObject {
     func webViewViewControllerDidCancel(_ vc: WebViewViewController)
 }
 
+/// создаем объект-дублер для первого самостоятельного теста (1 self-test)
+final class WebViewViewControllerSpy: WebViewViewControllerProtocol {
+    var presenter: WebViewPresenterProtocol?
+    var loadRequestCalled: Bool = false
+    func load(request: URLRequest) {
+        loadRequestCalled = true
+    }
+    func setProgressValue(_ newValue: Float) { }
+    func setProgressHidden(_ isHidden: Bool) { }
+}
+
 final class WebViewViewController: UIViewController, WebViewViewControllerProtocol {
     /// переменная для рефакторинга - создаем переменную, которя соответствует протоколу MVP
     var presenter: WebViewPresenterProtocol?

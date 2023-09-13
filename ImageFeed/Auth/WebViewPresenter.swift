@@ -15,6 +15,17 @@ public protocol WebViewPresenterProtocol {
     func code(from url: URL) -> String?
 }
 
+/// создаем объект-дублер для первого теста (1-test)
+final class WebViewPresenterSpy: WebViewPresenterProtocol {
+    var view: WebViewViewControllerProtocol?
+    var viewDidLoadCalled: Bool = false
+    func viewDidLoad() {
+        viewDidLoadCalled = true
+    }
+    func didUpdateProgressValue(_ newValue: Double) { }
+    func code(from url: URL) -> String? { return nil }
+}
+
 final class WebViewPresenter: WebViewPresenterProtocol {
     /// переменная для рефакторинга - создаем переменную, которя соответствует протоколу MVC
     weak var view: WebViewViewControllerProtocol?
@@ -38,7 +49,7 @@ final class WebViewPresenter: WebViewPresenterProtocol {
         view?.setProgressHidden(shouldHideProgress)
     }
     
-    private func shouldHideProgress(for value: Float) -> Bool {
+    func shouldHideProgress(for value: Float) -> Bool {
         abs(value - 1.0) <= 0.0001
     }
     
