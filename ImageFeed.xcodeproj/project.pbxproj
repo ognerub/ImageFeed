@@ -15,6 +15,7 @@
 		8429895B2A8E26BA002D3C97 /* ProfileService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8429895A2A8E26BA002D3C97 /* ProfileService.swift */; };
 		842BC8F52A66FB2600B09935 /* SingleImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 842BC8F42A66FB2600B09935 /* SingleImageViewController.swift */; };
 		842BDCC92AB1B65E00F7204A /* WebViewPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 842BDCC82AB1B65E00F7204A /* WebViewPresenter.swift */; };
+		842BDCCB2AB1DB7000F7204A /* AuthHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 842BDCCA2AB1DB7000F7204A /* AuthHelper.swift */; };
 		8431A3512A5754370056E618 /* ImagesListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8431A3502A5754370056E618 /* ImagesListCell.swift */; };
 		8431A3542A58A80C0056E618 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8431A3532A58A80C0056E618 /* Assets.xcassets */; };
 		844E955D2A783F720037DCE9 /* AuthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 844E955C2A783F720037DCE9 /* AuthViewController.swift */; };
@@ -49,6 +50,7 @@
 		8429895A2A8E26BA002D3C97 /* ProfileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileService.swift; sourceTree = "<group>"; };
 		842BC8F42A66FB2600B09935 /* SingleImageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleImageViewController.swift; sourceTree = "<group>"; };
 		842BDCC82AB1B65E00F7204A /* WebViewPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewPresenter.swift; sourceTree = "<group>"; };
+		842BDCCA2AB1DB7000F7204A /* AuthHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthHelper.swift; sourceTree = "<group>"; };
 		8431A3502A5754370056E618 /* ImagesListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesListCell.swift; sourceTree = "<group>"; };
 		8431A3532A58A80C0056E618 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		844E955C2A783F720037DCE9 /* AuthViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewController.swift; sourceTree = "<group>"; };
@@ -111,6 +113,7 @@
 				844E955C2A783F720037DCE9 /* AuthViewController.swift */,
 				84041D572A78414A0085D28A /* WebViewViewController.swift */,
 				842BDCC82AB1B65E00F7204A /* WebViewPresenter.swift */,
+				842BDCCA2AB1DB7000F7204A /* AuthHelper.swift */,
 			);
 			path = Auth;
 			sourceTree = "<group>";
@@ -271,6 +274,7 @@
 				8407D2B32AAB8A3F00EE49BA /* DateFormatter.swift in Sources */,
 				84B4C6012A839A4F003901B1 /* URLRequest.swift in Sources */,
 				84B4C6032A839A75003901B1 /* URLSession.swift in Sources */,
+				842BDCCB2AB1DB7000F7204A /* AuthHelper.swift in Sources */,
 				84FB04372A507D170084F445 /* ImagesListViewController.swift in Sources */,
 				84249D0E2A9A869200A90322 /* TabBarController.swift in Sources */,
 				8473C9AD2AA1DCEF00E7BE87 /* ImagesListResponseBody.swift in Sources */,
