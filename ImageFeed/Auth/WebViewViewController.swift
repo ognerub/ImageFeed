@@ -8,12 +8,22 @@
 import UIKit
 import WebKit
 
+/// протокол для рефакторинга - прописываем что может видеть MVP
+public protocol WebViewViewControllerProtocol: AnyObject {
+    var presenter: WebViewPresenterProtocol? { get set }
+    func load(request: URLRequest)
+    func setProgressValue(_ newValue: Float)
+    func setProgressHidden(_ isHidden: Bool)
+}
+
 protocol WebViewViewControllerDelegate: AnyObject {
     func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String)
     func webViewViewControllerDidCancel(_ vc: WebViewViewController)
 }
 
-final class WebViewViewController: UIViewController {
+final class WebViewViewController: UIViewController, WebViewViewControllerProtocol {
+    /// переменная для рефакторинга - создаем переменную, которя соответствует протоколу MVP
+    var presenter: WebViewPresenterProtocol?
     
     static let shared = WebViewViewController()
     
@@ -32,29 +42,29 @@ final class WebViewViewController: UIViewController {
         super.viewDidLoad()
         alertPresenter = AlertPresenterImpl(viewController: self)
         webView.navigationDelegate = self
-        var urlComponents = URLComponents(string: Constants.unsplashAuthorizeURLString)!
-        urlComponents.queryItems = [
-            URLQueryItem(name: "client_id", value: Constants.accessKey),
-            URLQueryItem(name: "redirect_uri", value: Constants.redirectURI),
-            URLQueryItem(name: "response_type", value: Constants.code),
-            URLQueryItem(name: "scope", value: Constants.accessScope)
-        ]
-        let url = urlComponents.url!
-        let request = URLRequest(url: url)
-        webView.load(request)
+        
+        presenter?.viewDidLoad()
         
         estimatedProgressObservation = webView.observe(
             \.estimatedProgress,
              options: [],
              changeHandler: {[weak self] _, _ in
                  guard let self = self else { return }
-                 self.updateProgress()
+                 self.presenter?.didUpdateProgressValue(self.webView.estimatedProgress)
              })
     }
-    /// метод, мешяющий параметры отображения progressView в зависимости от прогресса загрузки WKWebView
-    private func updateProgress() {
-        progressView.progress = Float(webView.estimatedProgress)
-        progressView.isHidden = fabs(webView.estimatedProgress - 1.0) <= 0.0001
+    
+    /// функция для рефакторинга - загрузка webView по соответствующему запросу
+    func load(request: URLRequest) {
+        webView.load(request)
+    }
+    /// функция для рефакторинга - установка значения progressBar
+    func setProgressValue(_ newValue: Float) {
+        progressView.progress = newValue
+    }
+    /// функция для рефакторинга - скрытие progressBar
+    func setProgressHidden(_ isHidden: Bool) {
+        progressView.isHidden = isHidden
     }
     
     func cleanWebViewAfterUse() {
@@ -91,29 +101,9 @@ extension WebViewViewController: WKNavigationDelegate {
     }
     
     private func code(from navigationAction: WKNavigationAction) -> String? {
-        if
-            let url = navigationAction.request.url,
-            let urlComponents = URLComponents(string: url.absoluteString),
-            urlComponents.path == "/oauth/authorize/native",
-            let items = urlComponents.queryItems,
-            let codeItem = items.first(where: { $0.name == "code" })
-        {
-            return codeItem.value
-        } else {
+        if  let url = navigationAction.request.url{
+            return presenter?.code(from: url)
+        }
             return nil
         }
-    }
-    
-    func showNetWorkErrorForWebViewVC(completion: @escaping () -> Void) {
-        DispatchQueue.main.async {
-            let model = AlertModel(
-                title: "Что-то пошло не так(",
-                message: "Загрузка не удалась",
-                firstButton: "OK",
-                secondButton: nil,
-                firstCompletion: completion,
-                secondCompletion: {})
-            self.alertPresenter?.show(with: model)
-        }
-    }
 }
