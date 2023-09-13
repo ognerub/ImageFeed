@@ -8,7 +8,13 @@
 import UIKit
 import Kingfisher
 
-final class ProfileViewController: UIViewController {
+protocol ProfileViewControllerProtocol {
+    var presenter: ProfilePresenterProtocol? { get set }
+}
+
+final class ProfileViewController: UIViewController, ProfileViewControllerProtocol {
+    
+    var presenter: ProfilePresenterProtocol?
     
     private let profileService = ProfileService.shared
     private let profileImageService = ProfileImageService.shared
@@ -64,8 +70,10 @@ final class ProfileViewController: UIViewController {
         super.viewDidLoad()
         alertPresenter = AlertPresenterImpl(viewController: self)
         view.backgroundColor = UIColor(named: "YP Black")
+        
         addSubViews()
         configureConstraints()
+        
         guard let profile = profileService.profile else { return }
         updateProfileDetails(profile: profile)
         
@@ -84,13 +92,11 @@ final class ProfileViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        guard let profile = profileService.profile else {
-            return
-        }
+        
+        guard let profile = profileService.profile else { return }
         updateProfileDetails(profile: profile)
-        guard let avatarURL = profileImageService.avatarURL else {
-            return
-        }
+        
+        guard let avatarURL = profileImageService.avatarURL else { return }
         profileImageService.fetchProfileImageURL(username: profile.username) { _ in
             self.updateAvatar(url: avatarURL)
         }
