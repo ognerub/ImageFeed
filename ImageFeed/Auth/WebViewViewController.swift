@@ -21,23 +21,9 @@ protocol WebViewViewControllerDelegate: AnyObject {
     func webViewViewControllerDidCancel(_ vc: WebViewViewController)
 }
 
-/// создаем объект-дублер для первого самостоятельного теста (1 self-test)
-final class WebViewViewControllerSpy: WebViewViewControllerProtocol {
-    var presenter: WebViewPresenterProtocol?
-    var loadRequestCalled: Bool = false
-    func load(request: URLRequest) {
-        loadRequestCalled = true
-    }
-    func setProgressValue(_ newValue: Float) { }
-    func setProgressHidden(_ isHidden: Bool) { }
-}
-
 final class WebViewViewController: UIViewController, WebViewViewControllerProtocol {
-    /// переменная для рефакторинга - создаем переменную, которя соответствует протоколу MVP
-    var presenter: WebViewPresenterProtocol?
     
     static let shared = WebViewViewController()
-    
     private let splashViewController = SplashViewController.shared
     
     /// переменная для нового API
@@ -45,6 +31,9 @@ final class WebViewViewController: UIViewController, WebViewViewControllerProtoc
     private var alertPresenter: AlertPresenterProtocol?
 
     weak var delegate: WebViewViewControllerDelegate?
+    
+    /// переменная для рефакторинга - создаем переменную, которя соответствует протоколу MVP
+    var presenter: WebViewPresenterProtocol?
     
     @IBOutlet private var webView: WKWebView!
     @IBOutlet private var progressView: UIProgressView!
@@ -117,4 +106,16 @@ extension WebViewViewController: WKNavigationDelegate {
         }
             return nil
         }
+}
+
+// MARK: - Items for tests
+/// создаем объект-дублер для первого самостоятельного теста (1 self-test)
+final class WebViewViewControllerSpy: WebViewViewControllerProtocol {
+    var presenter: WebViewPresenterProtocol?
+    var loadRequestCalled: Bool = false
+    func load(request: URLRequest) {
+        loadRequestCalled = true
+    }
+    func setProgressValue(_ newValue: Float) { }
+    func setProgressHidden(_ isHidden: Bool) { }
 }

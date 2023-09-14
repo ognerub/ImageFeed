@@ -7,16 +7,29 @@
 
 import Foundation
 import UIKit
+import Kingfisher
 
 public protocol ProfilePresenterProtocol {
     var viewController: ProfileViewControllerProtocol? { get set }
-    
+    var profileView: UIView { get set }
+    var exitButton: UIButton { get set }
+    func setupSubViews()
+    func viewDidLoad()
+    func viewWillAppear()
+    func updateAvatar(url: URL)
+    func switchToSplashViewController()
 }
 
-final class ProfilePresenter: UIView, ProfilePresenterProtocol {
+final class ProfilePresenter: ProfilePresenterProtocol {
     
-    weak var viewController: ProfileViewControllerProtocol?
+    private let profileService = ProfileService.shared
+    private let profileImageService = ProfileImageService.shared
     
+    var profileView: UIView = {
+        let profileView = UIView(frame: .zero)
+        profileView.backgroundColor = UIColor(named: "YP Black")
+        return profileView
+    }()
     var personImageView: UIImageView = {
         let personImage = UIImage(named: "Avatar") ?? UIImage(systemName: "person.crop.circle.fill")!
         let personImageView = UIImageView(image: personImage)
@@ -58,38 +71,65 @@ final class ProfilePresenter: UIView, ProfilePresenterProtocol {
         return exitButton
     }()
     
-    init() {
-        super.init(frame: .zero)
-        backgroundColor = UIColor(named: "YP Black")
-        setup()
+    weak var viewController: ProfileViewControllerProtocol?
+    
+    private func updateProfileDetails(profile: Profile) {
+        personNameLabel.text = profile.name
+        personHashTagLabel.text = profile.loginName
+        personInfoTextLabel.text = profile.bio
     }
     
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        setup()
-    }
-    
-    func setup() {
+    func setupSubViews() {
         addSubViews()
         configureConstraints()
+    }
+    
+    func viewDidLoad() {
+        guard let profile = profileService.profile else { return }
+        updateProfileDetails(profile: profile)
+        if let url = profileImageService.avatarURL {
+            updateAvatar(url: url)
+        }
+    }
+    
+    func viewWillAppear() {
+        guard let profile = profileService.profile else { return }
+        updateProfileDetails(profile: profile)
+        guard let avatarURL = profileImageService.avatarURL else { return }
+        profileImageService.fetchProfileImageURL(username: profile.username) { _ in
+            self.updateAvatar(url: avatarURL)
+        }
+    }
+    
+    func updateAvatar(url: URL) {
+        personImageView.kf.indicatorType = .activity
+        let processor = RoundCornerImageProcessor(cornerRadius: 61)
+        personImageView.kf.setImage(with: url, options: [.processor(processor)])
+        personImageView.layer.masksToBounds = true
+        personImageView.layer.cornerRadius = 34
+    }
+    
+    func switchToSplashViewController() {
+        guard let window = UIApplication.shared.windows.first else { fatalError("Invalid Configuration of switchToSplashViewController") }
+        window.rootViewController = SplashViewController()
     }
 }
 
 // MARK: - Setup views
 private extension ProfilePresenter {
     func addSubViews() {
-        addSubview(personImageView)
-        addSubview(personNameLabel)
-        addSubview(personHashTagLabel)
-        addSubview(personInfoTextLabel)
-        addSubview(exitButton)
+        profileView.addSubview(personImageView)
+        profileView.addSubview(personNameLabel)
+        profileView.addSubview(personHashTagLabel)
+        profileView.addSubview(personInfoTextLabel)
+        profileView.addSubview(exitButton)
     }
     func configureConstraints() {
         NSLayoutConstraint.activate([
             personImageView.widthAnchor.constraint(equalToConstant: 70),
             personImageView.heightAnchor.constraint(equalToConstant: 70),
-            personImageView.topAnchor.constraint(equalTo: topAnchor, constant: 76),
-            personImageView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 16),
+            personImageView.topAnchor.constraint(equalTo: profileView.topAnchor, constant: 76),
+            personImageView.leadingAnchor.constraint(equalTo: profileView.safeAreaLayoutGuide.leadingAnchor, constant: 16),
             
             personNameLabel.topAnchor.constraint(equalTo: personImageView.bottomAnchor, constant: 8),
             personNameLabel.leadingAnchor.constraint(equalTo: personImageView.leadingAnchor),
@@ -101,7 +141,7 @@ private extension ProfilePresenter {
             personInfoTextLabel.leadingAnchor.constraint(equalTo: personHashTagLabel.leadingAnchor),
             
             exitButton.centerYAnchor.constraint(equalTo: personImageView.centerYAnchor),
-            exitButton.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -16)
+            exitButton.trailingAnchor.constraint(equalTo: profileView.trailingAnchor, constant: -16)
         ])
     }
 }
