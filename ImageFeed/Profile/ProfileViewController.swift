@@ -34,6 +34,7 @@ final class ProfileViewController: UIViewController, ProfileViewControllerProtoc
     override func viewDidLoad() {
         super.viewDidLoad()
         alertPresenter = AlertPresenterImpl(viewController: self)
+        
         presenter.viewDidLoad()
         
         profileImageServiceObserver = NotificationCenter.default.addObserver(
@@ -92,5 +93,17 @@ private extension ProfileViewController {
                 secondCompletion: { })
             self.alertPresenter?.show(with: model)
         }
+    }
+}
+
+// MARK: - Items for tests
+/// создаем объект-дублер для первого самостоятельного теста (1 self-test)
+final class ProfileViewControllerSpy: ProfileViewControllerProtocol {
+    
+    var presenter: ProfilePresenterProtocol!
+    var configureCalled: Bool = false
+    
+    func configure(_ presenter: ProfilePresenterProtocol) {
+        configureCalled = true
     }
 }

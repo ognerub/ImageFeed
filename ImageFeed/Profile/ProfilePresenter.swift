@@ -145,3 +145,23 @@ private extension ProfilePresenter {
         ])
     }
 }
+
+// MARK: - Items for tests
+/// создаем объект-дублер для первого теста (1-test)
+final class ProfilePresenterSpy: ProfilePresenterProtocol {
+    
+    var viewController: ProfileViewControllerProtocol?
+    var profileView: UIView = UIView()
+    var exitButton: UIButton = UIButton()
+
+    var viewDidLoadCalled: Bool = false
+    
+    func viewDidLoad() {
+        viewDidLoadCalled = true
+    }
+    
+    func setupSubViews() { }
+    func viewWillAppear() { }
+    func updateAvatar(url: URL) { }
+    func switchToSplashViewController() { }
+}
