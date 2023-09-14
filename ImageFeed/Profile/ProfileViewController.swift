@@ -10,6 +10,7 @@ import Kingfisher
 
 public protocol ProfileViewControllerProtocol: AnyObject {
     var presenter: ProfilePresenterProtocol! { get set }
+    func showAlertBeforExit()
 }
 
 final class ProfileViewController: UIViewController, ProfileViewControllerProtocol {
@@ -70,7 +71,7 @@ final class ProfileViewController: UIViewController, ProfileViewControllerProtoc
 }
 
 // MARK: - Methods to show alert when exit button pressed
-private extension ProfileViewController {
+extension ProfileViewController {
     func setupExitButton() {
         presenter.exitButton.addTarget(self, action: #selector(didTapExitButton), for: .primaryActionTriggered)
     }
@@ -102,8 +103,12 @@ final class ProfileViewControllerSpy: ProfileViewControllerProtocol {
     
     var presenter: ProfilePresenterProtocol!
     var configureCalled: Bool = false
+    var showAlert: Bool = false
     
     func configure(_ presenter: ProfilePresenterProtocol) {
         configureCalled = true
+    }
+    func showAlertBeforExit() {
+        showAlert = true
     }
 }

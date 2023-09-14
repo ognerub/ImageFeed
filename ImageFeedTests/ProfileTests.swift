@@ -36,7 +36,7 @@ final class ProfileTests: XCTestCase {
     }
     
     // 2 test
-    func personImageViewIsVisiableWhenViewWillAppear() {
+    func testPersonImageViewIsVisible() {
         // given
         let viewController = ProfileViewControllerSpy()
         let presenter = ProfilePresenter()
@@ -44,9 +44,43 @@ final class ProfileTests: XCTestCase {
         // when
         presenter.viewWillAppear()
         // then
-        XCTAssertTrue(presenter.personImageView.isHidden)
+        XCTAssertFalse(presenter.personImageView.isHidden)
     }
     
+    // 3 test
+    func testAlertIsShownWhenExitButtonPressed() {
+        //given
+        let viewController = ProfileViewControllerSpy()
+        let presenter = ProfilePresenter()
+        viewController.configure(presenter)
+        // when
+        viewController.showAlertBeforExit()
+        // then
+        XCTAssertTrue(viewController.showAlert)
+    }
     
-
+    // 4 test
+    func testExitButtonCorrectImage() {
+        // given
+        let viewController = ProfileViewControllerSpy()
+        let presenter = ProfilePresenter()
+        viewController.configure(presenter)
+        // when
+        presenter.viewWillAppear()
+        // then
+        XCTAssertEqual(presenter.exitButton.tintColor, UIColor(named: "YP Red"))
+    }
+    
+    // 5 test
+    func testSwitchToSplashVC() {
+        // given
+        let viewController = ProfileViewControllerSpy()
+        let presenter = ProfilePresenter()
+        viewController.configure(presenter)
+        let window = UIApplication.shared.windows.first
+        // when
+        presenter.switchToSplashViewController()
+        // then
+        XCTAssertNoThrow(window!.rootViewController = SplashViewController())
+    }
 }
