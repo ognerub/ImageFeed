@@ -25,6 +25,7 @@ final class ProfileViewController: UIViewController, ProfileViewControllerProtoc
     var presenter: ProfilePresenterProtocol!
     
     override func loadView() {
+        super.loadView()
         presenter = ProfilePresenter()
         configure(presenter)
         view = presenter.profileView

@@ -8,7 +8,19 @@
 import UIKit
 import Kingfisher
 
-final class ImagesListViewController: UIViewController {
+public protocol ImagesListViewControllerProtocol: AnyObject {
+    var presenter: ImagesListPresenterProtocol! {get set}
+    func showNetWorkErrorForImagesListVC(completion: @escaping () -> Void)
+}
+
+final class ImagesListViewController: UIViewController, ImagesListViewControllerProtocol {
+    
+    var presenter: ImagesListPresenterProtocol!
+    
+    func configure(_ presenter: ImagesListPresenterProtocol) {
+        self.presenter = presenter
+        self.presenter.viewController = self
+    }
     
     private let showSingleImageSequeIdentifier = "ShowSingleImage"
     private let imagesListService = ImagesListService.shared
@@ -21,9 +33,17 @@ final class ImagesListViewController: UIViewController {
     
     @IBOutlet private var tableView: UITableView!
     
+    override func loadView() {
+        super.loadView()
+        presenter = ImagesListPresenter()
+        configure(presenter)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         tableView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
+        
         imagesListServiceObserver = NotificationCenter.default.addObserver(
             forName: ImagesListService.DidChangeNotification,
             object: nil,
@@ -32,7 +52,7 @@ final class ImagesListViewController: UIViewController {
             guard let self = self else { return }
             self.updateTableViewAnimated()
         }
-        fetchPhotosNextPageSimple()
+        presenter.fetchPhotosNextPageSimple()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -83,28 +103,12 @@ extension ImagesListViewController: UITableViewDelegate {
         willDisplay cell: UITableViewCell,
         forRowAt indexPath: IndexPath) {
             if indexPath.row + 1 == imagesListService.photos.count {
-                fetchPhotosNextPageSimple()
+                presenter.fetchPhotosNextPageSimple()
             }
         }
 }
 
-// MARK: - Private extension
-private extension ImagesListViewController {
-    
-    func fetchPhotosNextPageSimple() {
-        UIBlockingProgressHUD.show()
-        imagesListService.fetchPhotosNextPage() { result in
-            switch result {
-            case .success:
-                UIBlockingProgressHUD.dismiss()
-            case .failure:
-                self.showNetWorkErrorForImagesListVC() {
-                    self.fetchPhotosNextPageSimple()
-                }
-                UIBlockingProgressHUD.dismiss()
-            }
-        }
-    }
+extension ImagesListViewController {
     
     func showNetWorkErrorForImagesListVC(completion: @escaping () -> Void) {
         DispatchQueue.main.async {

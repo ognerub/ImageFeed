@@ -18,6 +18,7 @@
 		842BDCCB2AB1DB7000F7204A /* AuthHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 842BDCCA2AB1DB7000F7204A /* AuthHelper.swift */; };
 		842BDCD32AB1E3B300F7204A /* WebViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 842BDCD22AB1E3B300F7204A /* WebViewTests.swift */; };
 		843067C92AB3256E00C1204E /* ProfileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843067C22AB3256500C1204E /* ProfileTests.swift */; };
+		843067CB2AB36B2100C1204E /* ImagesListPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843067CA2AB36B2100C1204E /* ImagesListPresenter.swift */; };
 		8431A3512A5754370056E618 /* ImagesListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8431A3502A5754370056E618 /* ImagesListCell.swift */; };
 		8431A3542A58A80C0056E618 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8431A3532A58A80C0056E618 /* Assets.xcassets */; };
 		844E955D2A783F720037DCE9 /* AuthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 844E955C2A783F720037DCE9 /* AuthViewController.swift */; };
@@ -67,6 +68,7 @@
 		842BDCD02AB1E3B300F7204A /* ImageFeedTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ImageFeedTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		842BDCD22AB1E3B300F7204A /* WebViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewTests.swift; sourceTree = "<group>"; };
 		843067C22AB3256500C1204E /* ProfileTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileTests.swift; sourceTree = "<group>"; };
+		843067CA2AB36B2100C1204E /* ImagesListPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesListPresenter.swift; sourceTree = "<group>"; };
 		8431A3502A5754370056E618 /* ImagesListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesListCell.swift; sourceTree = "<group>"; };
 		8431A3532A58A80C0056E618 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		844E955C2A783F720037DCE9 /* AuthViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewController.swift; sourceTree = "<group>"; };
@@ -131,6 +133,7 @@
 			children = (
 				8473C9AC2AA1DCEF00E7BE87 /* ImagesListResponseBody.swift */,
 				84FB04362A507D170084F445 /* ImagesListViewController.swift */,
+				843067CA2AB36B2100C1204E /* ImagesListPresenter.swift */,
 				8431A3502A5754370056E618 /* ImagesListCell.swift */,
 				84EB111F2A9E3548000A2F64 /* ImagesListService.swift */,
 			);
@@ -206,16 +209,16 @@
 				84FB04322A507D170084F445 /* AppDelegate.swift */,
 				84FB04342A507D170084F445 /* SceneDelegate.swift */,
 				848BC92D2A76B6620084D082 /* AuthConfiguration.swift */,
+				8407D2B22AAB8A3F00EE49BA /* DateFormatter.swift */,
 				84D5D18F2A8A8C740089A7BE /* UIBlockingProgressHUD.swift */,
 				847F30972A81357B00B5BEDA /* SplashViewController.swift */,
 				84249D0D2A9A869200A90322 /* TabBarController.swift */,
 				8456E55F2A93668800940549 /* Alert */,
 				844E955E2A783F810037DCE9 /* Auth */,
-				84B4C6062A839AF4003901B1 /* Network */,
 				8496ECCA2A6A6EAE003B7B5D /* Profile */,
 				8431A3522A5754640056E618 /* ImagesList */,
 				842BC8F42A66FB2600B09935 /* SingleImageViewController.swift */,
-				8407D2B22AAB8A3F00EE49BA /* DateFormatter.swift */,
+				84B4C6062A839AF4003901B1 /* Network */,
 				84FB04382A507D170084F445 /* Main.storyboard */,
 				84FB043D2A507D1B0084F445 /* LaunchScreen.storyboard */,
 				8431A3532A58A80C0056E618 /* Assets.xcassets */,
@@ -372,6 +375,7 @@
 				84041D582A78414A0085D28A /* WebViewViewController.swift in Sources */,
 				849E21F12A8FF1B10006B247 /* ProfileImageService.swift in Sources */,
 				84FB04352A507D170084F445 /* SceneDelegate.swift in Sources */,
+				843067CB2AB36B2100C1204E /* ImagesListPresenter.swift in Sources */,
 				84D5D1902A8A8C740089A7BE /* UIBlockingProgressHUD.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
