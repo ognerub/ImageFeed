@@ -17,20 +17,12 @@ protocol ImagesListViewControllerProtocol: AnyObject {
 
 final class ImagesListViewController: UIViewController, ImagesListViewControllerProtocol {
     
-    var presenter: ImagesListPresenterProtocol!
-    
-    func configure(_ presenter: ImagesListPresenterProtocol) {
-        self.presenter = presenter
-        self.presenter.viewController = self
-    }
-    
     private let showSingleImageSequeIdentifier = "ShowSingleImage"
-    private let imagesListService = ImagesListService.shared
-    private let singleImageViewController = SingleImageViewController.shared
     
     private var imagesListServiceObserver: NSObjectProtocol?
-    var alertPresenter: AlertPresenterProtocol?
     
+    var alertPresenter: AlertPresenterProtocol?
+    var presenter: ImagesListPresenterProtocol!
     var photos: [Photo] = []
     
     @IBOutlet var tableView: UITableView!
@@ -44,9 +36,7 @@ final class ImagesListViewController: UIViewController, ImagesListViewController
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        tableView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
-        
+        presenter.viewDidLoad()
         imagesListServiceObserver = NotificationCenter.default.addObserver(
             forName: ImagesListService.DidChangeNotification,
             object: nil,
@@ -55,7 +45,6 @@ final class ImagesListViewController: UIViewController, ImagesListViewController
             guard let self = self else { return }
             self.presenter.updateTableViewAnimated()
         }
-        presenter.fetchPhotosNextPageSimple()
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -66,6 +55,11 @@ final class ImagesListViewController: UIViewController, ImagesListViewController
         } else {
             super.prepare(for: segue, sender: sender)
         }
+    }
+    
+    func configure(_ presenter: ImagesListPresenterProtocol) {
+        self.presenter = presenter
+        self.presenter.viewController = self
     }
 }
 
@@ -82,57 +76,22 @@ extension ImagesListViewController: UITableViewDelegate {
     func tableView(
         _ tableView: UITableView,
         heightForRowAt indexPath: IndexPath) -> CGFloat {
-            let imageInsets = UIEdgeInsets(top: 4, left: 16, bottom: 4, right: 16)
-            if photos[indexPath.row].size.height > 50 {
-                let imageViewWidth = tableView.bounds.width - imageInsets.left - imageInsets.right
-                let imageWidth = photos[indexPath.row].size.width
-                let scale = imageViewWidth / imageWidth
-                let cellHeight = photos[indexPath.row].size.height * scale + imageInsets.top + imageInsets.bottom
-                return cellHeight
-            } else {
-                let cellHeight = 50 + imageInsets.top + imageInsets.bottom
-                return cellHeight
-            }
+            presenter.configCellHeight(indexPath: indexPath)
         }
-    
+    /// данный метод осуществляет запуск загрузки фотографий в случае если текущая строка + 1 равна количеству фотографий в массии (тем самым реализуем предварительную загрузку, не позволив пролистать пользователю ленту до последней фотографии, получаем бесконечную ленту!)
     func tableView(
         _ tableView: UITableView,
         willDisplay cell: UITableViewCell,
         forRowAt indexPath: IndexPath) {
-            if indexPath.row + 1 == imagesListService.photos.count {
-                presenter.fetchPhotosNextPageSimple()
-            }
+            presenter.endlessLoading(indexPath: indexPath)
         }
-}
-
-extension ImagesListViewController {
-    
-    
-    
-    /// данный метод конфигурирует стиль кастомных ячеек, в частности присваивается картинка, если такая имеется (если нет, guard else вернет nil), форматируется дата, задается стиль кнопки лайка для четных и нечетных ячеек по indexPath.row)
-    
 }
 
 //MARK: - ImageListCellDelegate
 extension ImagesListViewController: ImagesListCellDelegate {
+    /// вызываем запрос в сеть со сменой текущего состояния лайка, на время запроса блокируем интерфейс
     func imageListCellDidTapLike(_ cell: ImagesListCell) {
-        guard let indexPath = tableView.indexPath(for: cell) else { return }
-        let photo = photos[indexPath.row]
-        UIBlockingProgressHUD.show()
-        imagesListService.changeLike(photoId: photo.id, isLike: !photo.isLiked) { result in
-            UIBlockingProgressHUD.dismiss()
-            switch result {
-            case .success:
-                self.photos = self.imagesListService.photos
-                let isLiked = self.photos[indexPath.row].isLiked
-                let likeImage = isLiked ? UIImage(named: "LikeOn") : UIImage(named: "LikeOff")
-                cell.cellLikeButton.setImage(likeImage, for: .normal)
-            case .failure:
-                self.presenter.showNetWorkErrorForImagesListVC() {
-                    self.imageListCellDidTapLike(cell)
-                }
-            }
-        }
+        presenter.changeCellLike(for: cell)
     }
 }
 
@@ -149,7 +108,7 @@ extension ImagesListViewController: UITableViewDataSource {
             return UITableViewCell()
         }
         imageListCell.delegate = self
-        presenter.configCell(for: imageListCell)
+        presenter.configCellContent(for: imageListCell)
         return imageListCell
     }
 }
