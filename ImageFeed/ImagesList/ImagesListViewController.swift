@@ -8,9 +8,11 @@
 import UIKit
 import Kingfisher
 
-public protocol ImagesListViewControllerProtocol: AnyObject {
-    var presenter: ImagesListPresenterProtocol! {get set}
-    func showNetWorkErrorForImagesListVC(completion: @escaping () -> Void)
+protocol ImagesListViewControllerProtocol: AnyObject {
+    var presenter: ImagesListPresenterProtocol! { get set }
+    var alertPresenter: AlertPresenterProtocol? { get set }
+    var photos: [Photo] { get set }
+    var tableView: UITableView! { get set }
 }
 
 final class ImagesListViewController: UIViewController, ImagesListViewControllerProtocol {
@@ -27,15 +29,16 @@ final class ImagesListViewController: UIViewController, ImagesListViewController
     private let singleImageViewController = SingleImageViewController.shared
     
     private var imagesListServiceObserver: NSObjectProtocol?
-    private var alertPresenter: AlertPresenterProtocol?
+    var alertPresenter: AlertPresenterProtocol?
     
     var photos: [Photo] = []
     
-    @IBOutlet private var tableView: UITableView!
+    @IBOutlet var tableView: UITableView!
     
     override func loadView() {
         super.loadView()
         presenter = ImagesListPresenter()
+        alertPresenter = AlertPresenterImpl(viewController: self)
         configure(presenter)
     }
     
@@ -50,14 +53,9 @@ final class ImagesListViewController: UIViewController, ImagesListViewController
             queue: .main
         ) { [weak self] notification in
             guard let self = self else { return }
-            self.updateTableViewAnimated()
+            self.presenter.updateTableViewAnimated()
         }
         presenter.fetchPhotosNextPageSimple()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        alertPresenter = AlertPresenterImpl(viewController: self)
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -65,7 +63,6 @@ final class ImagesListViewController: UIViewController, ImagesListViewController
             let viewController = segue.destination as! SingleImageViewController
             let indexPath = sender as! IndexPath
             viewController.fullscreenImageURL = URL(string: photos[indexPath.row].largeImageURL)
-//            _ = viewController.view // crash fix
         } else {
             super.prepare(for: segue, sender: sender)
         }
@@ -110,18 +107,7 @@ extension ImagesListViewController: UITableViewDelegate {
 
 extension ImagesListViewController {
     
-    func showNetWorkErrorForImagesListVC(completion: @escaping () -> Void) {
-        DispatchQueue.main.async {
-            let model = AlertModel(
-                title: "Что-то пошло не так(",
-                message: "Попробовать еще раз?",
-                firstButton: "Повторить",
-                secondButton: "Не надо",
-                firstCompletion: completion,
-                secondCompletion: {})
-            self.alertPresenter?.show(with: model)
-        }
-    }
+    
     
     /// данный метод конфигурирует стиль кастомных ячеек, в частности присваивается картинка, если такая имеется (если нет, guard else вернет nil), форматируется дата, задается стиль кнопки лайка для четных и нечетных ячеек по indexPath.row)
     func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
@@ -156,18 +142,17 @@ extension ImagesListViewController: ImagesListCellDelegate {
         let photo = photos[indexPath.row]
         UIBlockingProgressHUD.show()
         imagesListService.changeLike(photoId: photo.id, isLike: !photo.isLiked) { result in
+            UIBlockingProgressHUD.dismiss()
             switch result {
             case .success:
                 self.photos = self.imagesListService.photos
                 let isLiked = self.photos[indexPath.row].isLiked
                 let likeImage = isLiked ? UIImage(named: "LikeOn") : UIImage(named: "LikeOff")
                 cell.cellLikeButton.setImage(likeImage, for: .normal)
-                UIBlockingProgressHUD.dismiss()
             case .failure:
-                self.showNetWorkErrorForImagesListVC() {
+                self.presenter.showNetWorkErrorForImagesListVC() {
                     self.imageListCellDidTapLike(cell)
                 }
-                UIBlockingProgressHUD.dismiss()
             }
         }
     }
@@ -188,21 +173,6 @@ extension ImagesListViewController: UITableViewDataSource {
         imageListCell.delegate = self
         configCell(for: imageListCell, with: indexPath)
         return imageListCell
-    }
-    
-    func updateTableViewAnimated() {
-        let oldCount = photos.count
-        let newCount = imagesListService.photos.count
-        photos = imagesListService.photos
-        if oldCount != newCount {
-            tableView.performBatchUpdates {
-                var indexPaths: [IndexPath] = []
-                for i in oldCount..<newCount {
-                    indexPaths.append(IndexPath(row: i, section: 0))
-                }
-                tableView.insertRows(at: indexPaths, with: .automatic)
-            } completion: { _ in}
-        }
     }
 }
 

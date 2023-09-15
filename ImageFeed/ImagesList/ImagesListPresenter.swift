@@ -5,11 +5,13 @@
 //  Created by Admin on 14.09.2023.
 //
 
-import Foundation
+import UIKit
 
-public protocol ImagesListPresenterProtocol {
+protocol ImagesListPresenterProtocol {
     var viewController: ImagesListViewControllerProtocol? { get set }
     func fetchPhotosNextPageSimple()
+    func updateTableViewAnimated()
+    func showNetWorkErrorForImagesListVC(completion: @escaping () -> Void)
 }
 
 final class ImagesListPresenter: ImagesListPresenterProtocol {
@@ -25,11 +27,39 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
             case .success:
                 UIBlockingProgressHUD.dismiss()
             case .failure:
-                self.viewController?.showNetWorkErrorForImagesListVC() {
+                self.showNetWorkErrorForImagesListVC() {
                     self.fetchPhotosNextPageSimple()
                 }
                 UIBlockingProgressHUD.dismiss()
             }
+        }
+    }
+    
+    func updateTableViewAnimated() {
+        guard let oldCount = viewController?.photos.count else { return }
+        let newCount = imagesListService.photos.count
+        viewController?.photos = imagesListService.photos
+        if oldCount != newCount {
+            viewController?.tableView.performBatchUpdates {
+                var indexPaths: [IndexPath] = []
+                for i in oldCount..<newCount {
+                    indexPaths.append(IndexPath(row: i, section: 0))
+                }
+                viewController?.tableView.insertRows(at: indexPaths, with: .automatic)
+            } completion: { _ in}
+        }
+    }
+    
+    func showNetWorkErrorForImagesListVC(completion: @escaping () -> Void) {
+        DispatchQueue.main.async {
+            let model = AlertModel(
+                title: "Что-то пошло не так(",
+                message: "Попробовать еще раз?",
+                firstButton: "Повторить",
+                secondButton: "Не надо",
+                firstCompletion: completion,
+                secondCompletion: {})
+            self.viewController?.alertPresenter?.show(with: model)
         }
     }
 }
