@@ -110,29 +110,7 @@ extension ImagesListViewController {
     
     
     /// данный метод конфигурирует стиль кастомных ячеек, в частности присваивается картинка, если такая имеется (если нет, guard else вернет nil), форматируется дата, задается стиль кнопки лайка для четных и нечетных ячеек по indexPath.row)
-    func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
-        /// осуществляем загрузку фото, пока идет загрузка или фото отсутствует вставляем заглушку
-        guard let image = UIImage(named: "Stub") else { return }
-        cell.cellImage.kf.indicatorType = .custom(indicator: UIBlockingProgressHUD.MyIndicator())
-        cell.cellImage.kf.setImage(with: URL(string:photos[indexPath.row].thumbImageURL)) { result in
-            switch result {
-            case .success(_):
-                cell.cellImage.contentMode = UIView.ContentMode.scaleAspectFit
-                self.tableView.reloadRows(at: [indexPath], with: .automatic)
-            case .failure(_):
-                cell.cellImage.contentMode = UIView.ContentMode.center
-                cell.cellImage.backgroundColor = UIColor(named: "YP Grey")
-                cell.cellImage.image = image
-            }
-        }
-        
-        cell.cellDateLabel.text = photos[indexPath.row].createdAt ?? ""
-        
-        /// настраиваем лайки для каждой фотографии
-        let isLiked = photos[indexPath.row].isLiked
-        let likeImage = isLiked ? UIImage(named: "LikeOn") : UIImage(named: "LikeOff")
-        cell.cellLikeButton.setImage(likeImage, for: .normal)
-    }
+    
 }
 
 //MARK: - ImageListCellDelegate
@@ -171,7 +149,7 @@ extension ImagesListViewController: UITableViewDataSource {
             return UITableViewCell()
         }
         imageListCell.delegate = self
-        configCell(for: imageListCell, with: indexPath)
+        presenter.configCell(for: imageListCell)
         return imageListCell
     }
 }
