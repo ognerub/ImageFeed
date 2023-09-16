@@ -8,7 +8,7 @@
 import Foundation
 
 struct AlertModel {
-    let title: String
+    var title: String
     let message: String
     let firstButton: String
     let secondButton: String?

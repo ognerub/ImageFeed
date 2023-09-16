@@ -5,11 +5,10 @@
 //  Created by Admin on 13.09.2023.
 //
 
-import Foundation
 import UIKit
 import Kingfisher
 
-public protocol ProfilePresenterProtocol {
+protocol ProfilePresenterProtocol {
     var viewController: ProfileViewControllerProtocol? { get set }
     var profileView: UIView { get set }
     var exitButton: UIButton { get set }
@@ -18,12 +17,15 @@ public protocol ProfilePresenterProtocol {
     func viewWillAppear()
     func updateAvatar(url: URL)
     func switchToSplashViewController()
+    func showAlertBeforExit()
 }
 
 final class ProfilePresenter: ProfilePresenterProtocol {
     
     private let profileService = ProfileService.shared
     private let profileImageService = ProfileImageService.shared
+    private let storage = OAuth2TokenStorage.shared
+    private let webViewViewController = WebViewViewController.shared
     
     var profileView: UIView = {
         let profileView = UIView(frame: .zero)
@@ -102,8 +104,8 @@ final class ProfilePresenter: ProfilePresenterProtocol {
     }
     
     func updateAvatar(url: URL) {
-        personImageView.kf.indicatorType = .activity
         let processor = RoundCornerImageProcessor(cornerRadius: 61)
+        personImageView.kf.indicatorType = .activity
         personImageView.kf.setImage(with: url, options: [.processor(processor)])
         personImageView.layer.masksToBounds = true
         personImageView.layer.cornerRadius = 34
@@ -112,6 +114,23 @@ final class ProfilePresenter: ProfilePresenterProtocol {
     func switchToSplashViewController() {
         guard let window = UIApplication.shared.windows.first else { fatalError("Invalid Configuration of switchToSplashViewController") }
         window.rootViewController = SplashViewController()
+    }
+    
+    func showAlertBeforExit() {
+        DispatchQueue.main.async {
+            let model = AlertModel(
+                title: "Пока, пока!",
+                message: "Уверены что хотите выйти?",
+                firstButton: "Да",
+                secondButton: "Нет",
+                firstCompletion: {
+                    self.storage.nilTokenInUserDefaults()
+                    self.webViewViewController.cleanWebViewAfterUse()
+                    self.switchToSplashViewController()
+                },
+                secondCompletion: { })
+            self.viewController?.alertPresenter?.show(with: model)
+        }
     }
 }
 
@@ -153,13 +172,10 @@ final class ProfilePresenterSpy: ProfilePresenterProtocol {
     var viewController: ProfileViewControllerProtocol?
     var profileView: UIView = UIView()
     var exitButton: UIButton = UIButton()
-
-    var viewDidLoadCalled: Bool = false
+    var showAlert: Bool = false
     
-    func viewDidLoad() {
-        viewDidLoadCalled = true
-    }
-    
+    func viewDidLoad() { }
+    func showAlertBeforExit() { showAlert = true }
     func setupSubViews() { }
     func viewWillAppear() { }
     func updateAvatar(url: URL) { }

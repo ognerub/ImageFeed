@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Kingfisher
 
 protocol ImagesListPresenterProtocol {
     var viewController: ImagesListViewControllerProtocol? { get set }
@@ -27,21 +28,6 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
     func viewDidLoad() {
         viewController?.tableView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
         fetchPhotosNextPageSimple()
-    }
-    
-    private func fetchPhotosNextPageSimple() {
-        UIBlockingProgressHUD.show()
-        imagesListService.fetchPhotosNextPage() { result in
-            switch result {
-            case .success:
-                UIBlockingProgressHUD.dismiss()
-            case .failure:
-                self.showNetWorkErrorForImagesListVC() {
-                    self.fetchPhotosNextPageSimple()
-                }
-                UIBlockingProgressHUD.dismiss()
-            }
-        }
     }
     
     func endlessLoading(indexPath: IndexPath) {
@@ -88,34 +74,16 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
     }
     
     func configCellContent(for cell: ImagesListCell) {
-        // set photos for each cell
         guard
             let image = UIImage(named: "Stub"),
             let photos = viewController?.photos,
             let indexPath = viewController?.tableView.indexPath(for: cell)
         else { return }
         configCellImage(for: cell, with: indexPath, photos: photos, image: image)
-        // set text (date) for each cell
         cell.cellDateLabel.text = photos[indexPath.row].createdAt ?? ""
-        // set like status for each cell
         let isLiked = photos[indexPath.row].isLiked
         let likeImage = isLiked ? UIImage(named: "LikeOn") : UIImage(named: "LikeOff")
         cell.cellLikeButton.setImage(likeImage, for: .normal)
-    }
-    
-    private func configCellImage(for cell: ImagesListCell, with indexPath: IndexPath, photos: [Photo], image: UIImage) {
-        cell.cellImage.kf.indicatorType = .custom(indicator: UIBlockingProgressHUD.MyIndicator())
-        cell.cellImage.kf.setImage(with: URL(string:photos[indexPath.row].thumbImageURL)) { result in
-            switch result {
-            case .success(_):
-                cell.cellImage.contentMode = UIView.ContentMode.scaleAspectFit
-                self.viewController?.tableView.reloadRows(at: [indexPath], with: .automatic)
-            case .failure(_):
-                cell.cellImage.contentMode = UIView.ContentMode.center
-                cell.cellImage.backgroundColor = UIColor(named: "YP Grey")
-                cell.cellImage.image = image
-            }
-        }
     }
     
     func changeCellLike(for cell: ImagesListCell) {
@@ -153,4 +121,67 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
             self.viewController?.alertPresenter?.show(with: model)
         }
     }
+    
+    private func configCellImage(for cell: ImagesListCell, with indexPath: IndexPath, photos: [Photo], image: UIImage) {
+        cell.cellImage.kf.indicatorType = .custom(indicator: UIBlockingProgressHUD.MyIndicator())
+        cell.cellImage.kf.setImage(with: URL(string:photos[indexPath.row].thumbImageURL)) { result in
+            switch result {
+            case .success(_):
+                cell.cellImage.contentMode = UIView.ContentMode.scaleAspectFit
+                self.viewController?.tableView.reloadRows(at: [indexPath], with: .automatic)
+            case .failure(_):
+                cell.cellImage.contentMode = UIView.ContentMode.center
+                cell.cellImage.backgroundColor = UIColor(named: "YP Grey")
+                cell.cellImage.image = image
+            }
+        }
+    }
+    
+    private func fetchPhotosNextPageSimple() {
+        UIBlockingProgressHUD.show()
+        imagesListService.fetchPhotosNextPage() { result in
+            UIBlockingProgressHUD.dismiss()
+            switch result {
+            case .success:
+                return
+            case .failure:
+                self.showNetWorkErrorForImagesListVC() {
+                    self.fetchPhotosNextPageSimple()
+                }
+            }
+        }
+    }
+}
+
+final class ImagesListPresenterSpy: ImagesListPresenterProtocol {
+    
+    var viewController: ImagesListViewControllerProtocol?
+    
+    private let imagesListService = ImagesListService.shared
+    
+    var viewDidLoadCalled: Bool = false
+    var endlessLoading: Int = 0
+    var model = AlertModel(title: "test", message: "test", firstButton: "test", secondButton: nil, firstCompletion: {}, secondCompletion: {})
+    
+    func viewDidLoad() {
+        viewDidLoadCalled = true
+    }
+    
+    func endlessLoading(indexPath: IndexPath) {
+        endlessLoading = 1
+        if indexPath.row + 1 == imagesListService.photos.count {
+            endlessLoading = 0
+        }
+    }
+    
+    func updateTableViewAnimated() { }
+    
+    func showNetWorkErrorForImagesListVC(completion: @escaping () -> Void) {
+            model.title = "success"
+            viewController?.alertPresenter?.show(with: model)
+    }
+    
+    func configCellContent(for cell: ImagesListCell) { }
+    func configCellHeight(indexPath: IndexPath) -> CGFloat { return CGFloat(50) }
+    func changeCellLike(for cell: ImagesListCell) { }
 }

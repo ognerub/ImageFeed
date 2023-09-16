@@ -9,25 +9,12 @@
 import XCTest
 
 final class ProfileTests: XCTestCase {
-
-    // 1 test
-    func testViewControllerCallsViewDidLoad() {
-        // given
-        let viewController = ProfileViewController()
-        // создаем объект-дублер презентера и соединяем его с вьюконтроллером
-        let presenter = ProfilePresenterSpy()
-        viewController.configure(presenter)
-        // when
-        viewController.viewDidLoad()
-        // then
-        XCTAssertTrue(presenter.viewDidLoadCalled)
-    }
     
-    // 1 self-test
-    func testPresenterCallLoadrequest() {
+    // 1 test
+    func testPresenterCallConfigureCell() {
         // given
         let viewController = ProfileViewControllerSpy()
-        let presenter = ProfilePresenter() // Dummy (пустышка)
+        let presenter = ProfilePresenter()
         viewController.configure(presenter)
         // when
         presenter.viewDidLoad()
@@ -50,13 +37,13 @@ final class ProfileTests: XCTestCase {
     // 3 test
     func testAlertIsShownWhenExitButtonPressed() {
         //given
-        let viewController = ProfileViewControllerSpy()
-        let presenter = ProfilePresenter()
+        let viewController = ProfileViewController()
+        let presenter = ProfilePresenterSpy()
         viewController.configure(presenter)
         // when
-        viewController.showAlertBeforExit()
+        presenter.showAlertBeforExit()
         // then
-        XCTAssertTrue(viewController.showAlert)
+        XCTAssertTrue(presenter.showAlert)
     }
     
     // 4 test

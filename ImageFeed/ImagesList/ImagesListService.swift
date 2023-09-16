@@ -120,7 +120,7 @@ private extension ImagesListService {
         let path: String = "/photos?"
         + "page=\(page)"
         + "&&per_page=10"
-        + "&&order_by=relevant"
+        + "&&order_by=oldest"
         + "&&collections=11649432"
         return builder.makeHTTPRequest(
             path: path,

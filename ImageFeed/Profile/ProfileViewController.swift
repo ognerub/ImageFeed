@@ -6,22 +6,19 @@
 //
 
 import UIKit
-import Kingfisher
 
-public protocol ProfileViewControllerProtocol: AnyObject {
+protocol ProfileViewControllerProtocol: AnyObject {
     var presenter: ProfilePresenterProtocol! { get set }
-    func showAlertBeforExit()
+    var alertPresenter: AlertPresenterProtocol? { get set }
 }
 
 final class ProfileViewController: UIViewController, ProfileViewControllerProtocol {
     
-    private let storage = OAuth2TokenStorage.shared
     private let splashViewController = SplashViewController.shared
-    private let webViewViewController = WebViewViewController.shared
     
-    private var alertPresenter: AlertPresenterProtocol?
     private var profileImageServiceObserver: NSObjectProtocol?
     
+    var alertPresenter: AlertPresenterProtocol?
     var presenter: ProfilePresenterProtocol!
     
     override func loadView() {
@@ -78,23 +75,7 @@ extension ProfileViewController {
     }
     @objc
     func didTapExitButton() {
-        showAlertBeforExit()
-    }
-    func showAlertBeforExit() {
-        DispatchQueue.main.async {
-            let model = AlertModel(
-                title: "Пока, пока!",
-                message: "Уверены что хотите выйти?",
-                firstButton: "Да",
-                secondButton: "Нет",
-                firstCompletion: {
-                    self.storage.nilTokenInUserDefaults()
-                    self.webViewViewController.cleanWebViewAfterUse()
-                    self.presenter.switchToSplashViewController()
-                },
-                secondCompletion: { })
-            self.alertPresenter?.show(with: model)
-        }
+        presenter.showAlertBeforExit()
     }
 }
 
@@ -102,14 +83,11 @@ extension ProfileViewController {
 /// создаем объект-дублер для первого самостоятельного теста (1 self-test)
 final class ProfileViewControllerSpy: ProfileViewControllerProtocol {
     
+    var alertPresenter: AlertPresenterProtocol?
     var presenter: ProfilePresenterProtocol!
     var configureCalled: Bool = false
-    var showAlert: Bool = false
     
     func configure(_ presenter: ProfilePresenterProtocol) {
         configureCalled = true
-    }
-    func showAlertBeforExit() {
-        showAlert = true
     }
 }
