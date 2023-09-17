@@ -39,8 +39,8 @@ final class SplashViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         if storage.token != nil {
-            //fetchProfileSimple()
-            //fetchProfileImageSimple()
+            fetchProfileSimple()
+            fetchProfileImageSimple()
             switchToTabBarController()
         } else {
             showAuthViewController()

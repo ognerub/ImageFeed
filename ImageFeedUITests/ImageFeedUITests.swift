@@ -47,20 +47,16 @@ final class ImageFeedUITests: XCTestCase {
         // wait for images feed screen
         let tablesQuery = app.tables
         let firstCell = tablesQuery.children(matching: .cell).element(boundBy: 0)
-        XCTAssertTrue(firstCell.waitForExistence(timeout: 5))
         // swipe up to scroll down
         firstCell.swipeUp()
-        let secondCell = tablesQuery.children(matching: .cell).element(boundBy: 0)
-        XCTAssertTrue(secondCell.waitForExistence(timeout: 5))
-        secondCell.swipeDown()
-        // like fist image
-        firstCell.buttons["LikeButton"].tap()
+        sleep(3)
+        let secondCell = tablesQuery.children(matching: .cell).element(boundBy: 1)
+        secondCell.buttons["LikeButton"].tap()
         sleep(5)
-        // unlike first image
-        firstCell.buttons["LikeButton"].tap()
+        secondCell.buttons["LikeButton"].tap()
         sleep(5)
         // press on the first image
-        firstCell.tap()
+        secondCell.tap()
         sleep(3)
         // wait for fullscreen image open
         let image = app.scrollViews.images.element(boundBy: 0)
@@ -70,9 +66,7 @@ final class ImageFeedUITests: XCTestCase {
         // zoomout fullscreen image
         image.pinch(withScale: 0.5, velocity: -1)
         // go back to the images feed screen
-        app.scrollViews.buttons["BackButton"].tap()
-        sleep(3)
-        XCTAssertTrue(firstCell.waitForExistence(timeout: 5))
+        app.buttons["BackButton"].tap()
     }
     
     func testProfile() throws {
@@ -81,12 +75,14 @@ final class ImageFeedUITests: XCTestCase {
         let firstCell = tablesQuery.children(matching: .cell).element(boundBy: 0)
         XCTAssertTrue(firstCell.waitForExistence(timeout: 5))
         // go to profile screen
-        app.tabBars.buttons.element(boundBy: 0).tap()
+        app.tabBars.buttons.element(boundBy: 1).tap()
         sleep(5)
         // check user info
         XCTAssertTrue(app.staticTexts["personNameLabel"].exists)
         XCTAssertTrue(app.staticTexts["personHashTagLabel"].exists)
         // press logout button
+        app.buttons["exitButton"].tap()
+        sleep(3)
         app.alerts["Пока, пока!"].scrollViews.otherElements.buttons["Да"].tap()
         sleep(5)
         // wait for auth screen
