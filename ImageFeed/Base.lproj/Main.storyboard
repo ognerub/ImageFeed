@@ -42,6 +42,7 @@
                                                 </imageView>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="AOW-Xz-HGP" userLabel="Like Button">
                                                     <rect key="frame" x="333" y="4" width="44" height="44"/>
+                                                    <accessibility key="accessibilityConfiguration" identifier="LikeButton"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="44" id="FQa-ll-gXk"/>
                                                         <constraint firstAttribute="height" constant="44" id="SoX-MW-XYO"/>
@@ -119,7 +120,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1889.3129770992366" y="-35.211267605633807"/>
+            <point key="canvasLocation" x="2323" y="-38"/>
         </scene>
         <!--Single Image View Controller-->
         <scene sceneID="87Y-j3-tze">
@@ -151,6 +152,7 @@
                             </scrollView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Rtl-e5-nU0" userLabel="BackButton">
                                 <rect key="frame" x="8" y="67" width="44" height="44"/>
+                                <accessibility key="accessibilityConfiguration" identifier="BackButton"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="44" id="GVp-Zd-RgR"/>
                                     <constraint firstAttribute="height" constant="44" id="hui-TW-Dk7"/>
@@ -209,7 +211,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="9Xj-TM-a8D" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2800.7633587786258" y="-35.211267605633807"/>
+            <point key="canvasLocation" x="3234" y="-38"/>
         </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="wjq-0I-Gry">
@@ -227,7 +229,7 @@
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="I4k-Ne-NFa" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="894" y="-395"/>
+            <point key="canvasLocation" x="1405" y="-38"/>
         </scene>
         <!--AuthViewController-->
         <scene sceneID="r4A-bp-DJ1">
@@ -247,6 +249,7 @@
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eCS-vf-hxc" userLabel="EnterButton">
                                 <rect key="frame" x="16" y="680" width="361" height="48"/>
                                 <color key="backgroundColor" name="YP White"/>
+                                <accessibility key="accessibilityConfiguration" identifier="Authenticate"/>
                                 <constraints>
                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="44" id="pkU-vm-3xJ"/>
                                     <constraint firstAttribute="height" constant="48" id="xAq-vo-jhH"/>
@@ -279,7 +282,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="QLl-BL-KaO" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="5591.6030534351139" y="-1467.605633802817"/>
+            <point key="canvasLocation" x="1888" y="-796"/>
         </scene>
         <!--Web View View Controller-->
         <scene sceneID="Cpk-z2-sr1">
@@ -335,7 +338,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="qcs-il-LOJ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="6504.5801526717551" y="-1468.3098591549297"/>
+            <point key="canvasLocation" x="2801" y="-796"/>
         </scene>
     </scenes>
     <resources>

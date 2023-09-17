@@ -87,6 +87,9 @@ final class ProfilePresenter: ProfilePresenterProtocol {
     }
     
     func viewDidLoad() {
+        personNameLabel.accessibilityIdentifier = "personNameLabel"
+        personHashTagLabel.accessibilityIdentifier = "personHashTagLabel"
+        
         guard let profile = profileService.profile else { return }
         updateProfileDetails(profile: profile)
         if let url = profileImageService.avatarURL {
