@@ -83,6 +83,7 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
         cell.cellDateLabel.text = photos[indexPath.row].createdAt ?? ""
         let isLiked = photos[indexPath.row].isLiked
         let likeImage = isLiked ? UIImage(named: "LikeOn") : UIImage(named: "LikeOff")
+        cell.cellLikeButton.accessibilityIdentifier = "LikeButton"
         cell.cellLikeButton.setImage(likeImage, for: .normal)
     }
     

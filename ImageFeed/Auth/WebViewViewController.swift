@@ -38,6 +38,11 @@ final class WebViewViewController: UIViewController, WebViewViewControllerProtoc
     @IBOutlet private var webView: WKWebView!
     @IBOutlet private var progressView: UIProgressView!
     
+    override func loadView() {
+        super.loadView()
+        webView.accessibilityIdentifier = "UnsplashWebView"
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         alertPresenter = AlertPresenterImpl(viewController: self)
