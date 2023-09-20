@@ -23,29 +23,23 @@ protocol WebViewViewControllerDelegate: AnyObject {
 
 final class WebViewViewController: UIViewController, WebViewViewControllerProtocol {
     
-    static let shared = WebViewViewController()
-    private let splashViewController = SplashViewController.shared
-    
-    /// переменная для нового API
     private var estimatedProgressObservation: NSKeyValueObservation?
     private var alertPresenter: AlertPresenterProtocol?
     
-    /// переменная для рефакторинга - создаем переменную, которя соответствует протоколу MVP
     var presenter: WebViewPresenterProtocol?
     
-    @IBOutlet private var webView: WKWebView!
+    @IBOutlet var webView: WKWebView!
     @IBOutlet private var progressView: UIProgressView!
     
     override func loadView() {
         super.loadView()
-        webView.accessibilityIdentifier = "UnsplashWebView"
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         alertPresenter = AlertPresenterImpl(viewController: self)
         webView.navigationDelegate = self
-        
+        didUpdateProgressValue(0)
         presenter?.viewDidLoad()
         
         estimatedProgressObservation = webView.observe(
@@ -53,7 +47,7 @@ final class WebViewViewController: UIViewController, WebViewViewControllerProtoc
              options: [],
              changeHandler: {[weak self] _, _ in
                  guard let self = self else { return }
-                 self.presenter?.didUpdateProgressValue(self.webView.estimatedProgress)
+                 self.didUpdateProgressValue(self.webView.estimatedProgress)
              })
     }
     
@@ -63,24 +57,23 @@ final class WebViewViewController: UIViewController, WebViewViewControllerProtoc
     }
     /// функция для рефакторинга - установка значения progressBar
     func setProgressValue(_ newValue: Float) {
-        progressView.progress = newValue
+        progressView.setProgress(newValue, animated: true)
     }
     /// функция для рефакторинга - скрытие progressBar
     func setProgressHidden(_ isHidden: Bool) {
         progressView.isHidden = isHidden
     }
     
-    func cleanWebViewAfterUse() {
-        HTTPCookieStorage.shared.removeCookies(since: Date.distantPast)
-        WKWebsiteDataStore.default().fetchDataRecords(
-            ofTypes: WKWebsiteDataStore.allWebsiteDataTypes()) { records in
-                records.forEach { record in
-                    WKWebsiteDataStore.default().removeData(
-                        ofTypes: record.dataTypes,
-                        for: [record],
-                        completionHandler: {})
-                }
-            }
+    func didUpdateProgressValue(_ newValue: Double) {
+        let newProgressValue = Float(newValue)
+        setProgressValue(newProgressValue)
+        
+        let shouldHideProgress = shouldHideProgress(for: newProgressValue)
+        setProgressHidden(shouldHideProgress)
+    }
+    
+    func shouldHideProgress(for value: Float) -> Bool {
+        abs(value - 1.0) <= 0.0001
     }
     
     @IBAction func didTapNavBackButton(_ sender: Any) {

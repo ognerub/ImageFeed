@@ -7,12 +7,13 @@
 
 import Foundation
 
-let AccessKey = "37Srzq-z50u-dbfAlq6Glut7bUVnbonjepafLeiMQaw"
-let SecretKey = "iPrl0R--netyhxGACrrs6EyTLgAZRlovWLWsgG0x6-M"
-let RedirectURI = "urn:ietf:wg:oauth:2.0:oob"
-let AccessScope = "public+read_user+write_likes"
-let DefaultBaseURLString = "https://api.unsplash.com"
-let UnsplashAuthorizeURLString = "https://unsplash.com/oauth/authorize"
+let access = "37Srzq-z50u-dbfAlq6Glut7bUVnbonjepafLeiMQaw"
+let secret = "iPrl0R--netyhxGACrrs6EyTLgAZRlovWLWsgG0x6-M"
+let redirect = "urn:ietf:wg:oauth:2.0:oob"
+let scope = "public+read_user+write_likes"
+let base = "https://api.unsplash.com"
+let auth = "https://unsplash.com/oauth/authorize"
+let bearer = "Bearer Token"
 
 struct AuthConfiguration {
     
@@ -22,6 +23,7 @@ struct AuthConfiguration {
     let accessScope: String
     let defaultBaseURLString: String
     let authURLString: String
+    let bearerTokenString: String
 
     init(
         accessKey: String,
@@ -29,7 +31,8 @@ struct AuthConfiguration {
         redirectURI: String,
         accessScope: String,
         defaultBaseURLString: String,
-        authURLString: String
+        authURLString: String,
+        bearerTokenString: String
     ) {
         self.accessKey = accessKey
         self.secretKey = secretKey
@@ -37,15 +40,17 @@ struct AuthConfiguration {
         self.accessScope = accessScope
         self.defaultBaseURLString = defaultBaseURLString
         self.authURLString = authURLString
+        self.bearerTokenString = bearerTokenString
     }
     
     static var standart: AuthConfiguration {
-        return AuthConfiguration(accessKey: AccessKey,
-                                 secretKey: SecretKey,
-                                 redirectURI: RedirectURI,
-                                 accessScope: AccessScope,
-                                 defaultBaseURLString: DefaultBaseURLString,
-                                 authURLString: UnsplashAuthorizeURLString)
+        return AuthConfiguration(accessKey: access,
+                                 secretKey: secret,
+                                 redirectURI: redirect,
+                                 accessScope: scope,
+                                 defaultBaseURLString: base,
+                                 authURLString: auth,
+                                 bearerTokenString: bearer)
     }
     
 }
