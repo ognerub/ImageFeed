@@ -8,8 +8,9 @@
 import Foundation
 
 /// протокол для рефакторинга - прописываем что может видеть MVC
-public protocol WebViewPresenterProtocol {
+protocol WebViewPresenterProtocol {
     var view: WebViewViewControllerProtocol? { get set }
+    var delegate: WebViewViewControllerDelegate? { get set }
     func viewDidLoad()
     func didUpdateProgressValue(_ newValue: Double)
     func code(from url: URL) -> String?
@@ -18,11 +19,13 @@ public protocol WebViewPresenterProtocol {
 final class WebViewPresenter: WebViewPresenterProtocol {
     /// переменная для рефакторинга - создаем переменную, которя соответствует протоколу MVC
     weak var view: WebViewViewControllerProtocol?
+    weak var delegate: WebViewViewControllerDelegate?
     
     var authHelper: AuthHelperProtocol
     
-    init(authHelper: AuthHelperProtocol) {
+    init(authHelper: AuthHelperProtocol, delegate: WebViewViewControllerDelegate?) {
         self.authHelper = authHelper
+        self.delegate = delegate
     }
     
     func viewDidLoad() {
@@ -52,6 +55,7 @@ final class WebViewPresenter: WebViewPresenterProtocol {
 /// создаем объект-дублер для первого теста (1-test)
 final class WebViewPresenterSpy: WebViewPresenterProtocol {
     var view: WebViewViewControllerProtocol?
+    var delegate: WebViewViewControllerDelegate?
     var viewDidLoadCalled: Bool = false
     func viewDidLoad() {
         viewDidLoadCalled = true

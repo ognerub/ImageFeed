@@ -9,7 +9,7 @@ import UIKit
 import WebKit
 
 /// протокол для рефакторинга - прописываем что может видеть MVP
-public protocol WebViewViewControllerProtocol: AnyObject {
+protocol WebViewViewControllerProtocol: AnyObject {
     var presenter: WebViewPresenterProtocol? { get set }
     func load(request: URLRequest)
     func setProgressValue(_ newValue: Float)
@@ -29,8 +29,6 @@ final class WebViewViewController: UIViewController, WebViewViewControllerProtoc
     /// переменная для нового API
     private var estimatedProgressObservation: NSKeyValueObservation?
     private var alertPresenter: AlertPresenterProtocol?
-
-    weak var delegate: WebViewViewControllerDelegate?
     
     /// переменная для рефакторинга - создаем переменную, которя соответствует протоколу MVP
     var presenter: WebViewPresenterProtocol?
@@ -86,7 +84,7 @@ final class WebViewViewController: UIViewController, WebViewViewControllerProtoc
     }
     
     @IBAction func didTapNavBackButton(_ sender: Any) {
-        delegate?.webViewViewControllerDidCancel(self)
+        presenter?.delegate?.webViewViewControllerDidCancel(self)
     }
 }
 
@@ -98,7 +96,7 @@ extension WebViewViewController: WKNavigationDelegate {
         decisionHandler: @escaping (WKNavigationActionPolicy) -> Void
     ) {
         if let code = code(from: navigationAction) {
-            delegate?.webViewViewController(self, didAuthenticateWithCode: code)
+            presenter?.delegate?.webViewViewController(self, didAuthenticateWithCode: code)
             decisionHandler(.cancel)
         } else {
             decisionHandler(.allow)
