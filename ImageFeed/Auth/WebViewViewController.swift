@@ -14,6 +14,7 @@ protocol WebViewViewControllerProtocol: AnyObject {
     func load(request: URLRequest)
     func setProgressValue(_ newValue: Float)
     func setProgressHidden(_ isHidden: Bool)
+    func shouldHideProgress(for value: Float) -> Bool
 }
 
 protocol WebViewViewControllerDelegate: AnyObject {
@@ -114,4 +115,7 @@ final class WebViewViewControllerSpy: WebViewViewControllerProtocol {
     }
     func setProgressValue(_ newValue: Float) { }
     func setProgressHidden(_ isHidden: Bool) { }
+    func shouldHideProgress(for value: Float) -> Bool {
+        abs(value - 1.0) <= 0.0001
+    }
 }
