@@ -30,7 +30,6 @@ final class AuthViewController: UIViewController {
             let authHelper = AuthHelper()
             let webViewPresenter = WebViewPresenter(authHelper: authHelper, delegate: self)
             webViewViewController.presenter = webViewPresenter
-            webViewViewController.webView.accessibilityIdentifier = "UnsplashWebView"
             webViewPresenter.view = webViewViewController
         } else {
             super.prepare(for: segue, sender: sender) // 6
