@@ -120,13 +120,12 @@ private extension SplashViewController {
     func fetchProfileImageSimple() {
         profileImageService.fetchProfileImageURL(username: profileService.profile?.username ?? "username") { [weak self] result in
             guard let self = self else {return }
+            UIBlockingProgressHUD.dismiss()
             switch result {
             case .success:
-                UIBlockingProgressHUD.dismiss()
                 self.switchToTabBarController()
             case .failure:
                 self.showNetWorkErrorForSpashVC()
-                UIBlockingProgressHUD.dismiss()
             }
         }
     }

@@ -63,7 +63,7 @@ private extension ProfileService {
         builder.makeHTTPRequest(
             path: "/me",
             httpMethod: "GET",
-            baseURLString: Constants.defaultAPIURLString)
+            baseURLString: AuthConfiguration.standart.defaultBaseURLString)
     }
 }
 

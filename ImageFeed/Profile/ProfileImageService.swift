@@ -62,6 +62,6 @@ private extension ProfileImageService {
         builder.makeHTTPRequest(
             path: "/users/\(username)",
             httpMethod: "GET",
-            baseURLString: Constants.defaultAPIURLString)
+            baseURLString: AuthConfiguration.standart.defaultBaseURLString)
     }
 }

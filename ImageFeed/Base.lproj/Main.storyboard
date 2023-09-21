@@ -31,7 +31,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="393" height="252"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Stub" translatesAutoresizingMaskIntoConstraints="NO" id="88g-Xj-hRB" userLabel="Cell Image">
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="88g-Xj-hRB" userLabel="Cell Image">
                                                     <rect key="frame" x="16" y="4" width="361" height="244"/>
                                                     <userDefinedRuntimeAttributes>
                                                         <userDefinedRuntimeAttribute type="boolean" keyPath="layer.maskToBounds" value="YES"/>
@@ -42,6 +42,9 @@
                                                 </imageView>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="AOW-Xz-HGP" userLabel="Like Button">
                                                     <rect key="frame" x="333" y="4" width="44" height="44"/>
+                                                    <accessibility key="accessibilityConfiguration">
+                                                        <bool key="isElement" value="NO"/>
+                                                    </accessibility>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="44" id="FQa-ll-gXk"/>
                                                         <constraint firstAttribute="height" constant="44" id="SoX-MW-XYO"/>
@@ -119,7 +122,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1889.3129770992366" y="-35.211267605633807"/>
+            <point key="canvasLocation" x="2323" y="-38"/>
         </scene>
         <!--Single Image View Controller-->
         <scene sceneID="87Y-j3-tze">
@@ -129,16 +132,17 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jlJ-9r-M57">
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" placeholderIntrinsicWidth="393" placeholderIntrinsicHeight="852" translatesAutoresizingMaskIntoConstraints="NO" id="jlJ-9r-M57">
                                 <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                                 <subviews>
-                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" placeholderIntrinsicWidth="414" placeholderIntrinsicHeight="414" translatesAutoresizingMaskIntoConstraints="NO" id="THY-Nk-6W6" userLabel="Image View">
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" placeholderIntrinsicWidth="414" placeholderIntrinsicHeight="414" translatesAutoresizingMaskIntoConstraints="NO" id="THY-Nk-6W6" userLabel="Image View">
                                         <rect key="frame" x="0.0" y="0.0" width="414" height="414"/>
+                                        <color key="backgroundColor" name="YP Black"/>
                                     </imageView>
                                 </subviews>
                                 <constraints>
+                                    <constraint firstAttribute="bottom" secondItem="THY-Nk-6W6" secondAttribute="bottom" id="NzW-Eu-s35"/>
                                     <constraint firstItem="THY-Nk-6W6" firstAttribute="leading" secondItem="jlJ-9r-M57" secondAttribute="leading" id="rUc-0R-PlJ"/>
-                                    <constraint firstAttribute="bottom" secondItem="THY-Nk-6W6" secondAttribute="bottom" id="wnU-8x-y6J"/>
                                     <constraint firstAttribute="trailing" secondItem="THY-Nk-6W6" secondAttribute="trailing" id="wsX-n9-yhN"/>
                                     <constraint firstItem="THY-Nk-6W6" firstAttribute="top" secondItem="jlJ-9r-M57" secondAttribute="top" id="zvh-5q-nHI"/>
                                 </constraints>
@@ -150,6 +154,7 @@
                             </scrollView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Rtl-e5-nU0" userLabel="BackButton">
                                 <rect key="frame" x="8" y="67" width="44" height="44"/>
+                                <accessibility key="accessibilityConfiguration" identifier="BackButton"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="44" id="GVp-Zd-RgR"/>
                                     <constraint firstAttribute="height" constant="44" id="hui-TW-Dk7"/>
@@ -193,10 +198,10 @@
                             <constraint firstItem="dRl-O5-WPH" firstAttribute="centerX" secondItem="TYJ-I5-Hj9" secondAttribute="centerX" id="79w-P7-hKj"/>
                             <constraint firstItem="jlJ-9r-M57" firstAttribute="top" secondItem="TYJ-I5-Hj9" secondAttribute="top" id="85B-Kb-JMM"/>
                             <constraint firstAttribute="bottom" secondItem="dRl-O5-WPH" secondAttribute="bottom" constant="51" id="Lpm-DN-CRL"/>
-                            <constraint firstItem="djn-nm-vxL" firstAttribute="trailing" secondItem="jlJ-9r-M57" secondAttribute="trailing" id="MUH-iV-Faw"/>
+                            <constraint firstAttribute="trailing" secondItem="jlJ-9r-M57" secondAttribute="trailing" id="MUH-iV-Faw"/>
                             <constraint firstAttribute="bottom" secondItem="jlJ-9r-M57" secondAttribute="bottom" id="Zow-FK-drJ"/>
                             <constraint firstItem="Rtl-e5-nU0" firstAttribute="leading" secondItem="djn-nm-vxL" secondAttribute="leading" constant="8" id="cGt-pe-FSV"/>
-                            <constraint firstItem="djn-nm-vxL" firstAttribute="leading" secondItem="jlJ-9r-M57" secondAttribute="leading" id="rD2-y5-F9A"/>
+                            <constraint firstAttribute="leading" secondItem="jlJ-9r-M57" secondAttribute="leading" id="rD2-y5-F9A"/>
                             <constraint firstItem="Rtl-e5-nU0" firstAttribute="top" secondItem="djn-nm-vxL" secondAttribute="top" constant="8" id="tZN-Zi-mLY"/>
                         </constraints>
                     </view>
@@ -208,7 +213,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="9Xj-TM-a8D" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2802.2900763358775" y="-35.211267605633807"/>
+            <point key="canvasLocation" x="3234" y="-38"/>
         </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="wjq-0I-Gry">
@@ -226,7 +231,7 @@
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="I4k-Ne-NFa" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="894" y="-395"/>
+            <point key="canvasLocation" x="1405" y="-38"/>
         </scene>
         <!--AuthViewController-->
         <scene sceneID="r4A-bp-DJ1">
@@ -246,6 +251,7 @@
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eCS-vf-hxc" userLabel="EnterButton">
                                 <rect key="frame" x="16" y="680" width="361" height="48"/>
                                 <color key="backgroundColor" name="YP White"/>
+                                <accessibility key="accessibilityConfiguration" identifier="Authenticate"/>
                                 <constraints>
                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="44" id="pkU-vm-3xJ"/>
                                     <constraint firstAttribute="height" constant="48" id="xAq-vo-jhH"/>
@@ -278,12 +284,12 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="QLl-BL-KaO" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="5591.6030534351139" y="-1467.605633802817"/>
+            <point key="canvasLocation" x="1888" y="-796"/>
         </scene>
         <!--Web View View Controller-->
         <scene sceneID="Cpk-z2-sr1">
             <objects>
-                <viewController id="hjM-UW-NDw" customClass="WebViewViewController" customModule="ImageFeed" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="WebViewViewController" id="hjM-UW-NDw" customClass="WebViewViewController" customModule="ImageFeed" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="TcO-oN-ttA">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -334,7 +340,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="qcs-il-LOJ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="6504.5801526717551" y="-1468.3098591549297"/>
+            <point key="canvasLocation" x="2801" y="-796"/>
         </scene>
     </scenes>
     <resources>
@@ -343,7 +349,6 @@
         <image name="BackArrowBlack" width="24" height="24"/>
         <image name="LikeOn" width="42" height="42"/>
         <image name="Sharing" width="51" height="50"/>
-        <image name="Stub" width="343" height="252"/>
         <image name="tab_editorial_active" width="75" height="49"/>
         <namedColor name="YP Black">
             <color red="0.10199999809265137" green="0.10599999874830246" blue="0.13300000131130219" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

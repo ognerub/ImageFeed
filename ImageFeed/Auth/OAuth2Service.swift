@@ -62,15 +62,15 @@ final class OAuth2Service {
 private extension OAuth2Service {
     /// метод для запроса токена
     func authTokenRequest(code: String) -> URLRequest? {
-        let path: String = Constants.unsplashOauthTokenPath
-        + "?client_id=\(Constants.accessKey)"
-        + "&&client_secret=\(Constants.secretKey)"
-        + "&&redirect_uri=\(Constants.redirectURI)"
+        let path: String = "/oauth/token/"
+        + "?client_id=\(AuthConfiguration.standart.accessKey)"
+        + "&&client_secret=\(AuthConfiguration.standart.secretKey)"
+        + "&&redirect_uri=\(AuthConfiguration.standart.redirectURI)"
         + "&&code=\(code)"
         + "&&grant_type=authorization_code"
         return builder.makeHTTPRequest(
             path: path,
             httpMethod: "POST",
-            baseURLString: Constants.defaultBaseURLString)
+            baseURLString: String(AuthConfiguration.standart.authURLString.prefix(20)))
     }
 }

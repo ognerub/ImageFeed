@@ -15,16 +15,16 @@ final class OAuth2TokenStorage {
     
     var token: String? {
         get {
-            keychainWrapper.string(forKey: Constants.bearerToken)
+            keychainWrapper.string(forKey: "Bearer Token")
         }
         set {
             guard let newValue = newValue else { return }
-            keychainWrapper.set(newValue, forKey: Constants.bearerToken)
+            keychainWrapper.set(newValue, forKey: "Bearer Token")
         }
     }
     
     func nilTokenInUserDefaults() {
         token = nil
-        keychainWrapper.removeObject(forKey: Constants.bearerToken)
+        keychainWrapper.removeObject(forKey: "Bearer Token")
     }
 }
