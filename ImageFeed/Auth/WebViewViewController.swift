@@ -24,13 +24,13 @@ protocol WebViewViewControllerDelegate: AnyObject {
 
 final class WebViewViewController: UIViewController, WebViewViewControllerProtocol {
     
-    private var estimatedProgressObservation: NSKeyValueObservation?
-    private var alertPresenter: AlertPresenterProtocol?
-    
     var presenter: WebViewPresenterProtocol?
     
     @IBOutlet private var webView: WKWebView!
     @IBOutlet private var progressView: UIProgressView!
+    
+    private var estimatedProgressObservation: NSKeyValueObservation?
+    private var alertPresenter: AlertPresenterProtocol?
     
     override func loadView() {
         super.loadView()

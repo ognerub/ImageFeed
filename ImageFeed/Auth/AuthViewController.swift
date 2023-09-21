@@ -13,12 +13,12 @@ protocol AuthViewControllerDelegate: AnyObject {
 
 final class AuthViewController: UIViewController {
     
+    weak var delegate: AuthViewControllerDelegate?
+    
     private let showWebViewIdentifier: String = "ShowWebView"
     private var oAuth2Service = OAuth2Service()
     private var oAuth2TokenStorage = OAuth2TokenStorage()
     private var splashViewController = SplashViewController()
-    
-    weak var delegate: AuthViewControllerDelegate?
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == showWebViewIdentifier {

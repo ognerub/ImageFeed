@@ -23,10 +23,6 @@ protocol ProfilePresenterProtocol {
 
 final class ProfilePresenter: ProfilePresenterProtocol {
     
-    private let profileService = ProfileService.shared
-    private let profileImageService = ProfileImageService.shared
-    private let storage = OAuth2TokenStorage.shared
-    
     var profileView: UIView = {
         let profileView = UIView(frame: .zero)
         profileView.backgroundColor = UIColor(named: "YP Black")
@@ -74,6 +70,10 @@ final class ProfilePresenter: ProfilePresenterProtocol {
     }()
     
     weak var viewController: ProfileViewControllerProtocol?
+    
+    private let profileService = ProfileService.shared
+    private let profileImageService = ProfileImageService.shared
+    private let storage = OAuth2TokenStorage.shared
     
     private func updateProfileDetails(profile: Profile) {
         personNameLabel.text = profile.name

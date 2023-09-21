@@ -14,12 +14,11 @@ protocol ProfileViewControllerProtocol: AnyObject {
 
 final class ProfileViewController: UIViewController, ProfileViewControllerProtocol {
     
-    private let splashViewController = SplashViewController.shared
-    
-    private var profileImageServiceObserver: NSObjectProtocol?
-    
     var alertPresenter: AlertPresenterProtocol?
     var presenter: ProfilePresenterProtocol!
+    
+    private let splashViewController = SplashViewController.shared
+    private var profileImageServiceObserver: NSObjectProtocol?
     
     override func loadView() {
         super.loadView()
