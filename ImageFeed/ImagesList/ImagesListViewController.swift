@@ -87,11 +87,11 @@ final class ImagesListViewController: UIViewController, ImagesListViewController
     }
     
     private func changeCellLike(for cell: ImagesListCell) {
+        cellLikeAnimation(for: cell)
         guard let indexPath = tableView.indexPath(for: cell) else { return }
         let photo = photos[indexPath.row]
-        UIBlockingProgressHUD.show()
         imagesListService.changeLike(photoId: photo.id, isLike: !photo.isLiked) { result in
-            UIBlockingProgressHUD.dismiss()
+            cell.cellLikeButton.layer.removeAllAnimations()
             switch result {
             case .success:
                 self.photos = self.imagesListService.photos
@@ -101,6 +101,19 @@ final class ImagesListViewController: UIViewController, ImagesListViewController
             case .failure:
                 self.presenter.showNetWorkErrorForImagesListVC() {
                     self.changeCellLike(for: cell)
+                }
+            }
+        }
+    }
+    
+    private func cellLikeAnimation(for cell: ImagesListCell) {
+        UIView.animateKeyframes(withDuration: 1, delay: 0, options: .repeat) {
+            for startTime in 0..<2 {
+                UIView.addKeyframe(withRelativeStartTime: 0 + Double(startTime) / 10, relativeDuration: 0.1) {
+                    cell.cellLikeButton.transform = CGAffineTransform(scaleX: 1.5, y: 1.5)
+                }
+                UIView.addKeyframe(withRelativeStartTime: 0.1 + Double(startTime) / 10, relativeDuration: 0.1) {
+                    cell.cellLikeButton.transform = .identity
                 }
             }
         }

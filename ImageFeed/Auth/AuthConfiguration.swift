@@ -14,7 +14,7 @@ let scope = "public+read_user+write_likes"
 let base = "https://api.unsplash.com"
 let auth = "https://unsplash.com/oauth/authorize"
 let bearer = "Bearer Token"
-let scaled = 700.0
+let scaled = 700.0 /// this is scaled width of image to export (share with telegram or whats app)
 
 struct AuthConfiguration {
     
