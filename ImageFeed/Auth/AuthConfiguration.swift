@@ -14,6 +14,7 @@ let scope = "public+read_user+write_likes"
 let base = "https://api.unsplash.com"
 let auth = "https://unsplash.com/oauth/authorize"
 let bearer = "Bearer Token"
+let scaled = 700.0
 
 struct AuthConfiguration {
     
@@ -24,6 +25,7 @@ struct AuthConfiguration {
     let defaultBaseURLString: String
     let authURLString: String
     let bearerTokenString: String
+    let scaledWidth: Double
 
     init(
         accessKey: String,
@@ -32,7 +34,8 @@ struct AuthConfiguration {
         accessScope: String,
         defaultBaseURLString: String,
         authURLString: String,
-        bearerTokenString: String
+        bearerTokenString: String,
+        scaledWidth: Double
     ) {
         self.accessKey = accessKey
         self.secretKey = secretKey
@@ -41,6 +44,7 @@ struct AuthConfiguration {
         self.defaultBaseURLString = defaultBaseURLString
         self.authURLString = authURLString
         self.bearerTokenString = bearerTokenString
+        self.scaledWidth = scaledWidth
     }
     
     static var standart: AuthConfiguration {
@@ -50,7 +54,8 @@ struct AuthConfiguration {
                                  accessScope: scope,
                                  defaultBaseURLString: base,
                                  authURLString: auth,
-                                 bearerTokenString: bearer)
+                                 bearerTokenString: bearer,
+                                 scaledWidth: scaled)
     }
     
 }

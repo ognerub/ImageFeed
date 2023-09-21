@@ -32,8 +32,9 @@ final class SingleImageViewController: UIViewController {
     }
     
     @IBAction private func didTapShareButton(_ sender: UIButton) {
-        let image: UIImage = singleImageView.image ?? UIBlockingProgressHUD.MyIndicator().image
-        let item: [Any] = [image]
+        guard let image: UIImage = singleImageView.image else { return }
+        let scaleImageRatio = AuthConfiguration.standart.scaledWidth / image.size.width
+        let item: [Any] = [image.scalePreservingAspectRatio(targetSizeScale: scaleImageRatio)]
         let ac = UIActivityViewController(activityItems: item, applicationActivities: nil)
         present(ac, animated: true)
     }
