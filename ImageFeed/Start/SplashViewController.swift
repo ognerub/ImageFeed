@@ -11,7 +11,6 @@ import ProgressHUD
 final class SplashViewController: UIViewController {
     
     static let shared = SplashViewController()
-    
     private let tabBarViewControllerIdentifier = "TabBarController"
     private let authViewControllerIdentifier = "AuthViewController"
     private let mainUIStoryboard = "Main"
@@ -19,9 +18,7 @@ final class SplashViewController: UIViewController {
     private let oAuth2Service = OAuth2Service.shared
     private let profileService = ProfileService.shared
     private let profileImageService = ProfileImageService.shared
-    
     private var alertPresenter: AlertPresenterProtocol?
-    
     private var unsplashLogo: UIImageView = {
         let unsplashLogoImage = UIImage(named: "Vector") ?? UIImage(systemName: "sun")!
         let unsplashLogoView = UIImageView(image: unsplashLogoImage)

@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import WebKit
 import Kingfisher
 
 protocol ProfilePresenterProtocol {
@@ -21,11 +22,6 @@ protocol ProfilePresenterProtocol {
 }
 
 final class ProfilePresenter: ProfilePresenterProtocol {
-    
-    private let profileService = ProfileService.shared
-    private let profileImageService = ProfileImageService.shared
-    private let storage = OAuth2TokenStorage.shared
-    private let webViewViewController = WebViewViewController.shared
     
     var profileView: UIView = {
         let profileView = UIView(frame: .zero)
@@ -74,6 +70,10 @@ final class ProfilePresenter: ProfilePresenterProtocol {
     }()
     
     weak var viewController: ProfileViewControllerProtocol?
+    
+    private let profileService = ProfileService.shared
+    private let profileImageService = ProfileImageService.shared
+    private let storage = OAuth2TokenStorage.shared
     
     private func updateProfileDetails(profile: Profile) {
         personNameLabel.text = profile.name
@@ -129,12 +129,25 @@ final class ProfilePresenter: ProfilePresenterProtocol {
                 secondButton: "Нет",
                 firstCompletion: {
                     self.storage.nilTokenInUserDefaults()
-                    self.webViewViewController.cleanWebViewAfterUse()
+                    self.cleanWebViewAfterUse()
                     self.switchToSplashViewController()
                 },
                 secondCompletion: { })
             self.viewController?.alertPresenter?.show(with: model)
         }
+    }
+    
+    func cleanWebViewAfterUse() {
+        HTTPCookieStorage.shared.removeCookies(since: Date.distantPast)
+        WKWebsiteDataStore.default().fetchDataRecords(
+            ofTypes: WKWebsiteDataStore.allWebsiteDataTypes()) { records in
+                records.forEach { record in
+                    WKWebsiteDataStore.default().removeData(
+                        ofTypes: record.dataTypes,
+                        for: [record],
+                        completionHandler: {})
+                }
+            }
     }
 }
 

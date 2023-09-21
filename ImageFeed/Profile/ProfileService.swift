@@ -9,12 +9,9 @@ import Foundation
 
 final class ProfileService {
     
-    // создаем наш первый и самый простой синглтон
     static let shared = ProfileService()
-    
     private let builder: URLRequestBuilder
     private let urlSession: URLSession
-    
     private (set) var profile: Profile?
     private var currentTask: URLSessionTask?
     

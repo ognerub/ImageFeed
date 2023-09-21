@@ -16,15 +16,15 @@ protocol ImagesListViewControllerProtocol: AnyObject {
 
 final class ImagesListViewController: UIViewController, ImagesListViewControllerProtocol {
     
-    private let showSingleImageSequeIdentifier = "ShowSingleImage"
-    
-    private var imagesListServiceObserver: NSObjectProtocol?
-    
     var alertPresenter: AlertPresenterProtocol?
     var presenter: ImagesListPresenterProtocol!
     var photos: [Photo] = []
     
     @IBOutlet var tableView: UITableView!
+    
+    private let showSingleImageSequeIdentifier = "ShowSingleImage"
+    private let imagesListService = ImagesListService.shared
+    private var imagesListServiceObserver: NSObjectProtocol?
     
     override func loadView() {
         super.loadView()
@@ -60,6 +60,51 @@ final class ImagesListViewController: UIViewController, ImagesListViewController
         self.presenter = presenter
         self.presenter.viewController = self
     }
+    
+    private func configCell(at indexPath: IndexPath, cell: CellViewModel) {
+        let items = CellViewModel(
+            cellImage: cell.cellImage,
+            cellDateLabel: cell.cellDateLabel,
+            cellLikeButton: cell.cellLikeButton)
+        guard let image = UIImage(named: "Stub") else { return}
+        items.cellImage.kf.indicatorType = .custom(indicator: UIBlockingProgressHUD.MyIndicator())
+        items.cellImage.kf.setImage(with: URL(string:photos[indexPath.row].thumbImageURL)) { result in
+            switch result {
+            case .success(_):
+                items.cellImage.contentMode = UIView.ContentMode.scaleAspectFit
+                self.tableView.reloadRows(at: [indexPath], with: .automatic)
+            case .failure(_):
+                items.cellImage.contentMode = UIView.ContentMode.center
+                items.cellImage.backgroundColor = UIColor(named: "YP Grey")
+                items.cellImage.image = image
+            }
+        }
+        items.cellDateLabel.text = photos[indexPath.row].createdAt ?? ""
+        let isLiked = photos[indexPath.row].isLiked
+        let likeImage = isLiked ? UIImage(named: "LikeOn") : UIImage(named: "LikeOff")
+        items.cellLikeButton.accessibilityIdentifier = "LikeButton"
+        items.cellLikeButton.setImage(likeImage, for: .normal)
+    }
+    
+    private func changeCellLike(for cell: ImagesListCell) {
+        guard let indexPath = tableView.indexPath(for: cell) else { return }
+        let photo = photos[indexPath.row]
+        UIBlockingProgressHUD.show()
+        imagesListService.changeLike(photoId: photo.id, isLike: !photo.isLiked) { result in
+            UIBlockingProgressHUD.dismiss()
+            switch result {
+            case .success:
+                self.photos = self.imagesListService.photos
+                let isLiked = self.photos[indexPath.row].isLiked
+                let likeImage = isLiked ? UIImage(named: "LikeOn") : UIImage(named: "LikeOff")
+                cell.cellLikeButton.setImage(likeImage, for: .normal)
+            case .failure:
+                self.presenter.showNetWorkErrorForImagesListVC() {
+                    self.changeCellLike(for: cell)
+                }
+            }
+        }
+    }
 }
 
 // MARK: - UITableViewDelegate
@@ -90,7 +135,7 @@ extension ImagesListViewController: UITableViewDelegate {
 extension ImagesListViewController: ImagesListCellDelegate {
     /// вызываем запрос в сеть со сменой текущего состояния лайка, на время запроса блокируем интерфейс
     func imageListCellDidTapLike(_ cell: ImagesListCell) {
-        presenter.changeCellLike(for: cell)
+        changeCellLike(for: cell)
     }
 }
 
@@ -107,7 +152,11 @@ extension ImagesListViewController: UITableViewDataSource {
             return UITableViewCell()
         }
         imageListCell.delegate = self
-        presenter.configCellContent(for: imageListCell)
+        let cellViewModel = CellViewModel(
+            cellImage: imageListCell.cellImage,
+            cellDateLabel: imageListCell.cellDateLabel,
+            cellLikeButton: imageListCell.cellLikeButton)
+        configCell(at: indexPath, cell: cellViewModel)
         return imageListCell
     }
 }

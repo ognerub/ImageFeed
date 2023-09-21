@@ -21,6 +21,7 @@ final class URLRequestBuilder {
         httpMethod: String,
         baseURLString: String) -> URLRequest? {
             guard
+                baseURLString.isValidURL,
                 let url = URL(string: baseURLString),
                 let baseURL = URL(string: path, relativeTo: url)
             else { return nil }

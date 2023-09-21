@@ -9,11 +9,12 @@ import UIKit
 import WebKit
 
 /// протокол для рефакторинга - прописываем что может видеть MVP
-public protocol WebViewViewControllerProtocol: AnyObject {
+protocol WebViewViewControllerProtocol: AnyObject {
     var presenter: WebViewPresenterProtocol? { get set }
     func load(request: URLRequest)
     func setProgressValue(_ newValue: Float)
     func setProgressHidden(_ isHidden: Bool)
+    func shouldHideProgress(for value: Float) -> Bool
 }
 
 protocol WebViewViewControllerDelegate: AnyObject {
@@ -23,31 +24,24 @@ protocol WebViewViewControllerDelegate: AnyObject {
 
 final class WebViewViewController: UIViewController, WebViewViewControllerProtocol {
     
-    static let shared = WebViewViewController()
-    private let splashViewController = SplashViewController.shared
-    
-    /// переменная для нового API
-    private var estimatedProgressObservation: NSKeyValueObservation?
-    private var alertPresenter: AlertPresenterProtocol?
-
-    weak var delegate: WebViewViewControllerDelegate?
-    
-    /// переменная для рефакторинга - создаем переменную, которя соответствует протоколу MVP
     var presenter: WebViewPresenterProtocol?
     
     @IBOutlet private var webView: WKWebView!
     @IBOutlet private var progressView: UIProgressView!
     
+    private var estimatedProgressObservation: NSKeyValueObservation?
+    private var alertPresenter: AlertPresenterProtocol?
+    
     override func loadView() {
         super.loadView()
-        webView.accessibilityIdentifier = "UnsplashWebView"
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         alertPresenter = AlertPresenterImpl(viewController: self)
         webView.navigationDelegate = self
-        
+        webView.accessibilityIdentifier = "UnsplashWebView"
+        didUpdateProgressValue(0)
         presenter?.viewDidLoad()
         
         estimatedProgressObservation = webView.observe(
@@ -55,7 +49,7 @@ final class WebViewViewController: UIViewController, WebViewViewControllerProtoc
              options: [],
              changeHandler: {[weak self] _, _ in
                  guard let self = self else { return }
-                 self.presenter?.didUpdateProgressValue(self.webView.estimatedProgress)
+                 self.didUpdateProgressValue(self.webView.estimatedProgress)
              })
     }
     
@@ -65,28 +59,27 @@ final class WebViewViewController: UIViewController, WebViewViewControllerProtoc
     }
     /// функция для рефакторинга - установка значения progressBar
     func setProgressValue(_ newValue: Float) {
-        progressView.progress = newValue
+        progressView.setProgress(newValue, animated: true)
     }
     /// функция для рефакторинга - скрытие progressBar
     func setProgressHidden(_ isHidden: Bool) {
         progressView.isHidden = isHidden
     }
     
-    func cleanWebViewAfterUse() {
-        HTTPCookieStorage.shared.removeCookies(since: Date.distantPast)
-        WKWebsiteDataStore.default().fetchDataRecords(
-            ofTypes: WKWebsiteDataStore.allWebsiteDataTypes()) { records in
-                records.forEach { record in
-                    WKWebsiteDataStore.default().removeData(
-                        ofTypes: record.dataTypes,
-                        for: [record],
-                        completionHandler: {})
-                }
-            }
+    func didUpdateProgressValue(_ newValue: Double) {
+        let newProgressValue = Float(newValue)
+        setProgressValue(newProgressValue)
+        
+        let shouldHideProgress = shouldHideProgress(for: newProgressValue)
+        setProgressHidden(shouldHideProgress)
+    }
+    
+    func shouldHideProgress(for value: Float) -> Bool {
+        abs(value - 1.0) <= 0.0001
     }
     
     @IBAction func didTapNavBackButton(_ sender: Any) {
-        delegate?.webViewViewControllerDidCancel(self)
+        presenter?.delegate?.webViewViewControllerDidCancel(self)
     }
 }
 
@@ -98,7 +91,7 @@ extension WebViewViewController: WKNavigationDelegate {
         decisionHandler: @escaping (WKNavigationActionPolicy) -> Void
     ) {
         if let code = code(from: navigationAction) {
-            delegate?.webViewViewController(self, didAuthenticateWithCode: code)
+            presenter?.delegate?.webViewViewController(self, didAuthenticateWithCode: code)
             decisionHandler(.cancel)
         } else {
             decisionHandler(.allow)
@@ -123,4 +116,7 @@ final class WebViewViewControllerSpy: WebViewViewControllerProtocol {
     }
     func setProgressValue(_ newValue: Float) { }
     func setProgressHidden(_ isHidden: Bool) { }
+    func shouldHideProgress(for value: Float) -> Bool {
+        abs(value - 1.0) <= 0.0001
+    }
 }

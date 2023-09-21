@@ -30,11 +30,12 @@ final class WebViewTests: XCTestCase {
         // given
         let viewController = WebViewViewControllerSpy()
         let authHelper = AuthHelper() // Dummy (пустышка)
-        let presenter = WebViewPresenter(authHelper: authHelper)
+        let presenter = WebViewPresenterSpy()
         viewController.presenter = presenter
         presenter.view = viewController
+        let request = URLRequest(url: URL(string: "apple.com")!)
         // when
-        presenter.viewDidLoad()
+        viewController.load(request: request)
         // then
         XCTAssertTrue(viewController.loadRequestCalled)
     }
@@ -42,11 +43,15 @@ final class WebViewTests: XCTestCase {
     // 2 test
     func testProgeessVisibleWhenLessThenOne() {
         // given
+        let viewController = WebViewViewControllerSpy()
+        let authViewController = AuthViewController()
         let authHelper = AuthHelper()
-        let presenter = WebViewPresenter(authHelper: authHelper)
+        let presenter = WebViewPresenter(authHelper: authHelper, delegate: authViewController)
+        viewController.presenter = presenter
+        presenter.view = viewController
         let progress: Float = 0.6
         // when
-        let shouldHideProgress = presenter.shouldHideProgress(for: progress)
+        let shouldHideProgress = viewController.shouldHideProgress(for: progress)
         //then
         XCTAssertFalse(shouldHideProgress)
     }
@@ -54,11 +59,15 @@ final class WebViewTests: XCTestCase {
     // 2 self-test
     func testProgressHiddenWhenOne() {
         // given
+        let viewController = WebViewViewControllerSpy()
+        let authViewController = AuthViewController()
         let authHelper = AuthHelper()
-        let presenter = WebViewPresenter(authHelper: authHelper)
+        let presenter = WebViewPresenter(authHelper: authHelper, delegate: authViewController)
+        viewController.presenter = presenter
+        presenter.view = viewController
         let progress: Float = 1
         // when
-        let shouldHideProgress = presenter.shouldHideProgress(for: progress)
+        let shouldHideProgress = viewController.shouldHideProgress(for: progress)
         //then
         XCTAssertTrue(shouldHideProgress)
     }
@@ -70,7 +79,7 @@ final class WebViewTests: XCTestCase {
         let authHelper = AuthHelper(configuration: configuration)
         // when
         let url = authHelper.authURL()
-        let urlString = url.absoluteString
+        let urlString = url!.absoluteString
         // then
         XCTAssertTrue(urlString.contains(configuration.authURLString))
         XCTAssertTrue(urlString.contains(configuration.accessKey))
