@@ -53,7 +53,6 @@ extension SingleImageViewController: UIScrollViewDelegate {
     /// метод, который вызывается после завершения зума пользователем (для способа 2)
     func scrollViewDidEndZooming(_ scrollView: UIScrollView, with view: UIView?, atScale scale: CGFloat) {
         UIView.animate(withDuration: 0.5) {
-            //self.rescaleAndCenterImageInScrollViewV2()
             self.rescaleAndCenterImageInScrollView(image: self.singleImageView.image!)
         }
     }

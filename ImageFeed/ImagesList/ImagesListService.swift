@@ -97,7 +97,7 @@ final class ImagesListService {
                             size: photo.size,
                             createdAt: photo.createdAt,
                             welcomeDescription: photo.welcomeDescription,
-                            thumbImageURL: photo.largeImageURL,
+                            thumbImageURL: photo.thumbImageURL,
                             largeImageURL: photo.largeImageURL,
                             isLiked: !photo.isLiked
                         )

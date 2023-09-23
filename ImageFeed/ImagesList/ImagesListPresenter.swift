@@ -14,14 +14,14 @@ protocol ImagesListPresenterProtocol {
     func endlessLoading(indexPath: IndexPath)
     func updateTableViewAnimated()
     func showNetWorkErrorForImagesListVC(completion: @escaping () -> Void)
-    func configCellHeight(indexPath: IndexPath) -> CGFloat
 }
 
 final class ImagesListPresenter: ImagesListPresenterProtocol {
     
-    private let imagesListService = ImagesListService.shared
-    
+    var cellHeightArray: [CGFloat?] = []
     weak var viewController: ImagesListViewControllerProtocol?
+    
+    private let imagesListService = ImagesListService.shared
     
     func viewDidLoad() {
         viewController?.tableView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
@@ -52,7 +52,7 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
             } completion: { _ in}
         }
     }
-        
+    
     func showNetWorkErrorForImagesListVC(completion: @escaping () -> Void) {
         DispatchQueue.main.async {
             let model = AlertModel(
@@ -63,24 +63,6 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
                 firstCompletion: completion,
                 secondCompletion: {})
             self.viewController?.alertPresenter?.show(with: model)
-        }
-    }
-    
-    func configCellHeight(indexPath: IndexPath) -> CGFloat {
-        guard
-            let photos = viewController?.photos,
-            let tableView = viewController?.tableView
-        else { return CGFloat(50)}
-        let imageInsets = UIEdgeInsets(top: 4, left: 16, bottom: 4, right: 16)
-        if photos[indexPath.row].size.height > 50 {
-            let imageViewWidth = tableView.bounds.width - imageInsets.left - imageInsets.right
-            let imageWidth = photos[indexPath.row].size.width
-            let scale = imageViewWidth / imageWidth
-            let cellHeight = photos[indexPath.row].size.height * scale + imageInsets.top + imageInsets.bottom
-            return cellHeight
-        } else {
-            let cellHeight = 50 + imageInsets.top + imageInsets.bottom
-            return cellHeight
         }
     }
     
@@ -101,7 +83,7 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
 }
 
 final class ImagesListPresenterSpy: ImagesListPresenterProtocol {
-
+    
     private let imagesListService = ImagesListService.shared
     
     var viewController: ImagesListViewControllerProtocol?
@@ -120,8 +102,7 @@ final class ImagesListPresenterSpy: ImagesListPresenterProtocol {
     }
     func updateTableViewAnimated() { }
     func showNetWorkErrorForImagesListVC(completion: @escaping () -> Void) {
-            model.title = "success"
-            viewController?.alertPresenter?.show(with: model)
+        model.title = "success"
+        viewController?.alertPresenter?.show(with: model)
     }
-    func configCellHeight(indexPath: IndexPath) -> CGFloat { return CGFloat(50) }
 }

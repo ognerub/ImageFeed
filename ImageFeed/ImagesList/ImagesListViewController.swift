@@ -71,7 +71,7 @@ final class ImagesListViewController: UIViewController, ImagesListViewController
         items.cellImage.kf.setImage(with: URL(string:photos[indexPath.row].thumbImageURL)) { result in
             switch result {
             case .success(_):
-                items.cellImage.contentMode = UIView.ContentMode.scaleAspectFit
+                items.cellImage.contentMode = UIView.ContentMode.scaleAspectFill
                 self.tableView.reloadRows(at: [indexPath], with: .automatic)
             case .failure(_):
                 items.cellImage.contentMode = UIView.ContentMode.center
@@ -133,7 +133,7 @@ extension ImagesListViewController: UITableViewDelegate {
     func tableView(
         _ tableView: UITableView,
         heightForRowAt indexPath: IndexPath) -> CGFloat {
-            presenter.configCellHeight(indexPath: indexPath)
+            return UITableView.automaticDimension
         }
     /// данный метод осуществляет запуск загрузки фотографий в случае если текущая строка + 1 равна количеству фотографий в массии (тем самым реализуем предварительную загрузку, не позволив пролистать пользователю ленту до последней фотографии, получаем бесконечную ленту!)
     func tableView(
