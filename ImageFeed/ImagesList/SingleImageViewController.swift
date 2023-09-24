@@ -16,7 +16,7 @@ final class SingleImageViewController: UIViewController {
     
     var fullscreenImageURL: URL?
     
-    var stubImageView: UIImageView = {
+    private var stubImageView: UIImageView = {
         let stubImageView = UIImageView()
         stubImageView.backgroundColor = .clear
         stubImageView.translatesAutoresizingMaskIntoConstraints = false
@@ -68,49 +68,13 @@ extension SingleImageViewController: UIScrollViewDelegate {
 // MARK: - Private functions
 private extension SingleImageViewController {
     
-    func addStubImageView(view: UIView, stubImageView: UIImageView) {
-        let image = UIBlockingProgressHUD.MyIndicator().image
-        
-        let gradient = CAGradientLayer()
-        gradient.frame = CGRect(x: 0, y: 0, width: 166, height: 150)
-        gradient.locations = [0, 0.1, 0.3]
-        gradient.colors = [
-            UIColor(red: 0.682, green: 0.686, blue: 0.706, alpha: 1).cgColor,
-            UIColor(red: 0.531, green: 0.533, blue: 0.553, alpha: 1).cgColor,
-            UIColor(red: 0.431, green: 0.433, blue: 0.453, alpha: 1).cgColor
-        ]
-        gradient.startPoint = CGPoint(x: 0, y: 0)
-        gradient.endPoint = CGPoint(x: 1, y: 1)
-        
-        let gradientChangeAnimation = CABasicAnimation(keyPath: "locations")
-        gradientChangeAnimation.duration = 0.75
-        gradientChangeAnimation.repeatCount = .infinity
-        gradientChangeAnimation.autoreverses = true
-        gradientChangeAnimation.fromValue = [0, 0.1, 0.3]
-        gradientChangeAnimation.toValue = [0, 0.8, 1]
-        gradient.add(gradientChangeAnimation, forKey: "locationsChange")
-        
-        stubImageView.layer.addSublayer(gradient)
-        view.addSubview(stubImageView)
-        
-        NSLayoutConstraint.activate([
-            stubImageView.widthAnchor.constraint(equalToConstant: 166),
-            stubImageView.heightAnchor.constraint(equalToConstant: 150),
-            stubImageView.topAnchor.constraint(equalTo: scrollView.centerYAnchor, constant: -75),
-            stubImageView.leadingAnchor.constraint(equalTo: scrollView.centerXAnchor, constant:  -83)])
-
-        let maskView = UIView(frame: CGRect(x: 0, y: 0, width: 166, height: 150))
-        maskView.layer.contents = image.cgImage
-        stubImageView.mask = maskView
-    }
-    
     func loadFullscreenImage(imageView: UIImageView) {
-        addStubImageView(view: view, stubImageView: stubImageView)
+        UIBlockingProgressHUD().addStubImageView(view: view, stubImageView: stubImageView)
         guard let fullscreenImageURL = fullscreenImageURL else { return }
         imageView.kf.setImage(with: fullscreenImageURL) { result in
             switch result {
             case .success(let result):
-                self.stubImageView.removeFromSuperview()
+                UIBlockingProgressHUD().removeStubImageView(stubImageView: self.stubImageView)
                 self.rescaleAndCenterImageInScrollView(image: result.image)
             case .failure(let error):
                 self.showNetWorkErrorForSingleImageVC {
