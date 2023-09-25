@@ -30,6 +30,7 @@ final class SingleImageViewController: UIViewController {
         super.viewDidLoad()
         scrollView.minimumZoomScale = 0.1
         scrollView.maximumZoomScale = 1.25
+        setupGestureRecognizer()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -113,5 +114,22 @@ private extension SingleImageViewController {
         let x = (newContentSize.width - visibleRectSize.width) / 2
         let y = (newContentSize.height - visibleRectSize.height) / 2
         scrollView.setContentOffset(CGPoint(x: x, y: y), animated: false)
+    }
+}
+
+// MARK: - UIGestureRecognizer
+extension SingleImageViewController {
+    func  setupGestureRecognizer() {
+        let swipeGestureRecognizerDown = UISwipeGestureRecognizer(
+            target: self,
+            action: #selector(didSwipe(_:))
+            )
+        swipeGestureRecognizerDown.direction = .down
+        scrollView.addGestureRecognizer(swipeGestureRecognizerDown)
+    }
+    
+    @objc
+    func didSwipe(_ sender: UIGestureRecognizer) {
+        dismiss(animated: true)
     }
 }
