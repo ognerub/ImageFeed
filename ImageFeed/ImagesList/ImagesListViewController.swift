@@ -140,7 +140,9 @@ extension ImagesListViewController: UITableViewDelegate {
         _ tableView: UITableView,
         willDisplay cell: UITableViewCell,
         forRowAt indexPath: IndexPath) {
-            presenter.endlessLoading(indexPath: indexPath)
+            if let visibleRows = tableView.indexPathsForVisibleRows, indexPath == visibleRows.last {
+                presenter.endlessLoading(indexPath: indexPath)
+            }
         }
 }
 
