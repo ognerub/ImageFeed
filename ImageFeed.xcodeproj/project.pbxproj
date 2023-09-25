@@ -174,8 +174,8 @@
 			isa = PBXGroup;
 			children = (
 				84FC5F2E2A7E9CE00011B164 /* OAuthTokenResponseBody.swift */,
-				84FC5F302A7E9DDD0011B164 /* OAuth2Service.swift */,
 				84DB4E852A7ED5A800B8E3A3 /* OAuth2TokenStorage.swift */,
+				84FC5F302A7E9DDD0011B164 /* OAuth2Service.swift */,
 				848BC92D2A76B6620084D082 /* AuthConfiguration.swift */,
 				844E955C2A783F720037DCE9 /* AuthViewController.swift */,
 				842BDCCA2AB1DB7000F7204A /* AuthHelper.swift */,

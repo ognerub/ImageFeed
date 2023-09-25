@@ -29,7 +29,7 @@ final class ProfileTests: XCTestCase {
         let presenter = ProfilePresenter()
         viewController.configure(presenter)
         // when
-        presenter.viewWillAppear()
+        presenter.viewDidLoad()
         // then
         XCTAssertFalse(presenter.personImageView.isHidden)
     }
@@ -53,7 +53,7 @@ final class ProfileTests: XCTestCase {
         let presenter = ProfilePresenter()
         viewController.configure(presenter)
         // when
-        presenter.viewWillAppear()
+        presenter.viewDidLoad()
         // then
         XCTAssertEqual(presenter.exitButton.tintColor, UIColor(named: "YP Red"))
     }

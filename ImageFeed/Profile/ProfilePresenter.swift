@@ -91,10 +91,17 @@ final class ProfilePresenter: ProfilePresenterProtocol {
         personHashTagLabel.accessibilityIdentifier = "personHashTagLabel"
         exitButton.accessibilityIdentifier = "exitButton"
         
-        guard let profile = profileService.profile else { return }
-        updateProfileDetails(profile: profile)
-        if let url = profileImageService.avatarURL {
-            updateAvatar(url: url)
+        if storage.loginName != nil {
+            personNameLabel.text = storage.loginName
+            personHashTagLabel.text = storage.hashTag
+            personInfoTextLabel.text = storage.infoText
+            updateAvatar(url: URL(string: storage.avatarURL!)!)
+        } else {
+            guard let profile = profileService.profile else { return }
+            updateProfileDetails(profile: profile)
+            if let url = profileImageService.avatarURL {
+                updateAvatar(url: url)
+            }
         }
     }
     

@@ -40,8 +40,11 @@ final class SplashViewController: UIViewController {
         guard !wasChecked else { return }
         wasChecked = true
         if storage.token != nil {
-            //fetchProfileSimple()
-            switchToTabBarController()
+            if storage.loginName != nil {
+                switchToTabBarController()
+            } else {
+                fetchProfileSimple()
+            }
         } else {
             showAuthViewController()
         }

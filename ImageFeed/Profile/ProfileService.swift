@@ -10,6 +10,7 @@ import Foundation
 final class ProfileService {
     
     static let shared = ProfileService()
+    private let storage: OAuth2TokenStorage
     private let builder: URLRequestBuilder
     private let urlSession: URLSession
     private (set) var profile: Profile?
@@ -17,10 +18,12 @@ final class ProfileService {
     
     init(
         urlSession: URLSession = .shared,
-        builder: URLRequestBuilder = .shared
+        builder: URLRequestBuilder = .shared,
+        storage: OAuth2TokenStorage = .shared
     ) {
         self.urlSession = urlSession
         self.builder = builder
+        self.storage = storage
     }
     
     /// получаем информаю профиля в соответсвии с заданной структурой
@@ -43,6 +46,7 @@ final class ProfileService {
                     let bio = body.bio
                     let profile = Profile(username: username, name: "\(firstName) \(lastName ?? "")", loginName: "@\(username)", bio: bio ?? "")
                     self.profile = profile
+                    self.storageUserInfo()
                     completion(.success(profile))
                 case .failure(let error):
                     completion(.failure(error))
@@ -50,6 +54,12 @@ final class ProfileService {
             }
         }
         currentTask?.resume()
+    }
+    
+    func storageUserInfo() {
+        storage.loginName = profile?.name
+        storage.hashTag = profile?.loginName
+        storage.infoText = profile?.bio
     }
 }
 
