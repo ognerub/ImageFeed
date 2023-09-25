@@ -73,6 +73,7 @@ final class ProfilePresenter: ProfilePresenterProtocol {
     private let profileService = ProfileService.shared
     private let profileImageService = ProfileImageService.shared
     private let storage = OAuth2TokenStorage.shared
+    private let imagesListService = ImagesListService.shared
     
     private func updateProfileDetails(profile: Profile) {
         personNameLabel.text = profile.name
@@ -121,6 +122,7 @@ final class ProfilePresenter: ProfilePresenterProtocol {
                     self.storage.nilTokenInUserDefaults()
                     self.cleanWebViewAfterUse()
                     self.switchToSplashViewController()
+                    self.imagesListService.nillLasLoadedPage()
                 },
                 secondCompletion: { })
             self.viewController?.alertPresenter?.show(with: model)

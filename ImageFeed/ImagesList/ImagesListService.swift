@@ -13,12 +13,13 @@ final class ImagesListService {
     
     static let shared = ImagesListService()
     
+    var lastLoadedPage: Int?
+    
     private let urlSession: URLSession
     private let builder: URLRequestBuilder
     
     private var currentTask: URLSessionTask?
     private var likeTask: URLSessionTask?
-    private var lastLoadedPage: Int = 0
     private (set) var photos: [Photo] = []
     
     init (
@@ -29,10 +30,21 @@ final class ImagesListService {
         self.builder = builder
     }
     
+    func getNextPage() -> Int {
+        guard let lastLoadedPage = lastLoadedPage else { return 1 }
+        let currentPage = lastLoadedPage
+        let nextPage = currentPage + 1
+        return nextPage
+    }
+    
+    func nillLasLoadedPage() {
+        lastLoadedPage = nil
+    }
+    
     
     func fetchPhotosNextPage(completion: @escaping (Result<[Photo], Error>) -> Void) {
-        if currentTask != nil { return }
-        let nextPage = lastLoadedPage + 1
+        if currentTask != nil { return } else { currentTask?.cancel() }
+        let nextPage = getNextPage()
         guard let request = urlRequestWithBearerToken(page: nextPage) else {
             print("Invalide request in fetchPhotosNextPage")
             completion(.failure(NetworkError.urlSessionError))
@@ -57,9 +69,7 @@ final class ImagesListService {
                         photos.append(photo)
                     }
                     self.photos.append(contentsOf: photos)
-                    var stopRaceValue = self.lastLoadedPage
-                    stopRaceValue += 1
-                    self.lastLoadedPage = stopRaceValue
+                    self.lastLoadedPage = nextPage
                     NotificationCenter.default.post(
                         name: ImagesListService.DidChangeNotification,
                         object: self,
