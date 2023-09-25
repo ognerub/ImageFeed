@@ -26,6 +26,8 @@ final class SplashViewController: UIViewController {
         return unsplashLogoView
     }()
     
+    private var wasChecked = false
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         alertPresenter = AlertPresenterImpl(viewController: self)
@@ -35,10 +37,10 @@ final class SplashViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        guard !wasChecked else { return }
+        wasChecked = true
         if storage.token != nil {
             fetchProfileSimple()
-            fetchProfileImageSimple()
-            switchToTabBarController()
         } else {
             showAuthViewController()
         }
@@ -103,7 +105,7 @@ private extension SplashViewController {
     
     func fetchProfileSimple() {
         profileService.fetchProfile() { [weak self] result in
-            guard let self = self else {return }
+            guard let self = self else { return }
             switch result {
             case .success:
                 self.fetchProfileImageSimple()
@@ -116,7 +118,7 @@ private extension SplashViewController {
     
     func fetchProfileImageSimple() {
         profileImageService.fetchProfileImageURL(username: profileService.profile?.username ?? "username") { [weak self] result in
-            guard let self = self else {return }
+            guard let self = self else { return }
             UIBlockingProgressHUD.dismiss()
             switch result {
             case .success:
@@ -134,7 +136,9 @@ private extension SplashViewController {
                 message: "Не удалось войти в систему",
                 firstButton: "OK",
                 secondButton: nil,
-                firstCompletion: {},
+                firstCompletion: {
+                    self.wasChecked = false
+                },
                 secondCompletion: {})
             self.alertPresenter?.show(with: model)
         }

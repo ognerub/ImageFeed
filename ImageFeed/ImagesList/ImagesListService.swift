@@ -31,7 +31,7 @@ final class ImagesListService {
     
     
     func fetchPhotosNextPage(completion: @escaping (Result<[Photo], Error>) -> Void) {
-        if currentTask != nil { return } else { currentTask?.cancel() }
+        if currentTask != nil { return }
         let nextPage = lastLoadedPage + 1
         guard let request = urlRequestWithBearerToken(page: nextPage) else {
             print("Invalide request in fetchPhotosNextPage")

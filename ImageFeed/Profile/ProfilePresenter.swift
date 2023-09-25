@@ -15,7 +15,6 @@ protocol ProfilePresenterProtocol {
     var exitButton: UIButton { get set }
     func setupSubViews()
     func viewDidLoad()
-    func viewWillAppear()
     func updateAvatar(url: URL)
     func switchToSplashViewController()
     func showAlertBeforExit()
@@ -95,15 +94,6 @@ final class ProfilePresenter: ProfilePresenterProtocol {
         updateProfileDetails(profile: profile)
         if let url = profileImageService.avatarURL {
             updateAvatar(url: url)
-        }
-    }
-    
-    func viewWillAppear() {
-        guard let profile = profileService.profile else { return }
-        updateProfileDetails(profile: profile)
-        guard let avatarURL = profileImageService.avatarURL else { return }
-        profileImageService.fetchProfileImageURL(username: profile.username) { _ in
-            self.updateAvatar(url: avatarURL)
         }
     }
     
@@ -194,7 +184,6 @@ final class ProfilePresenterSpy: ProfilePresenterProtocol {
     func viewDidLoad() { }
     func showAlertBeforExit() { showAlert = true }
     func setupSubViews() { }
-    func viewWillAppear() { }
     func updateAvatar(url: URL) { }
     func switchToSplashViewController() { }
 }

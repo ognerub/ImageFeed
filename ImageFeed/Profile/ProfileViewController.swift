@@ -45,11 +45,6 @@ final class ProfileViewController: UIViewController, ProfileViewControllerProtoc
         }
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        presenter.viewWillAppear()
-    }
-    
     @objc
     private func updateAvatarObjc(notification: Notification) {
         guard

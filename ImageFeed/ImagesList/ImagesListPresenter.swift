@@ -19,6 +19,9 @@ protocol ImagesListPresenterProtocol {
 final class ImagesListPresenter: ImagesListPresenterProtocol {
     
     var cellHeightArray: [CGFloat?] = []
+    
+    var photosCount: Int?
+    
     weak var viewController: ImagesListViewControllerProtocol?
     
     private let imagesListService = ImagesListService.shared
@@ -29,7 +32,8 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
     }
     
     func endlessLoading(indexPath: IndexPath) {
-        if indexPath.row + 1 == imagesListService.photos.count {
+        guard let photosCount = photosCount else { return }
+        if indexPath.row + 1 == photosCount {
             fetchPhotosNextPageSimple()
         }
     }
@@ -49,7 +53,9 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
                     indexPaths.append(IndexPath(row: i, section: 0))
                 }
                 tableView.insertRows(at: indexPaths, with: .automatic)
-            } completion: { _ in}
+            } completion: { _ in
+                self.photosCount = newCount
+            }
         }
     }
     
