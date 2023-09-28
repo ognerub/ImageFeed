@@ -73,9 +73,9 @@ private extension SingleImageViewController {
         UIBlockingProgressHUD().addStubImageView(view: view, stubImageView: stubImageView)
         guard let fullscreenImageURL = fullscreenImageURL else { return }
         imageView.kf.setImage(with: fullscreenImageURL) { result in
+            UIBlockingProgressHUD().removeStubImageView(stubImageView: self.stubImageView)
             switch result {
             case .success(let result):
-                UIBlockingProgressHUD().removeStubImageView(stubImageView: self.stubImageView)
                 self.rescaleAndCenterImageInScrollView(image: result.image)
             case .failure(let error):
                 self.showNetWorkErrorForSingleImageVC {

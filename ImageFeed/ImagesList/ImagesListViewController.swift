@@ -133,8 +133,17 @@ extension ImagesListViewController: UITableViewDelegate {
     func tableView(
         _ tableView: UITableView,
         heightForRowAt indexPath: IndexPath) -> CGFloat {
-            return UITableView.automaticDimension
+            let estimatedHeight = CGFloat(300)
+            let automaticHeight = UITableView.automaticDimension
+            let scale = (self.photos[indexPath.row].size.width / tableView.frame.width)
+            let imgHeight = self.photos[indexPath.row].size.height / scale
+            if imgHeight > estimatedHeight {
+                return automaticHeight
+            } else {
+                return imgHeight
+            }
         }
+    
     /// данный метод осуществляет запуск загрузки фотографий в случае если текущая строка + 1 равна количеству фотографий в массиве (тем самым реализуем предварительную загрузку, не позволив пролистать пользователю ленту до последней фотографии, получаем бесконечную ленту!)
     func tableView(
         _ tableView: UITableView,
