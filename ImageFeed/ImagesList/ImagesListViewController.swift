@@ -71,7 +71,7 @@ final class ImagesListViewController: UIViewController, ImagesListViewController
         items.cellImage.kf.setImage(with: URL(string:photos[indexPath.row].thumbImageURL)) { result in
             switch result {
             case .success(_):
-                items.cellImage.contentMode = UIView.ContentMode.scaleAspectFit
+                items.cellImage.contentMode = UIView.ContentMode.scaleAspectFill
                 self.tableView.reloadRows(at: [indexPath], with: .automatic)
             case .failure(_):
                 items.cellImage.contentMode = UIView.ContentMode.center
@@ -87,11 +87,11 @@ final class ImagesListViewController: UIViewController, ImagesListViewController
     }
     
     private func changeCellLike(for cell: ImagesListCell) {
+        cellLikeAnimation(for: cell)
         guard let indexPath = tableView.indexPath(for: cell) else { return }
         let photo = photos[indexPath.row]
-        UIBlockingProgressHUD.show()
         imagesListService.changeLike(photoId: photo.id, isLike: !photo.isLiked) { result in
-            UIBlockingProgressHUD.dismiss()
+            cell.cellLikeButton.layer.removeAllAnimations()
             switch result {
             case .success:
                 self.photos = self.imagesListService.photos
@@ -101,6 +101,19 @@ final class ImagesListViewController: UIViewController, ImagesListViewController
             case .failure:
                 self.presenter.showNetWorkErrorForImagesListVC() {
                     self.changeCellLike(for: cell)
+                }
+            }
+        }
+    }
+    
+    private func cellLikeAnimation(for cell: ImagesListCell) {
+        UIView.animateKeyframes(withDuration: 1, delay: 0, options: .repeat) {
+            for startTime in 0..<2 {
+                UIView.addKeyframe(withRelativeStartTime: 0 + Double(startTime) / 10, relativeDuration: 0.1) {
+                    cell.cellLikeButton.transform = CGAffineTransform(scaleX: 1.5, y: 1.5)
+                }
+                UIView.addKeyframe(withRelativeStartTime: 0.1 + Double(startTime) / 10, relativeDuration: 0.1) {
+                    cell.cellLikeButton.transform = .identity
                 }
             }
         }
@@ -120,14 +133,25 @@ extension ImagesListViewController: UITableViewDelegate {
     func tableView(
         _ tableView: UITableView,
         heightForRowAt indexPath: IndexPath) -> CGFloat {
-            presenter.configCellHeight(indexPath: indexPath)
+            let estimatedHeight = CGFloat(300)
+            let automaticHeight = UITableView.automaticDimension
+            let scale = (self.photos[indexPath.row].size.width / tableView.frame.width)
+            let imgHeight = self.photos[indexPath.row].size.height / scale
+            if imgHeight > estimatedHeight {
+                return automaticHeight
+            } else {
+                return imgHeight
+            }
         }
-    /// данный метод осуществляет запуск загрузки фотографий в случае если текущая строка + 1 равна количеству фотографий в массии (тем самым реализуем предварительную загрузку, не позволив пролистать пользователю ленту до последней фотографии, получаем бесконечную ленту!)
+    
+    /// данный метод осуществляет запуск загрузки фотографий в случае если текущая строка + 1 равна количеству фотографий в массиве (тем самым реализуем предварительную загрузку, не позволив пролистать пользователю ленту до последней фотографии, получаем бесконечную ленту!)
     func tableView(
         _ tableView: UITableView,
         willDisplay cell: UITableViewCell,
         forRowAt indexPath: IndexPath) {
-            presenter.endlessLoading(indexPath: indexPath)
+            if let visibleRows = tableView.indexPathsForVisibleRows, indexPath == visibleRows.last {
+                presenter.endlessLoading(indexPath: indexPath)
+            }
         }
 }
 

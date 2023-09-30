@@ -15,7 +15,6 @@ protocol ProfilePresenterProtocol {
     var exitButton: UIButton { get set }
     func setupSubViews()
     func viewDidLoad()
-    func viewWillAppear()
     func updateAvatar(url: URL)
     func switchToSplashViewController()
     func showAlertBeforExit()
@@ -74,6 +73,7 @@ final class ProfilePresenter: ProfilePresenterProtocol {
     private let profileService = ProfileService.shared
     private let profileImageService = ProfileImageService.shared
     private let storage = OAuth2TokenStorage.shared
+    private let imagesListService = ImagesListService.shared
     
     private func updateProfileDetails(profile: Profile) {
         personNameLabel.text = profile.name
@@ -91,19 +91,17 @@ final class ProfilePresenter: ProfilePresenterProtocol {
         personHashTagLabel.accessibilityIdentifier = "personHashTagLabel"
         exitButton.accessibilityIdentifier = "exitButton"
         
-        guard let profile = profileService.profile else { return }
-        updateProfileDetails(profile: profile)
-        if let url = profileImageService.avatarURL {
-            updateAvatar(url: url)
-        }
-    }
-    
-    func viewWillAppear() {
-        guard let profile = profileService.profile else { return }
-        updateProfileDetails(profile: profile)
-        guard let avatarURL = profileImageService.avatarURL else { return }
-        profileImageService.fetchProfileImageURL(username: profile.username) { _ in
-            self.updateAvatar(url: avatarURL)
+        if storage.loginName != nil {
+            personNameLabel.text = storage.loginName
+            personHashTagLabel.text = storage.hashTag
+            personInfoTextLabel.text = storage.infoText
+            updateAvatar(url: URL(string: storage.avatarURL!)!)
+        } else {
+            guard let profile = profileService.profile else { return }
+            updateProfileDetails(profile: profile)
+            if let url = profileImageService.avatarURL {
+                updateAvatar(url: url)
+            }
         }
     }
     
@@ -131,6 +129,7 @@ final class ProfilePresenter: ProfilePresenterProtocol {
                     self.storage.nilTokenInUserDefaults()
                     self.cleanWebViewAfterUse()
                     self.switchToSplashViewController()
+                    self.imagesListService.nillLasLoadedPage()
                 },
                 secondCompletion: { })
             self.viewController?.alertPresenter?.show(with: model)
@@ -194,7 +193,6 @@ final class ProfilePresenterSpy: ProfilePresenterProtocol {
     func viewDidLoad() { }
     func showAlertBeforExit() { showAlert = true }
     func setupSubViews() { }
-    func viewWillAppear() { }
     func updateAvatar(url: URL) { }
     func switchToSplashViewController() { }
 }

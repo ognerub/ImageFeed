@@ -15,13 +15,16 @@ final class ProfileImageService {
     private (set) var avatarURL: URL?
     private let urlSession: URLSession
     private let builder: URLRequestBuilder
+    private let storage: OAuth2TokenStorage
     
     init (
         urlSession: URLSession = .shared,
-        builder: URLRequestBuilder = .shared
+        builder: URLRequestBuilder = .shared,
+        storage: OAuth2TokenStorage = .shared
     ) {
         self.urlSession = urlSession
         self.builder = builder
+        self.storage = storage
     }
     
     func fetchProfileImageURL(
@@ -40,6 +43,7 @@ final class ProfileImageService {
                     case .success(let body):
                         guard let profileImageURL = body.profileImage.medium else {return}
                         self.avatarURL = URL(string: profileImageURL)
+                        self.storage.avatarURL = profileImageURL
                         completion(.success(profileImageURL))
                         NotificationCenter.default.post(
                             name: ProfileImageService.DidChangeNotification,

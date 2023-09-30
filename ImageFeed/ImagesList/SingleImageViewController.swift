@@ -16,6 +16,13 @@ final class SingleImageViewController: UIViewController {
     
     var fullscreenImageURL: URL?
     
+    private var stubImageView: UIImageView = {
+        let stubImageView = UIImageView()
+        stubImageView.backgroundColor = .clear
+        stubImageView.translatesAutoresizingMaskIntoConstraints = false
+        return stubImageView
+    }()
+    
     @IBOutlet private weak var scrollView: UIScrollView!
     @IBOutlet private weak var singleImageView: UIImageView!
     
@@ -23,6 +30,7 @@ final class SingleImageViewController: UIViewController {
         super.viewDidLoad()
         scrollView.minimumZoomScale = 0.1
         scrollView.maximumZoomScale = 1.25
+        setupGestureRecognizer()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -32,8 +40,9 @@ final class SingleImageViewController: UIViewController {
     }
     
     @IBAction private func didTapShareButton(_ sender: UIButton) {
-        let image: UIImage = singleImageView.image ?? UIBlockingProgressHUD.MyIndicator().image
-        let item: [Any] = [image]
+        guard let image: UIImage = singleImageView.image else { return }
+        let scaleImageRatio = AuthConfiguration.standart.scaledWidth / image.size.width
+        let item: [Any] = [image.scalePreservingAspectRatio(targetSizeScale: scaleImageRatio)]
         let ac = UIActivityViewController(activityItems: item, applicationActivities: nil)
         present(ac, animated: true)
     }
@@ -52,7 +61,6 @@ extension SingleImageViewController: UIScrollViewDelegate {
     /// метод, который вызывается после завершения зума пользователем (для способа 2)
     func scrollViewDidEndZooming(_ scrollView: UIScrollView, with view: UIView?, atScale scale: CGFloat) {
         UIView.animate(withDuration: 0.5) {
-            //self.rescaleAndCenterImageInScrollViewV2()
             self.rescaleAndCenterImageInScrollView(image: self.singleImageView.image!)
         }
     }
@@ -61,26 +69,13 @@ extension SingleImageViewController: UIScrollViewDelegate {
 // MARK: - Private functions
 private extension SingleImageViewController {
     
-    func addStubImageView(view: UIView, stubImageView: UIImageView) {
-        view.addSubview(stubImageView)
-        stubImageView.translatesAutoresizingMaskIntoConstraints = false
-        stubImageView.widthAnchor.constraint(equalToConstant: 166).isActive = true
-        stubImageView.heightAnchor.constraint(equalToConstant: 150).isActive = true
-        stubImageView.topAnchor.constraint(equalTo: scrollView.centerYAnchor, constant: -83).isActive = true
-        stubImageView.leadingAnchor.constraint(equalTo: scrollView.centerXAnchor, constant: -75).isActive = true
-        view.layoutIfNeeded()
-    }
-    
     func loadFullscreenImage(imageView: UIImageView) {
-        UIBlockingProgressHUD.show()
-        let stubImageView = UIBlockingProgressHUD.MyIndicator().imageView
-        addStubImageView(view: view, stubImageView: stubImageView)
+        UIBlockingProgressHUD().addStubImageView(view: view, stubImageView: stubImageView)
         guard let fullscreenImageURL = fullscreenImageURL else { return }
         imageView.kf.setImage(with: fullscreenImageURL) { result in
-            UIBlockingProgressHUD.dismiss()
+            UIBlockingProgressHUD().removeStubImageView(stubImageView: self.stubImageView)
             switch result {
             case .success(let result):
-                stubImageView.removeFromSuperview()
                 self.rescaleAndCenterImageInScrollView(image: result.image)
             case .failure(let error):
                 self.showNetWorkErrorForSingleImageVC {
@@ -119,5 +114,22 @@ private extension SingleImageViewController {
         let x = (newContentSize.width - visibleRectSize.width) / 2
         let y = (newContentSize.height - visibleRectSize.height) / 2
         scrollView.setContentOffset(CGPoint(x: x, y: y), animated: false)
+    }
+}
+
+// MARK: - UIGestureRecognizer
+extension SingleImageViewController {
+    func  setupGestureRecognizer() {
+        let swipeGestureRecognizerDown = UISwipeGestureRecognizer(
+            target: self,
+            action: #selector(didSwipe(_:))
+            )
+        swipeGestureRecognizerDown.direction = .down
+        scrollView.addGestureRecognizer(swipeGestureRecognizerDown)
+    }
+    
+    @objc
+    func didSwipe(_ sender: UIGestureRecognizer) {
+        dismiss(animated: true)
     }
 }
